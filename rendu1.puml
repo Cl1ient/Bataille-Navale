@@ -1,0 +1,13 @@
+@startuml batailleNaval
+package Controller {
+
+}
+
+package Model {
+
+}
+
+package View {
+
+}
+@enduml
