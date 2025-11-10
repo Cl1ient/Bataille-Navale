@@ -4,10 +4,37 @@ package Controller {
 }
 
 package Model {
+    package Boat{
+        interface Boat <<interface>>{
 
+        }
+
+        class Submarine implements Boat{
+
+        }
+
+        class Torpedo implements Boat{
+
+        }
+
+        class Destroyer implements Boat{
+
+        }
+
+        class Cruiser implements Boat{
+
+        }
+
+        class AircraftCarrier implements Boat{
+
+        }
+    }
 }
 
 package View {
-
+    class MainScreen{}
+    class EndScreen{}
+    class ConfigurationScreen{}
+    class PlacementScreen{}
 }
 @enduml
