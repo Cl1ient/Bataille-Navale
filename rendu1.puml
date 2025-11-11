@@ -4,8 +4,79 @@ package Controller {
 }
 
 package Model {
-    package Boat{
 
+    interface Observer <<interface>> {
+        + update()
+    }
+    abstract class AbstractObservable {
+        + attachObserver(Observer): void
+        + detachObserver(Observer): void
+        # notifyObservers(): void
+    }
+
+    interface GridEntity <<interface>> {
+        + onHit(attacker: Player, coordinates: Coordinates) : ShotResult
+        + getType(): String
+    }
+
+    ' implémenté plus tard getRelative pour les bombes etc
+    ' equals pour comparé 2 coordonés
+    class Coordinates {
+        - row: Integer
+        - column: Integer
+        + <<create>> Coordinates(row: Integer, column: Integer)
+        + equals(Object): boolean
+        + toString(): String
+    }
+
+    ' Entity type pour le cas bateau/bombe
+    ' class pour faire passer les résultas à travers les autres
+    class ShotResult {
+        - isHit: boolean
+        - isSunk: boolean
+        - entityType: String
+        - Coordinates: Coordinates
+        - message: String
+
+        + <<create>> ShotResult(isHit: boolean, isSunk: boolean, entityType: String, Coordinates: Coordinates, message: String)
+        + isHit(): boolean
+        + isSunk(): boolean
+        + getEntityType(): String
+        + getCoordinates(): Coordinates
+        + getMessage(): String
+    }
+    AbstractObservable .down.> Observer : notifie
+    GridEntity .right.> Coordinates : use
+
+    package Map{
+        ' placeEntity prend une liste car une entity occupe plusieurs case
+        class Grid extends Model.AbstractObservable{
+            - size: Integer
+            - cells: GridCell[][]
+
+            + <<create>> Grid(size: Integer)
+            + placeEntity(entity: GridEntity, coordinates: List<Coordinates>): boolean
+            + getCell(coordinates: Coordinates): GridCell
+        }
+        ' indexInEntity : qu'elle index de l'entiter est touché
+        class GridCell{
+            - isHit: boolean
+            - entity: GridEntity
+            - indexInEntity: Integer
+
+            + <<create>> GridCell(entity: GridEntity, indexInEntity: Integer)
+            + hit(): ShotResult
+            + isOccuped(): boolean
+        }
+
+        ShotResult .down.> Coordinates : contient
+        Grid "1" *-- "*" GridCell
+        GridCell "1" o-- "0..1" GridEntity
+        Grid .down.> Coordinates : use
+        Grid .down.> GridEntity : use
+        GridCell .down.> GridEntity : use
+    }
+    package Boat{
         enum BoatType <<enumerate>> {
             AIRCRAFT_CARRIER
             CRUISER
@@ -22,7 +93,8 @@ package Model {
             + createBoat(BoatType): Boat
         }
 
-        interface Boat <<interface>> extends GridEntity {
+        ' un bateau est une entité de la grille
+        interface Boat <<interface>> extends Model.GridEntity {
             + isSunk(): boolean
             + hit(index: Integer): void
             + getSize(): Integer
@@ -88,7 +160,6 @@ package Model {
 
         BoatFactory .up.> BoatType : use
         SimpleBoatFactory .up.> BoatType : use
-
     }
 }
 
