@@ -8,11 +8,6 @@ package Model {
     interface Observer <<interface>> {
         + update()
     }
-    abstract class AbstractObservable {
-        + attachObserver(Observer): void
-        + detachObserver(Observer): void
-        # notifyObservers(): void
-    }
 
     interface GridEntity <<interface>> {
         + onHit(attacker: Player, coordinates: Coordinates) : ShotResult
@@ -45,12 +40,12 @@ package Model {
         + getCoordinates(): Coordinates
         + getMessage(): String
     }
-    AbstractObservable .down.> Observer : notifie
+
     GridEntity .right.> Coordinates : use
 
     package Map{
         ' placeEntity prend une liste car une entity occupe plusieurs case
-        class Grid extends Model.AbstractObservable{
+        class Grid extends Model.Observer{
             - size: Integer
             - cells: GridCell[][]
 
@@ -160,6 +155,25 @@ package Model {
 
         BoatFactory .up.> BoatType : use
         SimpleBoatFactory .up.> BoatType : use
+    }
+
+    package Player{
+        interface Player implements Model.Observer {
+            + isDefeated(): boolean
+            + update(): void
+        }
+
+        class HumanPlayer implements Player {
+            - name: String
+            - myGrid: Grid
+            - shotsGrid: Grid
+            - observers: List<Observer>
+
+            + <<create>> HumanPlayer(name: String, myGrid: Map.Grid, shotsGrid: Map.Grid)
+            + isDefeated(): boolean
+            + update(): void
+            + notifyObservers(): void
+        }
     }
 }
 
