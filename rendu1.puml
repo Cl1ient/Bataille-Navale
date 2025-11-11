@@ -5,29 +5,90 @@ package Controller {
 
 package Model {
     package Boat{
-        interface Boat <<interface>>{
 
+        enum BoatType <<enumerate>> {
+            AIRCRAFT_CARRIER
+            CRUISER
+            DESTROYER
+            SUBMARINE
+            TORPEDO
+        }
+        ' Interface design patern : Factory
+        interface BoatFactory <<interface>>{
+            + createBoat(BoatType): Boat
         }
 
-        class Submarine implements Boat{
+        class SimpleBoatFactory implements BoatFactory{
+            + createBoat(BoatType): Boat
+        }
 
+        interface Boat <<interface>> extends GridEntity {
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
+        }
+        class Submarine implements Boat{
+            - size: Integer
+            - hits: boolean[]
+
+            + <<create>> Submarine()
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
         }
 
         class Torpedo implements Boat{
+            - size: Integer
+            - hits: boolean[]
 
+            + <<create>> Torpedo()
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
         }
 
         class Destroyer implements Boat{
+            - size: Integer
+            - hits: boolean[]
 
+            + <<create>> Destroyer()
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
         }
 
         class Cruiser implements Boat{
+            - size: Integer
+            - hits: boolean[]
 
+            + <<create>> Cruiser()
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
         }
 
         class AircraftCarrier implements Boat{
+            - size: Integer
+            - hits: boolean[]
 
+            + <<create>> AircraftCarrier()
+            + isSunk(): boolean
+            + hit(index: Integer): void
+            + getSize(): Integer
+            + getName(): String
         }
+
+        BoatFactory ..> Boat : create
+        SimpleBoatFactory ..> Boat : create
+
+        BoatFactory .up.> BoatType : use
+        SimpleBoatFactory .up.> BoatType : use
+
     }
 }
 
