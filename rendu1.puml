@@ -94,7 +94,7 @@ package Model {
         ' un bateau est une entité de la grille
         interface Boat <<interface>> extends Model.GridEntity {
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -104,7 +104,7 @@ package Model {
 
             + <<create>> Submarine()
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -115,7 +115,7 @@ package Model {
 
             + <<create>> Torpedo()
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -126,7 +126,7 @@ package Model {
 
             + <<create>> Destroyer()
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -137,7 +137,7 @@ package Model {
 
             + <<create>> Cruiser()
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -148,7 +148,7 @@ package Model {
 
             + <<create>> AircraftCarrier()
             + isSunk(): boolean
-            + hit(index: Integer): void
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -175,8 +175,8 @@ package Model {
             + attachObserver(Observer)
             + notifyObservers()
             + isDefeated(): boolean
-            + update(): void
-            + notifyObservers(): void
+            + update()
+            + notifyObservers()
         }
     }
 }
