@@ -45,11 +45,14 @@ package Model {
 
     package Map{
         ' placeEntity prend une liste car une entity occupe plusieurs case
-        class Grid extends Model.Observer{
+        class Grid{
             - size: Integer
             - cells: GridCell[][]
+            - observers: List<Observer>
 
             + <<create>> Grid(size: Integer)
+            + attachObserver(Observer)
+            + notifyObservers()
             + placeEntity(entity: GridEntity, coordinates: List<Coordinates>): boolean
             + getCell(coordinates: Coordinates): GridCell
         }
@@ -158,9 +161,8 @@ package Model {
     }
 
     package Player{
-        interface Player implements Model.Observer {
+        interface Player <<interface>>{
             + isDefeated(): boolean
-            + update(): void
         }
 
         class HumanPlayer implements Player {
@@ -170,6 +172,8 @@ package Model {
             - observers: List<Observer>
 
             + <<create>> HumanPlayer(name: String, myGrid: Map.Grid, shotsGrid: Map.Grid)
+            + attachObserver(Observer)
+            + notifyObservers()
             + isDefeated(): boolean
             + update(): void
             + notifyObservers(): void
