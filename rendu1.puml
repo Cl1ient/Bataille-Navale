@@ -32,6 +32,8 @@ package Model {
         - entityType: String
         - Coordinates: Coordinates
         - message: String
+        - isTrap: boolean
+        - playerWeapon: Weapon
 
         + <<create>> ShotResult(isHit: boolean, isSunk: boolean, entityType: String, Coordinates: Coordinates, message: String)
         + isHit(): boolean
@@ -39,6 +41,8 @@ package Model {
         + getEntityType(): String
         + getCoordinates(): Coordinates
         + getMessage(): String
+        + isTrap(): boolean
+        + getPlayerWeapon(): Weapon
     }
 
     GridEntity .right.> Coordinates : use
@@ -231,6 +235,27 @@ package Model {
         }
 
         Trap .up.> Coordinates : use
+    }
+
+    package Island{
+        interface IslandItem <<interface>>{
+            +onFind(player: Player)
+        }
+
+        class IslandEmpty implements IslandItem {
+            + <<create>> IslandEmpty()
+            + onFind(player: Player::Player): ShotResult
+        }
+
+        class BombItem implements IslandItem {
+            + <<create>> BombItem()
+            + onFind(player: Player): ShotResult
+        }
+
+        class SonarItem implements IslandItem {
+            + <<create>> SonarItem()
+            + onFind(player: Player): ShotResult
+        }
     }
 }
 
