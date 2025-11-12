@@ -179,6 +179,36 @@ package Model {
             + notifyObservers()
         }
     }
+
+    package Weapon{
+        interface Weapon <<interface>> {
+            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + getName(): String
+            + getUsesLeft(): Integer
+        }
+
+        class Bombe implements Weapon{
+            - useLeft: Integer
+            + <<create>> Bombe()
+            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + getName(): String
+            + getUsesLeft(): Integer
+            + use()
+        }
+
+        class Sonar implements Weapon{
+            - useLeft: Integer
+            + <<create>> Sonar()
+            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + getName(): String
+            + getUsesLeft(): Integer
+            + use()
+        }
+
+        Weapon .up.> Model.Player.Player : use
+        Weapon .up.> Coordinates : use
+        Weapon .up.> ShotResult : return
+    }
 }
 
 package View {
