@@ -167,6 +167,9 @@ package Model {
     package Player{
         interface Player <<interface>>{
             + isDefeated(): boolean
+            + shoot(coord: Coordinates, weapon: Weapon): ShotResult
+            + receiveShot(coord: Coordinates, weapon: Weapon): ShotResult
+            + update()
         }
 
         class HumanPlayer implements Player {
@@ -176,6 +179,8 @@ package Model {
             - observers: List<Observer>
 
             + <<create>> HumanPlayer(name: String, myGrid: Map.Grid, shotsGrid: Map.Grid)
+            + shoot(coord: Coordinates, weapon: Weapon): ShotResult
+            + receiveShot(coord: Coordinates, weapon: Weapon): ShotResult
             + attachObserver(Observer)
             + notifyObservers()
             + isDefeated(): boolean
@@ -255,6 +260,42 @@ package Model {
         class SonarItem implements IslandItem {
             + <<create>> SonarItem()
             + onFind(player: Player): ShotResult
+        }
+    }
+
+    package Game{
+        class GameConfiguration(){
+            - gridSize: Integer
+            - boatCounts: Map<BoatType, Integer>
+            - isIslandMode: boolean
+            - numSpecialItems: Integer
+            - computerShotLevel: Integer
+            - placementLevel: Integer ' D4, D10
+
+            + <<create>> GameConfiguration(size: Integer, boatMap: Map<Boat::BoatType, Integer>, island: boolean, level: Integer)
+            ' Faut que j'implémente les getters encore
+        }
+
+        class Game{
+            - humanPlayer: Player::HumanPlayer
+            - computerPlayer: ComputerPlayer
+            - config: GameConfiguration
+            - observers: List<Observer>
+            - turnNumber: Integer
+
+            + <<create>> Game(config: GameConfiguration, hp: HumanPlayer, cp: ComputerPlayer)
+
+            ' observer
+            + attachObserver(Observer): void
+            + notifyObservers(): void
+
+            ' gestion de la partie
+            + startGame(): void
+            + processHumanTurn(coord: Coordinates, weapon: Weapon): ShotResult
+            + processComputerTurn(): ShotResult
+            + isGameOver(): boolean ' D6
+            + restartGame(config: GameConfiguration): void ' D7
+            + nextTurn(): void
         }
     }
 }
