@@ -98,7 +98,7 @@ package Model {
         ' un bateau est une entité de la grille
         interface Boat <<interface>> extends Model.GridEntity {
             + isSunk(): boolean
-            + hit(index: Integer)
+            + onHit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
