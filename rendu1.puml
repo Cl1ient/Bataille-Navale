@@ -209,6 +209,29 @@ package Model {
         Weapon .up.> Coordinates : use
         Weapon .up.> ShotResult : return
     }
+
+    package Trap{
+        class BlackHole implements Model.GridEntity{
+            - size: Integer
+
+            + <<create>> BlackHole()
+            + onHit(attacker: Player::Player, coordinates: Coordinates): ShotResult
+            + getType(): String
+            + getSize(): Integer
+        }
+
+        class Tornado implements Model.GridEntity{
+            - size: Integer
+            - turnsLEft: Integer
+            + <<create>> Tornado()
+
+            + onHit(attacker: Player::Player, coordinates: Coordinates): ShotResult
+            + getType(): String
+            + getSize(): Integer
+        }
+
+        Trap .up.> Coordinates : use
+    }
 }
 
 package View {
