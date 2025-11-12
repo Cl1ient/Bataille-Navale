@@ -1,6 +1,10 @@
 @startuml batailleNaval
+skinparam linetype ortho
+skinparam packageStyle rectangle
+hide circle
 package Controller {
-
+    class GameController {
+    }
 }
 
 package Model {
@@ -12,6 +16,7 @@ package Model {
     interface GridEntity <<interface>> {
         + onHit(attacker: Player, coordinates: Coordinates) : ShotResult
         + getType(): String
+        + getSize(): Integer
     }
 
     ' implémenté plus tard getRelative pour les bombes etc
@@ -22,6 +27,7 @@ package Model {
         + <<create>> Coordinates(row: Integer, column: Integer)
         + equals(Object): boolean
         + toString(): String
+        + getRelative(dRow: Integer, dCol: Integer): Coordinates
     }
 
     ' Entity type pour le cas bateau/bombe
@@ -30,22 +36,22 @@ package Model {
         - isHit: boolean
         - isSunk: boolean
         - entityType: String
-        - Coordinates: Coordinates
+        - coordinates: Coordinates
         - message: String
         - isTrap: boolean
-        - playerWeapon: Weapon
+        - acquiredWeapon: Weapon
 
-        + <<create>> ShotResult(isHit: boolean, isSunk: boolean, entityType: String, Coordinates: Coordinates, message: String)
+        + <<create>> ShotResult(isHit: boolean, isSunk: boolean, entityType: String, coordinates: Coordinates, message: String, isTrap: boolean, acquiredWeapon: Weapon)
         + isHit(): boolean
         + isSunk(): boolean
         + getEntityType(): String
         + getCoordinates(): Coordinates
         + getMessage(): String
         + isTrap(): boolean
-        + getPlayerWeapon(): Weapon
+        + getAcquiredWeapon(): Weapon
     }
 
-    GridEntity .right.> Coordinates : use
+    GridEntity .right.> Coordinates : <<use>>
 
     package Map{
         ' placeEntity prend une liste car une entity occupe plusieurs case
@@ -59,6 +65,7 @@ package Model {
             + notifyObservers()
             + placeEntity(entity: GridEntity, coordinates: List<Coordinates>): boolean
             + getCell(coordinates: Coordinates): GridCell
+            + searchIsland(coordinates: Coordinates): ShotResult
         }
         ' indexInEntity : qu'elle index de l'entiter est touché
         class GridCell{
@@ -74,9 +81,9 @@ package Model {
         ShotResult .down.> Coordinates : contient
         Grid "1" *-- "*" GridCell
         GridCell "1" o-- "0..1" GridEntity
-        Grid .down.> Coordinates : use
-        Grid .down.> GridEntity : use
-        GridCell .down.> GridEntity : use
+        Grid .down.> Coordinates : <<use>>
+        Grid .down.> GridEntity : <<use>>
+
     }
     package Boat{
         enum BoatType <<enumerate>> {
@@ -98,7 +105,7 @@ package Model {
         ' un bateau est une entité de la grille
         interface Boat <<interface>> extends Model.GridEntity {
             + isSunk(): boolean
-            + onHit(index: Integer)
+            + hit(index: Integer)
             + getSize(): Integer
             + getName(): String
         }
@@ -160,38 +167,62 @@ package Model {
         BoatFactory ..> Boat : create
         SimpleBoatFactory ..> Boat : create
 
-        BoatFactory .up.> BoatType : use
-        SimpleBoatFactory .up.> BoatType : use
+        BoatFactory .up.> BoatType : <<use>>
+        SimpleBoatFactory .up.> BoatType : <<use>>
     }
 
     package Player{
         interface Player <<interface>>{
             + isDefeated(): boolean
-            + shoot(coord: Coordinates, weapon: Weapon): ShotResult
-            + receiveShot(coord: Coordinates, weapon: Weapon): ShotResult
+            + shoot(coordinates: Coordinates, weapon: Weapon): ShotResult
+            + receiveShot(coordinates: Coordinates, weapon: Weapon): ShotResult
             + update()
         }
 
         class HumanPlayer implements Player {
             - name: String
-            - myGrid: Grid
+            - myGrid: Map.Grid
             - shotsGrid: Grid
             - observers: List<Observer>
+            - availableWeapons: List<Weapon>
+            - traps: List<Trap>
 
-            + <<create>> HumanPlayer(name: String, myGrid: Map.Grid, shotsGrid: Map.Grid)
-            + shoot(coord: Coordinates, weapon: Weapon): ShotResult
-            + receiveShot(coord: Coordinates, weapon: Weapon): ShotResult
+            + <<create>> HumanPlayer(name: String, mGrid: Grid, shotsGrid: Grid)
+            + shoot(coordinates: Coordinates, weapon: Weapon): ShotResult
+            + receiveShot(coordinates: Coordinates, weapon: Weapon): ShotResult
             + attachObserver(Observer)
             + notifyObservers()
             + isDefeated(): boolean
             + update()
             + notifyObservers()
         }
+
+        class ComputerPlayer implements Player {
+            - myGrid: Grid
+            - shotsGrid: Grid
+            - shotStrategy: ShotStrategy
+
+            + <<create>> ComputerPlayer(mGrid: Grid, shotsGrid: Grid)
+            + chooseShot(): Coordinates
+            + isDefeated(): boolean
+            + update()
+            + shoot(coordinates: Coordinates, weapon: Weapon): ShotResult
+            + receiveShot(coordinates: Coordinates, weapon: Weapon): ShotResult
+        }
+
+        interface ShotStrategy <<Strategy>> {
+            + getNextShot(shotsGrid: Grid, lastResult: ShotResult): Coordinates
+        }
+        class RandomShotStrategy implements ShotStrategy {}
+        class TargetedShotStrategy implements ShotStrategy {}
+
+
+        ComputerPlayer "1" *-- "1" ShotStrategy : <<use>>
     }
 
     package Weapon{
         interface Weapon <<interface>> {
-            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + apply(targetPlayer: Player, targetCoordinates: Coordinates): ShotResult
             + getName(): String
             + getUsesLeft(): Integer
         }
@@ -199,7 +230,7 @@ package Model {
         class Bombe implements Weapon{
             - useLeft: Integer
             + <<create>> Bombe()
-            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + apply(targetPlayer: Player, targetCoordinates: Coordinates): ShotResult
             + getName(): String
             + getUsesLeft(): Integer
             + use()
@@ -208,48 +239,48 @@ package Model {
         class Sonar implements Weapon{
             - useLeft: Integer
             + <<create>> Sonar()
-            + apply(targetPlayer: Player, targetCoord: Coordinates): ShotResult
+            + apply(targetPlayer: Player, targetCoordinates: Coordinates): ShotResult
             + getName(): String
             + getUsesLeft(): Integer
             + use()
         }
 
-        Weapon .up.> Model.Player.Player : use
-        Weapon .up.> Coordinates : use
+        Weapon .up.> Model.Player.Player : <<use>>
+        Weapon .up.> Coordinates : <<use>>
         Weapon .up.> ShotResult : return
     }
 
     package Trap{
         class BlackHole implements Model.GridEntity{
             - size: Integer
-
             + <<create>> BlackHole()
-            + onHit(attacker: Player::Player, coordinates: Coordinates): ShotResult
+            + onHit(attacker: Player, coordinates: Coordinates): ShotResult
             + getType(): String
             + getSize(): Integer
         }
 
         class Tornado implements Model.GridEntity{
             - size: Integer
-            - turnsLEft: Integer
+            - turnsLeft: Integer
             + <<create>> Tornado()
-
-            + onHit(attacker: Player::Player, coordinates: Coordinates): ShotResult
+            + onHit(attacker: Player, coordinates: Coordinates): ShotResult
+            + modifyCoordinates(coordinates: Coordinates): Coordinates
             + getType(): String
             + getSize(): Integer
         }
 
-        Trap .up.> Coordinates : use
+
+
     }
 
     package Island{
         interface IslandItem <<interface>>{
-            +onFind(player: Player)
+            +onFind(player: Player): ShotResult
         }
 
         class IslandEmpty implements IslandItem {
             + <<create>> IslandEmpty()
-            + onFind(player: Player::Player): ShotResult
+            + onFind(player: Player): ShotResult
         }
 
         class BombItem implements IslandItem {
@@ -261,49 +292,60 @@ package Model {
             + <<create>> SonarItem()
             + onFind(player: Player): ShotResult
         }
+
     }
 
     package Game{
-        class GameConfiguration(){
+        class GameConfiguration{
             - gridSize: Integer
-            - boatCounts: Map<BoatType, Integer>
+            - boatCounts: Map<Boat::BoatType, Integer>
             - isIslandMode: boolean
             - numSpecialItems: Integer
             - computerShotLevel: Integer
-            - placementLevel: Integer ' D4, D10
+            - placementLevel: Integer
 
-            + <<create>> GameConfiguration(size: Integer, boatMap: Map<Boat::BoatType, Integer>, island: boolean, level: Integer)
-            ' Faut que j'implémente les getters encore
+            + <<create>> GameConfiguration(...)
         }
 
         class Game{
-            - humanPlayer: Player::HumanPlayer
+            - humanPlayer: HumanPlayer
             - computerPlayer: ComputerPlayer
             - config: GameConfiguration
             - observers: List<Observer>
             - turnNumber: Integer
-
-            + <<create>> Game(config: GameConfiguration, hp: HumanPlayer, cp: ComputerPlayer)
-
-            ' observer
-            + attachObserver(Observer): void
-            + notifyObservers(): void
-
-            ' gestion de la partie
-            + startGame(): void
-            + processHumanTurn(coord: Coordinates, weapon: Weapon): ShotResult
+=
+            + <<create>> Game(config: GameConfiguration, hp: HumanPlayer, cp: :ComputerPlayer)
+            + attachObserver(Observer)
+            + notifyObservers()
+            + startGame()
+            + processHumanTurn(coordinates: Coordinates): Coordinates, weapon: Weapon::Weapon): ShotResult
             + processComputerTurn(): ShotResult
-            + isGameOver(): boolean ' D6
-            + restartGame(config: GameConfiguration): void ' D7
-            + nextTurn(): void
+            + isGameOver(): boolean
+            + restartGame(config: GameConfiguration)
+            + nextTurn()
         }
+
+        Game "1" *-- "1" GameConfiguration
+        Game "1" *-- "1" HumanPlayer
+        Game "1" *-- "1" ComputerPlayer
     }
+
+
+    HumanPlayer o-- Weapon
+    HumanPlayer o-- BlackHole
+    ComputerPlayer o-- Weapon
+    ComputerPlayer o-- BlackHole
+
+
+
+
 }
 
 package View {
-    class MainScreen{}
-    class EndScreen{}
+    class MainScreen implements Model.Observer {}
+    class EndScreen implements Model.Observer {}
     class ConfigurationScreen{}
     class PlacementScreen{}
+
 }
 @enduml
