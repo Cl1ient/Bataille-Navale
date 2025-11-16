@@ -19,12 +19,18 @@ package Model{
         - player2 : Player
         - gameOver : boolean
         - currentPlayer : Player
+        - _observers : GameObserver
 
         + "create" Game(p1: Player, p2 : Player)
         + startGame() : void /' boucle du jeu'/
-        + nextTurn() : void
+        + nextTurn() : void  /' initialise le tour en demandant au joueur de tirer'/
+        + proccesTurn(coord : Coordinate) : void /' méthode appelé par le controller une fois le joueur ayant tirer'/
         + isFinished() : boolean
         + placeBoat(grid : Grid, boats : List <Boat>) : void
+        + attachObserver(observer : GameObserver) : void
+        + notifyTurn(player : Player) : void /' affiche l'état actuelle des grilles du joueur ainsi que son score ...'/
+        + notifyAskPlayerToShot() : void /' demande au joueur de tirer et transmet les coordonnées au controller'/
+        + notifyGrid(player : Player) : void /' affiche l'état des grilles du joueur après qu'il ait jouer'/
     }
 
     class Player{
@@ -81,12 +87,18 @@ package Model{
         boat
     }
 
+    interface GameObserver{
+        + printTurn(player : Player) : void
+        + askPlayerToShot() : void
+        + printGrids(player : Player) : void
+    }
+
     Game *-> "2\n player1\n player2" Player
     Game -->  Grid : <<use>>
     Game -->  Boat : <<use>>
     Game -->  Coordinate : <<use>>
     Game -->  GridEntity : <<use>>
-
+    Game o-> "*\n_observers" GameObserver : > notify
 
     Player *--> "2\n ownGrid\n shotGrid" Grid
     Player -->  GridEntity : <<use>>
