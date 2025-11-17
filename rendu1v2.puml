@@ -33,7 +33,7 @@ package Model{
         - ownGrid : Grid
         - shotGrid : Grid
 
-        + shot(coord : Coordinate, shotResult : gridEntity) : void
+        + shotGridUpdate(coord : Coordinate, shotResult : gridEntity) : void
         + reciveShot(coord : Coordinate) : gridEntity
     }
 

@@ -1,6 +1,6 @@
 @startuml
 /'
-1) patterne Observer pour avoir une interface minimaliste
+1) patterne Observer pour avoir une interface minimaliste   X
 2) ajout interface pour bateau et player
 3) ajout piège
 4) ajout des armes
@@ -39,7 +39,7 @@ package Model{
         - ownGrid : Grid
         - shotGrid : Grid
 
-        + shot(coord : Coordinate, shotResult : gridEntity) : void
+        + shotGridUpdate(coord : Coordinate, shotResult : gridEntity) : void
         + reciveShot(coord : Coordinate) : gridEntity
     }
 
@@ -115,5 +115,24 @@ package Model{
 
     Boat *--> "1..*\n _position" Coordinate
 
+    GameObserver --> Player : "<<use>>"
+
 }
+package view{
+    class GameView implements Model.GameObserver{
+        + printTurn(player : Player) : void
+        + askPlayerToShot() : void
+        + printGrids(player : Player) : void
+    }
+}
+
+package Controller{
+    class GameController{
+        + sendShotCoord(coord : Coordinate) : void  /'méthode qui appellera la méthode processTurn dans la class Game'/
+    }
+}
+
+GameView --> Controller.GameController
+GameController --> Model.Game
+
 @enduml
