@@ -1,0 +1,298 @@
+@startuml
+/'
+1) patterne Observer pour avoir une interface minimaliste   X
+2) ajout interface pour bateau et player
+3) ajout piège
+4) ajout des armes
+5) ajout du mode île
+6) ajout du gameConfig
+
+-- Mise à jour de l'interface minimaliste en conosole
+   au fur et à mesure des différentes implémentations.
+'/
+skinparam linetype ortho
+
+
+package Model {
+    package Game{
+        class Game{
+            - player1 : Player
+            - player2 : Player
+            - gameOver : boolean
+            - currentPlayer : Player
+            - _observers : GameObserver
+
+            + "create" Game(p1: Player, p2 : Player)
+            + startGame() : void /' boucle du jeu'/
+            + nextTurn() : void  /' initialise le tour en demandant au joueur de tirer'/
+            + proccesTurn(coord : Coordinate) : void /' méthode appelé par le controller une fois le joueur ayant tirer'/
+            + isFinished() : boolean
+            + placeEntity(grid : Grid, entity : List <GridEntity>) : void
+            + attachObserver(observer : GameObserver) : void
+            + notifyTurn(player : Player) : void /' affiche l'état actuelle des grilles du joueur ainsi que son score ...'/
+            + notifyAskPlayerToShot() : void /' demande au joueur de tirer et transmet les coordonnées au controller'/
+            + notifyGrid(player : Player) : void /' affiche l'état des grilles du joueur après qu'il ait jouer'/
+            + notifyGameOver(winner : Player, looser : Player) : void
+        }
+
+        interface GameObserver{
+            + printTurn(player : Player) : void
+            + askPlayerToShot() : void
+            + printGrids(player : Player) : void
+            + printEndGame(winner : Player, looser : Player) : void
+        }
+    }
+
+    package Player{
+        interface Player{
+            + shotGridUpdate(coord : Coordinate) : void
+            + reciveShot(coord : Coordinate, weapon : Weapon, attacker : Player, receiver : Player, result : ShotResult) : ShotResult
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+        }
+
+        class HumanPlayer implements Player{
+            - name : string
+            - nbBoatRemaining : integer
+            - ownGrid : Grid
+            - shotGrid : Grid
+            - traps : List <Trap>
+            - availableWeapons: List<Weapon>
+
+            + shotGridUpdate(coord : Coordinate) : void
+            + reciveShot(coord : Coordinate, weapon : Weapon, attacker : Player, receiver : Player, result : ShotResult) : ShotResult
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+        }
+        class ComputerPlayer implements Player{
+            - name : string
+            - nbBoatRemaining : integer
+            - ownGrid : Grid
+            - shotGrid : Grid
+            - traps : List <Trap>
+            - availableWeapons: List<Weapon>
+
+            + shotGridUpdate(coord : Coordinate) : void
+            + reciveShot(coord : Coordinate, weapon : Weapon, attacker : Player, receiver : Player, result : ShotResult) : ShotResult
+            + shot() : Coordinate
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+        }
+    }
+
+    package Map{
+        class Grid{
+            - grid [][] : gridCells
+            - nbBoatRemaining : integer
+            - ownBoats : List <Boat>
+            - size : integer
+
+            + checkContentCell(coord : Coordinate) : boolean
+            + isBoatSunk(boat : Boat) : boolean
+            + reciveShot(coord : Coordinate, weapon : Weapon, attacker : Player, receiver : Player, result : ShotResult) : ShotResult
+        }
+
+        class GridCell{
+            - isHit : boolean
+            - isVisible : boolean
+            - position : Coordinate
+            - content : GridEntity
+            + setVisible() : void
+            + setHit() : void
+            + getContent() : GridEntity
+        }
+    }
+
+    class Coordinate{
+        - x : integer
+        - y : integer
+
+        + coordinateCmp(coord1 : Coordinate, coord2 : Coordinate) : boolean
+        + coordinateSearch(lstCoord : List <Coordinate>, coord : Coordinate) : boolean
+    }
+
+    interface GridEntity{
+        + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+        + getType(): String
+    }
+
+    package Ships{
+        interface Boat implements Model.GridEntity{
+            + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+            + getType(): String
+            + isSunk() : boolean
+            + reciveShot() : void
+        }
+
+        class AircraftCarrier implements Boat{
+            - position : List <Coordinate>
+            - size : integer
+            - nbShotRecive : integer
+
+            + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+            + getType(): String
+            + isSunk() : boolean
+            + reciveShot() : void
+        }
+
+        class Cruiser implements Boat{
+                - position : List <Coordinate>
+                - size : integer
+                - nbShotRecive : integer
+
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+                + isSunk() : boolean
+                + reciveShot() : void
+        }
+
+        class Destroyer implements Boat{
+                - position : List <Coordinate>
+                - size : integer
+                - nbShotRecive : integer
+
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+                + isSunk() : boolean
+                + reciveShot() : void
+        }
+
+        class Submarine implements Boat{
+                - position : List <Coordinate>
+                - size : integer
+                - nbShotRecive : integer
+
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+                + isSunk() : boolean
+                + reciveShot() : void
+        }
+
+        class TorpedoBoat implements Boat{
+                - position : List <Coordinate>
+                - size : integer
+                - nbShotRecive : integer
+
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+                + isSunk() : boolean
+                + reciveShot() : void
+        }
+    }
+
+    package Trap {
+            interface Trap implements Model.GridEntity{
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+            }
+
+            class BlackHole implements Trap{ /'size'/
+                - alreadyUsed: boolean
+                + <<create>> BlackHole()
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + getType(): String
+            }
+
+            class Tornado implements Trap{
+                - alreadyUsed: boolean
+                - turnsLeft: Integer
+                + <<create>> Tornado()
+                + onHit(attacker: Player, receiver :Player, coordinates: Coordinates, weapon : Weapon, result : ShotResult): ShotResult
+                + modifyCoordinates(coordinates: Coordinates): Coordinates
+                + getType(): String
+            }
+    }
+
+    package Weapon{
+            interface Weapon <<interface>> {
+                + apply(receiver: Player, attacker : Player, targetCoordinates: Coordinates, shotResult): ShotResult
+                + getName(): String
+                + getUsesLeft(): Integer
+            }
+
+            class Bombe implements Weapon{
+                - useLeft: Integer
+                + <<create>> Bombe()
+                + apply(receiver: Player, attacker : Player, targetCoordinates: Coordinates, shotResult): ShotResult
+                + getName(): String
+                + getUsesLeft(): Integer
+                + use()
+            }
+
+            class Sonar implements Weapon{
+                - useLeft: Integer
+                + <<create>> Sonar()
+                + apply(receiver: Player, attacker : Player, targetCoordinates: Coordinates, shotResult): ShotResult
+                + getName(): String
+                + getUsesLeft(): Integer
+                + use()
+            }
+    }
+
+    class ShotResult {
+
+            - nbBoatHit : integer
+            - nbBoatSunk : integer
+            - trap: List<Trap>
+            - acquiredWeapon: List<Weapon>
+
+            + <<create>> ShotResult()
+            + getNbBoatHit() : integer
+            + getNbBoatSunk() : integer
+            + getAcquiredWeapon(): Weapon
+            + getTrap() : List<trap>
+            + addAcquiredWeapon(weapon : Weapon) : void
+            + addTrap(trap : Trap) : void
+            + addNbBoatHit() : void
+            + addNbBoatSunk() : void
+    }
+
+    Game.Game *-> "2\n player1\n player2" Player.Player
+    Game.Game *-> "1\n" Model.ShotResult
+    Game.Game -->  Map.Grid : <<use>>
+    Game.Game -->  Coordinate : <<use>>
+    Game.Game o-> "*\n_observers" Game.GameObserver : > notify
+
+    Player.Player *--> "2\n ownGrid\n shotGrid" Map.Grid
+    Player.Player *--> "2\n _traps" Model.Trap.Trap
+    Player.Player *--> "2\n _weapon" Model.Weapon.Weapon
+    Player.Player -->  Coordinate : <<use>>
+    Player.Player -->  ShotResult : <<use>>
+
+    Map.Grid *--> "*\n _grid" GridCell
+    Map.Grid *--> "1..*\n _ownBoat" Boat
+    Map.Grid -->  Coordinate : <<use>>
+    Map.Grid -->  Model.Weapon.Weapon : <<use>>
+    Map.Grid -->  Model.ShotResult : <<use>>
+
+    Weapon.Weapon --> Model.ShotResult : <<use>>
+    Model.GridEntity --> Model.ShotResult : <<use>>
+
+
+    GridCell *--> "1\n position" Coordinate
+    GridCell *--> "1\n content" GridEntity
+
+    Boat *--> "1..*\n _position" Coordinate
+
+    Game.GameObserver --> Player.Player : "<<use>>"
+
+}
+package view{
+    class GameView implements Model.Game.GameObserver{
+        + printTurn(player : Player) : void
+        + askPlayerToShot() : void
+        + printGrids(player : Player) : void
+        + printEndGame(winner : Player, looser : Player) : void
+    }
+}
+
+package Controller{
+    class GameController{
+        + sendShotCoord(coord : Coordinate) : void  /'méthode qui appellera la méthode processTurn dans la class Game'/
+    }
+}
+
+GameView --> Controller.GameController
+GameController --> Model.Game.Game
+
+@enduml

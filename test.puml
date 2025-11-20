@@ -1,0 +1,229 @@
+@startuml
+skinparam linetype ortho
+
+package Model {
+
+    package Game {
+        class Game {
+            - player1 : Player
+            - player2 : Player
+            - gameOver : boolean
+            - currentPlayer : Player
+            - _observers : GameObserver
+
+            + Game(p1: Player, p2: Player)
+            + startGame() : void
+            + nextTurn() : void
+            + processTurn(coord : Coordinate) : void
+            + isFinished() : boolean
+            + placeEntity(grid : Grid, entity : List<GridEntity>) : void
+            + attachObserver(observer : GameObserver) : void
+            + notifyTurn(player : Player) : void
+            + notifyAskPlayerToShot() : void
+            + notifyGrid(player : Player) : void
+            + notifyGameOver(winner : Player, looser : Player) : void
+        }
+
+        interface GameObserver {
+            + printTurn(player : Player) : void
+            + askPlayerToShot() : void
+            + printGrids(player : Player) : void
+            + printEndGame(winner : Player, looser : Player) : void
+        }
+    }
+
+    package Player {
+        interface Player {
+            + shotGridUpdate(coord : Coordinate, entity : GridEntity) : void
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+            + getOwnGrid() : Grid
+            + getShotGrid() : Grid
+            + getAvailableWeapons() : List<Weapon>
+        }
+
+        class HumanPlayer implements Player {
+            - name : string
+            - nbBoatRemaining : integer
+            - ownGrid : Grid
+            - shotGrid : Grid
+            - traps : List<Trap>
+            - availableWeapons: List<Weapon>
+
+            + shotGridUpdate(coord : Coordinate, entity : GridEntity) : void
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+        }
+
+        class ComputerPlayer implements Player {
+            - name : string
+            - nbBoatRemaining : integer
+            - ownGrid : Grid
+            - shotGrid : Grid
+            - traps : List<Trap>
+            - availableWeapons: List<Weapon>
+
+            + shotGridUpdate(coord : Coordinate, entity : GridEntity) : void
+            + isDefeated() : boolean
+            + setShotGrid(grid : Grid) : void
+            + shot() : Coordinate
+        }
+    }
+
+    package Map {
+        class Grid {
+            - grid [][] : GridCell
+            - nbBoatRemaining : integer
+            - ownBoats : List<Boat>
+            - size : integer
+
+            + checkContentCell(coord : Coordinate) : boolean
+            + isBoatSunk(boat : Boat) : boolean
+            + getEntityAt(coord : Coordinate) : GridEntity
+            + setHit(coord : Coordinate) : void
+            + reveal(coord : Coordinate) : void
+        }
+
+        class GridCell {
+            - isHit : boolean
+            - isVisible : boolean
+            - position : Coordinate
+            - content : GridEntity
+            + setVisible() : void
+            + setHit() : void
+            + getContent() : GridEntity
+        }
+    }
+
+    class Coordinate {
+        - x : integer
+        - y : integer
+
+        + coordinateCmp(coord1 : Coordinate, coord2 : Coordinate) : boolean
+        + coordinateSearch(lstCoord : List<Coordinate>, coord : Coordinate) : boolean
+    }
+
+    interface GridEntity {
+        + onHit(coord : Coordinate, result : ShotResult) : void
+        + getType() : String
+    }
+
+    package Ships {
+        interface Boat extends Model.GridEntity {
+            + onHit(coord : Coordinate, result : ShotResult) : void
+            + getType() : String
+            + isSunk() : boolean
+            + receiveShot() : void
+        }
+
+        class AircraftCarrier implements Boat {
+            - position : List<Coordinate>
+            - size : integer
+            - nbShotReceive : integer
+        }
+
+        class Cruiser implements Boat {
+            - position : List<Coordinate>
+            - size : integer
+            - nbShotReceive : integer
+        }
+
+        class Destroyer implements Boat {
+            - position : List<Coordinate>
+            - size : integer
+            - nbShotReceive : integer
+        }
+
+        class Submarine implements Boat {
+            - position : List<Coordinate>
+            - size : integer
+            - nbShotReceive : integer
+        }
+
+        class TorpedoBoat implements Boat {
+            - position : List<Coordinate>
+            - size : integer
+            - nbShotReceive : integer
+        }
+    }
+
+    package Trap {
+        interface Trap extends Model.GridEntity {
+            + onHit(coord : Coordinate, result : ShotResult) : void
+            + getType(): String
+        }
+
+        class BlackHole implements Trap {
+            - alreadyUsed : boolean
+        }
+
+        class Tornado implements Trap {
+            - alreadyUsed : boolean
+            - turnsLeft : integer
+            + modifyCoordinates(coord : Coordinate) : Coordinate
+        }
+    }
+
+    package Weapon {
+        interface Weapon {
+            + apply(grid : Grid, coord : Coordinate, result : ShotResult) : void
+            + getName() : String
+            + getUsesLeft() : Integer
+        }
+
+        class Bombe implements Weapon {
+            - usesLeft : Integer
+            + use() : void
+        }
+
+        class Sonar implements Weapon {
+            - usesLeft : Integer
+            + use() : void
+        }
+    }
+
+    class ShotResult {
+        - nbBoatHit : integer
+        - nbBoatSunk : integer
+        - trap : List<Trap>
+        - acquiredWeapon : List<Weapon>
+
+        + ShotResult()
+        + getNbBoatHit() : integer
+        + getNbBoatSunk() : integer
+        + getAcquiredWeapon() : List<Weapon>
+        + getTrap() : List<Trap>
+        + addAcquiredWeapon(weapon : Weapon) : void
+        + addTrap(trap : Trap) : void
+        + addNbBoatHit() : void
+        + addNbBoatSunk() : void
+    }
+
+    Game.Game *-> Player.Player
+    Player.Player *-> Map.Grid
+    Map.Grid *-> GridCell
+    GridCell *-> GridEntity
+    GridEntity -> ShotResult : <<use>>
+    Weapon.Weapon -> ShotResult : <<use>>
+
+}
+
+package View {
+    class GameView implements Model.Game.GameObserver {
+        + printTurn(player : Player) : void
+        + askPlayerToShot() : void
+        + printGrids(player : Player) : void
+        + printEndGame(winner : Player, looser : Player) : void
+    }
+}
+
+package Controller {
+    class GameController {
+        + sendShotCoord(coord : Coordinate) : void
+    }
+}
+
+View.GameView --> Controller.GameController
+Controller.GameController --> Model.Game.Game
+
+@enduml
