@@ -46,7 +46,7 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public ShotResult shoot(Coordinates coordinates, Weapon weapon) {
+    public ShotResult shoot(Coordinates coordinates, Weapon weapon, Player player) {
         // TODO Trouver le targetPlayer via le Game.
         // TODO return weapon.apply(targetPlayer, coordinates);
         return null;
