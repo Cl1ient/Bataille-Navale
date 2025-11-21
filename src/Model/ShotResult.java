@@ -10,6 +10,7 @@ public class ShotResult {
     private  String m_message;
     private boolean m_isTrap;
     private Weapon m_acquiredWeapon;
+    private boolean m_isVisible;
 
     /**
      * Constructs the result of a shot
@@ -20,6 +21,7 @@ public class ShotResult {
      * @param message Descriptive message
      * @param isTrap True if the hit entity was a Trap
      * @param acquiredWeapon Weapon object found in island
+     * @param isVisible If entity is visible in the grid
      */
     public ShotResult(
             boolean isHit,
@@ -28,7 +30,8 @@ public class ShotResult {
             Coordinates coordinates,
             String message,
             boolean isTrap,
-            Weapon acquiredWeapon
+            Weapon acquiredWeapon,
+            boolean isVisible
     ) {
         this. m_isHit = isHit;
         this.m_isSunk = isSunk;
@@ -37,6 +40,7 @@ public class ShotResult {
         this.m_message = message;
         this.m_isTrap = isTrap;
         this.m_acquiredWeapon = acquiredWeapon;
+        this.m_isVisible = isVisible;
     }
 
     public boolean isHit() {
@@ -67,5 +71,7 @@ public class ShotResult {
         return m_acquiredWeapon;
     }
 
-
+    public boolean isVisible() {
+        return m_isVisible;
+    }
 }
