@@ -1,5 +1,6 @@
 @startuml
 skinparam linetype ortho
+
 title Architecture MVC Bataille Navale – Modèle complet
 
 ' ============================================================
@@ -18,10 +19,7 @@ package "Model" {
         +displaySymbol() : String
     }
 
-    interface Weapon {
-        +generateTargets(coord : Coordinate, grid : Grid) : List<Coordinate>
-        +getName() : String
-    }
+
 
     interface GameListener {
         +turnEnded(attacker : Player, resultSummary : Map<Coordinate, String>)
@@ -41,15 +39,15 @@ package "Model" {
         -currentPlayerIndex : int
         -listeners : List<GameListener>
 
+        +placeBoats()
+
+        +processComputerAttack()
         +processAttack(attacker : Player, weapon : Weapon, target : Coordinate)
         +processOffensiveAttack(attacker : Player, defender : Player, target : List<Coordinate>)
         +processShot(attacker : Player, defender : Player, x : int, y : int)
         +processScan(attacker : Player, defender : Player, target : List<Coordinate>)
 
-        +handleShipHit(attacker : Player, defender : Player, x : int, y : int)
-        +handleBlackHole(attacker : Player, defender : Player, x : int, y : int)
         +handleStorm(attacker : Player, defender : Player, x : int, y : int)
-        +handleMiss(defender : Player, x : int, y : int)
 
         +exploreIsland(player : Player, coord : Coordinate)
 
@@ -60,46 +58,75 @@ package "Model" {
         +notifyTurnEnded(attacker : Player, summary : Map<Coordinate,String>)
     }
 
-    class Player {
-        +name : String
-        -ownGrid : Grid
-        -trackingGrid : Grid
-        -weapons : List<Weapon>
+    package player{
+        abstract Player <<abstract>>{
+            -name : String
+            -ownGrid : Grid
+            -nbBoatRemaining : integer
+            -trackingGrid : Grid
+            -weapons : List<Weapon>
 
-        +getOwnGrid() : Grid
-        +getTrackingGrid() : Grid
-        +addWeapon(w : Weapon)
+            +placeBoats()
+            +getOwnGrid() : Grid
+            +getTrackingGrid() : Grid
+            +addWeapon(w : Weapon)
+            +markMiss(coord : Coordinate)
+            +getEntityFromCoord(coord : Coordinate) : GridEntity
+            +receiveShot(coord : Coordinate)
+            +triggerTornado(coord : Coordinate)
+            +loseOneBoat()
+            +hasLost() : boolean
+        }
+
+        class ComputerPlayer extends Player{
+            + choseCoord() : Coordinate
+            + choseWeapon() : Weapon
+        }
     }
 
-    class Grid {
-        -cells : Cell[][]
-        -size : integer
-        +getCell(x : int, y : int) : Cell
-        +isInside(coord : Coordinate) : boolean
-        +hit(x : int, y : int)
-        +desactiveTrap(x : int, y : int)
-        +markMiss(x : int, y : int)
+
+    package Map{
+        class Grid {
+            -cells : Cell[][]
+            -ownBoats : List <Boat>
+            -size : integer
+            +placeBoats()
+            +getCell(x : int, y : int) : Cell
+            +isInside(coord : Coordinate) : boolean
+            +hit(x : int, y : int)
+            +desactiveTrap(x : int, y : int)
+            +markMiss(x : int, y : int)
+            +triggerTornado(coord : Coordinate)
+            +getEntityFromCoord(coord : Coordinate) : GridEntity
+        }
+
+        class Cell {
+            -entity : GridEntity
+            -hit : boolean
+            -miss : boolean
+
+            +getEntity() : GridEntity
+            +setEntity(e : GridEntity)
+            +setHit(boolean)
+            +setMiss(boolean)
+        }
+
     }
 
-    class Cell {
-        -entity : GridEntity
-        -hit : boolean
-        -miss : boolean
 
-        +getEntity() : GridEntity
-        +setEntity(e : GridEntity)
-        +setHit(boolean)
-        +setMiss(boolean)
-    }
 
     class Coordinate {
-        +x : int
-        +y : int
+        -x : int
+        -y : int
+        +getX() : int
+        +getY() : int
     }
 
     class ScanResult {
-        +coord : Coordinate
-        +symbol : String
+        -coord : Coordinate
+        -symbol : String
+        +getCoord() : Coordinate
+        +getSymbol() : String
     }
 
 
@@ -199,19 +226,26 @@ package "Model" {
     ' Weapons
     ' ----------------------
 
-    class Missile {
-        +generateTargets(coord, grid)
+    package weapon{
+        interface Weapon {
+            +generateTargets(coord : Coordinate, grid : Grid) : List<Coordinate>
+            +getName() : String
+        }
+        class Missile {
+            +generateTargets(coord, grid)
+        }
+
+        class Bomb {
+            - useLeft: Integer
+            +generateTargets(coord, grid)
+        }
+
+        class Sonar {
+            - useLeft: Integer
+            +generateTargets(coord, grid)
+        }
     }
 
-    class Bomb {
-        - useLeft: Integer
-        +generateTargets(coord, grid)
-    }
-
-    class Sonar {
-        - useLeft: Integer
-        +generateTargets(coord, grid)
-    }
 
     ' ----------------------
     ' Grid Entities
@@ -273,7 +307,7 @@ package "View" {
         -statusPanel : StatusPanel
 
         +turnEnded(attacker : Player, resultSummary : Map<Coordinate, String>)
-        +onCellUpdated(player : Player, coord : Coordinate)
+        +onCellUpdated(cell : Cell, coord : Coordinate)
         +onScanResult(player : Player, results : List<ScanResult>)
         +onShipSunk(player : Player)
         +onGameOver(winner : Player)
@@ -282,11 +316,16 @@ package "View" {
 
     class GridPanel {
         +updateCell(coord : Coordinate, symbol : String)
-        +repaint()
+        +repaint(coord : Coordinate, cell : Cell)
     }
 
     class StatusPanel {
         +setMessage(msg : String)
+    }
+
+    class CellView{
+        <<create>> CellView(cell : Cell, controller : GameController)
+        +repaint(cell : Cell)
     }
 }
 
@@ -299,9 +338,11 @@ package "Controller" {
     class GameController {
         -game : Game
         -view : GameView
+        -cellSelected : Coordinate
 
         +onCellClicked(coord : Coordinate)
         +onWeaponSelected(weapon : Weapon)
+        +setCellSelected(coord : Coordinate)
     }
 }
 
@@ -344,9 +385,10 @@ GameView --> GameController : user actions
 Game --> GameView : <<listener>> turnEnded()
 GameListener <|.. GameView
 
-GameView --> GridPanel
+GameView *--> "2"GridPanel : <<contient>>
 GameView --> StatusPanel
 
-GridPanel --> Coordinate
+GridPanel --> Coordinate : <<uses>>
+GridPanel *--> "*\n_CellView" CellView : <<contient>>
 
 @enduml
