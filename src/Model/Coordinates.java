@@ -23,4 +23,20 @@ public class Coordinates {
     public String toString() {
         return "row:" + m_row + ", col:" + m_column;
     }
+
+    /**
+     * Provides Row coordinates of the cell
+     * @return Row
+     */
+    public int getRow() {
+        return this.m_row;
+    }
+
+    /**
+     * Provides Column coordinates of the cell
+     * @return Column
+     */
+    public Integer getColumn() {
+        return this.m_column;
+    }
 }

@@ -10,7 +10,7 @@ public class BlackHole implements GridEntity {
     public BlackHole(){}
 
     public ShotResult onHit(Player attacker, Coordinates coordinates){
-        return new ShotResult();
+        return null;
     }
 
     @Override

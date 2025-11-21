@@ -10,7 +10,7 @@ public class Tornado implements GridEntity {
     private Integer turnsLeft;
 
     public ShotResult onHit(Player attacker, Coordinates coordinates){
-        return new ShotResult();
+        return null;
     }
 
     public Coordinates modifyCoordinates(Coordinates coordinates){
