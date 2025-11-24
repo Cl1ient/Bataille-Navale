@@ -4,12 +4,8 @@ import Model.Player.HumanPlayer;
 import Model.Player.ComputerPlayer;
 import Model.Player.Player;
 import Model.ShotResult;
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.Weapon.Weapon;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class Game {
 
@@ -50,13 +46,13 @@ public class Game {
     /**
      * Processes the turn initiated by the human player.
      * Method is called by the GameController.
-     * @param coordinates The target coordinates chosen by the human.
+     * @param coordinate The target coordinates chosen by the human.
      * @param weapon The weapon selected for the attack.
      * @return The ShotResult of the action.
      */
-    public ShotResult processHumanTurn(Coordinates coordinates, Weapon weapon) {
+    public ShotResult processHumanTurn(Coordinate coordinate, Weapon weapon) {
         if (gameOver) return null;
-        ShotResult result = this.m_humanPlayer.shoot(coordinates, weapon, this.m_computerPlayer);
+        ShotResult result = this.m_humanPlayer.shoot(coordinate, weapon, this.m_computerPlayer);
         // TODO Traitement du résultat (Tornade, check victoire, etc.)
         // TODO Si  piège touché, la logique est dans le ShotResult ou le Piège.
         this.checkGameOver();
@@ -67,7 +63,7 @@ public class Game {
 
     public ShotResult processComputerTurn() {
         if (gameOver) return null;
-        Coordinates targetCoord = this.m_computerPlayer.chooseShot();
+        Coordinate targetCoord = this.m_computerPlayer.chooseShot();
         Weapon defaultWeapon = null;
         ShotResult result = this.m_computerPlayer.shoot(targetCoord, defaultWeapon, this.m_humanPlayer);
         this.checkGameOver();

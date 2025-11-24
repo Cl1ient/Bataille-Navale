@@ -1,10 +1,8 @@
 package Model.Map;
-
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.GridEntity;
 import Model.ShotResult;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Grid {
@@ -33,9 +31,9 @@ public class Grid {
      * @param coordinates The list of coordinates the entity will occupy.
      * @return true if placement was successful .
      */
-    public boolean placeEntity(GridEntity entity, List<Coordinates> coordinates) {
+    public boolean placeEntity(GridEntity entity, List<Coordinate> coordinates) {
 
-        for (Coordinates coord : coordinates) {
+        for (Coordinate coord : coordinates) {
             int row = coord.getRow();
             int col = coord.getColumn();
             if (this.cells[row][col].isOccuped()) {
@@ -44,7 +42,7 @@ public class Grid {
         }
 
         int indexInEntity = 0;
-        for (Coordinates coord : coordinates) {
+        for (Coordinate coord : coordinates) {
             int row = coord.getRow();
             int col = coord.getColumn();
 
@@ -56,23 +54,13 @@ public class Grid {
 
     /**
      * Retrieves the GridCell at the specified coordinates.
-     * @param coordinates The location to check.
+     * @param coordinate The location to check.
      * @return The GridCell object.
      */
-    public GridCell getCell(Coordinates coordinates) {
-        int row = coordinates.getRow();
-        int col = coordinates.getColumn();
+    public GridCell getCell(Coordinate coordinate) {
+        int row = coordinate.getRow();
+        int col = coordinate.getColumn();
         return this.cells[row][col];
-    }
-
-
-    /**
-     * Attempts to search an Island Cell for an item.
-     * @param coordinates The location to search.
-     * @return The ShotResult indicating the outcome of the search.
-     */
-    public ShotResult searchIsland(Coordinates coordinates) {
-        return null;
     }
 }
 

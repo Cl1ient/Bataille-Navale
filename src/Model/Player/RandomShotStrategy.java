@@ -1,12 +1,12 @@
 package Model.Player;
 
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.Map.Grid;
 import Model.ShotResult;
 
 public class RandomShotStrategy implements ShotStrategy {
     @Override
-    public Coordinates getNextShot(Grid shotsGrid, ShotResult lastResult){
+    public Coordinate getNextShot(Grid shotsGrid, ShotResult lastResult){
         return null;
     }
 }

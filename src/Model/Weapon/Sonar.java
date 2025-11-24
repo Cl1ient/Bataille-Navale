@@ -1,6 +1,6 @@
 package Model.Weapon;
 
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.Player.Player;
 import Model.ShotResult;
 
@@ -11,7 +11,7 @@ public class Sonar implements Weapon{
     }
 
     @Override
-    public ShotResult apply(Player targetPlayer, Coordinates targetCoordinates) {
+    public ShotResult apply(Player targetPlayer, Coordinate targetCoordinate) {
         return new ShotResult();
     }
 
