@@ -28,7 +28,7 @@ public class Coordinates {
      * Provides Row coordinates of the cell
      * @return Row
      */
-    public int getRow() {
+    public int getX() {
         return this.m_row;
     }
 
@@ -36,7 +36,7 @@ public class Coordinates {
      * Provides Column coordinates of the cell
      * @return Column
      */
-    public Integer getColumn() {
+    public Integer getY() {
         return this.m_column;
     }
 }

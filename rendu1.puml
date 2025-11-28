@@ -106,7 +106,7 @@ package model {
             -m_trapFactory : TrapFactory
             -m_islandItemFactory : IslandItemFactory
             +<<create>> Grid(entityPosition : Map<EntityType, List<Coordinate> >, gridSize : integer)
-            +placeEntity(Map<EntityType, List<Coordinate> >)
+            +placeEntity(entityPosition : <EntityType, List<Coordinate>>)
             +getCell(x : int, y : int) : Cell
             +isInside(coord : Coordinate) : boolean
             +hit(x : int, y : int)
@@ -364,7 +364,7 @@ package view {
         -m_statusPanel : StatusPanel
 
         +turnEnded(attacker : Player, resultSummary : Map<Coordinate, String>)
-        +onCellUpdated(cell : Cell, coord : Coordinate)
+        +onUpdated(cell : Cell, coord : Coordinate)
         +onScanResult(player : Player, results : List<ScanResult>)
         +onShipSunk(player : Player)
         +onGameOver(winner : Player)
