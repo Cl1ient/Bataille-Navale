@@ -1,7 +1,6 @@
 package Model.Map;
 
 import Model.GridEntity;
-import Model.ShotResult;
 
 public class GridCell {
     private boolean isHit;

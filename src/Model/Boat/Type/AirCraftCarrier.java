@@ -1,12 +1,15 @@
 package Model.Boat.Type;
 
 import Model.Boat.Boat;
+import Model.Coordinate;
+import Model.Game.Game;
+import Model.player.Player;
 
 public class AirCraftCarrier implements Boat {
 
     private static final int AIRCRAFTCARRIER_SIZE = 5;
     private final Integer size;
-    private final Boolean[] hits;
+    private Integer m_nbShotReceive;
     private final String name = "AirCraftCarrier";
 
     /**
@@ -15,10 +18,7 @@ public class AirCraftCarrier implements Boat {
      */
     public AirCraftCarrier(){
         this.size = AIRCRAFTCARRIER_SIZE;
-        this.hits = new Boolean[this.size];
-        for(int i = 0; i<this.size; i++){
-            this.hits[i] = false;
-        }
+        this.m_nbShotReceive = 0;
     }
 
     /**
@@ -27,21 +27,16 @@ public class AirCraftCarrier implements Boat {
      */
     @Override
     public boolean isSunk(){
-        for(boolean hit : hits){
-            if(!hit){
-                return false;
-            }
-        }
-        return true;
+        return size == m_nbShotReceive;
     }
 
-    /**
-     * Marks the specific segment of the ship that was hit.
-     * @param index index the position of the ship
-     */
+
     @Override
-    public void onHit(Integer index){
-        this.hits[index] = true;
+    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+        // comportement d'un bateau lorsqu'il est touché
+        this.m_nbShotReceive ++;
+        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
     /**
@@ -56,7 +51,7 @@ public class AirCraftCarrier implements Boat {
      * Returns the name of the boat
      * @return the name of the boat
      */
-    public String getName(){
+    public String getType(){
         return name;
     }
 }

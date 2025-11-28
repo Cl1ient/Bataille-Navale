@@ -1,11 +1,14 @@
 package Model.Boat.Type;
 
 import Model.Boat.Boat;
+import Model.Coordinate;
+import Model.Game.Game;
+import Model.player.Player;
 
 public class Submarine implements Boat {
     private static final int SUBMARINE_SIZE = 3;
     private final Integer size;
-    private final Boolean[] hits;
+    private Integer m_nbShotReceive;
     private final String name = "Submarine";
 
     /**
@@ -14,10 +17,7 @@ public class Submarine implements Boat {
      */
     public Submarine(){
         this.size = SUBMARINE_SIZE;
-        this.hits = new Boolean[this.size];
-        for(int i = 0; i<this.size; i++){
-            this.hits[i] = false;
-        }
+        this.m_nbShotReceive = 0;
     }
 
     /**
@@ -26,21 +26,15 @@ public class Submarine implements Boat {
      */
     @Override
     public boolean isSunk(){
-        for(boolean hit : hits){
-            if(!hit){
-                return false;
-            }
-        }
-        return true;
+        return size == m_nbShotReceive;
     }
 
-    /**
-     * Marks the specific segment of the ship that was hit.
-     * @param index index the position of the ship
-     */
+
     @Override
-    public void onHit(Integer index){
-        this.hits[index] = true;
+    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+        this.m_nbShotReceive ++;
+        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
     /**
@@ -55,7 +49,7 @@ public class Submarine implements Boat {
      * Returns the name of the boat
      * @return the name of the boat
      */
-    public String getName(){
+    public String getType(){
         return name;
     }
 

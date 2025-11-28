@@ -1,9 +1,9 @@
 package Model;
 
-import Model.Player.Player;
+import Model.Game.Game;
+import Model.player.Player;
 
 public interface GridEntity {
-    ShotResult onHit(Player attacker, Coordinates coordinates);
-    String getType();
-    Integer getSize();
+    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y);
+    public String getType();
 }

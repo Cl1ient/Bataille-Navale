@@ -1,6 +1,8 @@
 package Model.Boat;
 
+import Model.Game.Game;
 import Model.GridEntity;
+import Model.player.Player;
 
 public interface Boat extends GridEntity {
     /**
@@ -13,17 +15,12 @@ public interface Boat extends GridEntity {
      * Marks the specific segment of the ship that was hit.
      * @param index index the position of the ship
      */
-    void onHit(Integer index);
+    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y);
 
-    /**
-     *
-     * @return the size of the boat
-     */
-    Integer getSize();
 
     /**
      *
      * @return the name of the boat
      */
-    String getName();
+    public String getType();
 }

@@ -2,8 +2,8 @@ package Model;
 
 public class Coordinate {
 
-    private Integer m_row;
-    private Integer m_column;
+    private Integer m_x;
+    private Integer m_y;
 
     /**
      * Constructs a new Coordinates object.
@@ -11,8 +11,8 @@ public class Coordinate {
      * @param column The column index .
      */
     public Coordinate(Integer row, Integer column) {
-        this.m_row = row;
-        this.m_column = column;
+        this.m_x = row;
+        this.m_y = column;
     }
 
     /**
@@ -21,22 +21,22 @@ public class Coordinate {
      */
     @Override
     public String toString() {
-        return "row:" + m_row + ", col:" + m_column;
+        return "row:" + m_x + ", col:" + m_y;
     }
 
     /**
      * Provides Row coordinates of the cell
      * @return Row
      */
-    public int getRow() {
-        return this.m_row;
+    public int getX() {
+        return this.m_x;
     }
 
     /**
      * Provides Column coordinates of the cell
      * @return Column
      */
-    public Integer getColumn() {
-        return this.m_column;
+    public Integer getY() {
+        return this.m_y;
     }
 }

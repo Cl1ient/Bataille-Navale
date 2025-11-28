@@ -1,7 +1,6 @@
 package Model.Map;
 import Model.Coordinate;
 import Model.GridEntity;
-import Model.ShotResult;
 
 import java.util.List;
 

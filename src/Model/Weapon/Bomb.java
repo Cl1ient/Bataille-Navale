@@ -1,8 +1,6 @@
 package Model.Weapon;
 
 import Model.Coordinate;
-import Model.Player.Player;
-import Model.ShotResult;
 
 public class Bomb implements Weapon{
     private Integer useLeft;
