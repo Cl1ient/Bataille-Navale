@@ -1,6 +1,8 @@
 package Model.Weapon;
 
 import Model.Coordinate;
+import Model.Player.Player;
+import Model.ShotResult;
 
 public class Sonar implements Weapon{
     private Integer useLeft;
