@@ -6,7 +6,7 @@ public class ShotResult {
     private boolean m_isHit;
     private boolean m_isSunk;
     private String m_EntityType;
-    private  Coordinates m_coordinates;
+    private Coordinates m_coordinates;
     private  String m_message;
     private boolean m_isTrap;
     private Weapon m_acquiredWeapon;

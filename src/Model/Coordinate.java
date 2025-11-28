@@ -1,6 +1,6 @@
 package Model;
 
-public class Coordinates {
+public class Coordinate {
 
     private Integer m_row;
     private Integer m_column;
@@ -10,7 +10,7 @@ public class Coordinates {
      * @param row The row index .
      * @param column The column index .
      */
-    public Coordinates(Integer row, Integer column) {
+    public Coordinate(Integer row, Integer column) {
         this.m_row = row;
         this.m_column = column;
     }

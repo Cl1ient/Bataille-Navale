@@ -1,9 +1,9 @@
 package Model.Player;
 
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.Map.Grid;
 import Model.ShotResult;
 
 public interface ShotStrategy {
-    Coordinates getNextShot(Grid shotsGrid, ShotResult lastResult);
+    Coordinate getNextShot(Grid shotsGrid, ShotResult lastResult);
 }

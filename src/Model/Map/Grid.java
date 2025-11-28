@@ -6,7 +6,6 @@ import Model.GridEntity;
 import Model.Boat.Boat;
 import Model.entity.island.IslandItemFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 

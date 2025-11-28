@@ -1,6 +1,6 @@
 package Model.Player;
 
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.Map.Grid;
 import Model.ShotResult;
 import Model.Weapon.Weapon;
@@ -38,7 +38,7 @@ public class ComputerPlayer extends Player{
     }
 
 
-    public Coordinates chooseShot() {
+    public Coordinate chooseShot() {
         ShotResult lastResult = null;
         return this.shotStrategy.getNextShot(this.m_shotsGrid, lastResult);
     }
@@ -56,14 +56,14 @@ public class ComputerPlayer extends Player{
 
 
     @Override
-    public ShotResult shoot(Coordinates coordinates, Weapon weapon, Player player) {
+    public ShotResult shoot(Coordinate coordinate, Weapon weapon, Player player) {
 
         // TODO return weapon.apply(targetPlayer, coordinates);
         return null; // Placeholder
     }
 
     @Override
-    public ShotResult receiveSHot(Coordinates coordinates, Weapon weapon) {
+    public ShotResult receiveSHot(Coordinate coordinate, Weapon weapon) {
         // TODO GridCell cell = this.myGrid.getCell(coordinates);
         // TODO return cell.hit();
         return null;
