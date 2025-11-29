@@ -1,13 +1,15 @@
 package Model.Map;
 
-import Model.Coordinates;
+import Model.Coordinate;
 import Model.EntityType;
 import Model.GridEntity;
 import Model.Boat.Boat;
 import Model.entity.island.IslandItemFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 public class Grid {
 
@@ -20,10 +22,9 @@ public class Grid {
     /**
      * Constructor for the Grid.
      * Initializes the grid array (cells), size, and factories.
-     * @param entityPosition Map of EntityType to a List of Coordinates for initial placement.
      * @param gridSize The dimension of the square grid.
      */
-    public Grid(Map<EntityType, List<Coordinates>> entityPosition, Integer gridSize) {
+    public Grid(Integer gridSize) {
         this.m_size = gridSize;
         this.cells = new Cell[gridSize][gridSize];
         this.m_ownBoats = new ArrayList<>();
@@ -32,41 +33,41 @@ public class Grid {
         // TODO this.m_islandItemFactory = new IslandItemFactory();
 
         // init all the cell
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
+        for (Integer i = 0; i < gridSize; i++) {
+            for (Integer j = 0; j < gridSize; j++) {
                 this.cells[i][j] = new Cell();
             }
         }
     }
 
-    public void placeEntity(Map<EntityType, List<Coordinates>> entityPosition) {
+    public void placeEntity(Map<EntityType, List<Coordinate>> entityPosition) {
 
-        for (Map.Entry<EntityType, List<Coordinates>> entry : entityPosition.entrySet()) {
+        for (Map.Entry<EntityType, List<Coordinate>> entry : entityPosition.entrySet()) {
             EntityType type = entry.getKey();
-            List<Coordinates> coordinates = entry.getValue();
-            GridEntity entity = createEntityFromType(type, coordinates.size());
+            List<Coordinate> coordinates = entry.getValue();
+            GridEntity entity = createEntityFromType(type);
             if (entity != null) {
                 placeSingleEntity(entity, coordinates);
             }
         }
     }
 
-    private boolean placeSingleEntity(GridEntity entity, List<Coordinates> coordinates) {
-        for (Coordinates coord : coordinates) {
+    private boolean placeSingleEntity(GridEntity entity, List<Coordinate> coordinates) {
+        for (Coordinate coord : coordinates) {
             if (!isInside(coord)) {
                 return false;
             }
-            int row = coord.getX();
-            int col = coord.getY();
+            Integer row = coord.getX();
+            Integer col = coord.getY();
 
             if (this.cells[row][col].getEntity() != null) {
                 return false; // Cell occuped
             }
         }
 
-        for (Coordinates coord : coordinates) {
-            int row = coord.getX();
-            int col = coord.getY();
+        for (Coordinate coord : coordinates) {
+            Integer row = coord.getX();
+            Integer col = coord.getY();
 
             this.cells[row][col].setEntity(entity);
             if (entity instanceof Boat && !m_ownBoats.contains(entity)) {
@@ -76,32 +77,42 @@ public class Grid {
         return true;
     }
 
-    private GridEntity createEntityFromType(EntityType type, int size) {
-        switch (type){
-            case NEW_BOMB-> m_islandItemFactory.createNewItemBomb();
-            case NEW_BLACKHOLE -> m_islandItemFactory.createNEwItemBlackHole();
-            case NEW_STORM -> m_islandItemFactory.createNewItemStorm();
-            case NEW_SONAR -> m_islandItemFactory.createNewItemSonar();
+    private GridEntity createEntityFromType(EntityType type) {
+        switch (type) {
+            case NEW_BOMB:
+                return m_islandItemFactory.createNewItemBomb();
+
+            case NEW_BLACKHOLE:
+                return m_islandItemFactory.createNEwItemBlackHole();
+
+            case NEW_STORM:
+                return m_islandItemFactory.createNewItemStorm();
+
+            case NEW_SONAR:
+                return m_islandItemFactory.createNewItemSonar();
+
+            default:
+                return null;
         }
-        return null;
     }
 
-    public Cell getCell(int x, int y) {
+
+    public Cell getCell(Integer x, Integer y) {
         if (isInside(x, y)) {
             return cells[x][y];
         }
         return null;
     }
 
-    public boolean isInside(Coordinates coord) {
+    public boolean isInside(Coordinate coord) {
         return isInside(coord.getX(), coord.getY());
     }
 
-    private boolean isInside(int x, int y) {
+    private boolean isInside(Integer x, Integer y) {
         return x >= 0 && x < m_size && y >= 0 && y < m_size;
     }
 
-    public void hit(int x, int y) {
+    public void hit(Integer x, Integer y) {
         if (!isInside(x, y)) return;
         Cell targetCell = cells[x][y];
         targetCell.setHit(true);
@@ -113,7 +124,7 @@ public class Grid {
         }
     }
 
-    public void desactiveTrap(int x, int y) {
+    public void desactiveTrap(Integer x, Integer y) {
         if (!isInside(x, y)) return;
 
         Cell targetCell = cells[x][y];
@@ -123,23 +134,65 @@ public class Grid {
         // targetCell.setEntity(null);
     }
 
-    public void markMiss(int x, int y) {
+    public void markMiss(Integer x, Integer y) {
         if (!isInside(x, y)) return;
         cells[x][y].setMiss(true);
     }
 
-    public void triggerTornado(Coordinates coord) {
+    public void triggerTornado(Coordinate coord) {
         if (!isInside(coord)) return;
         // TODO appliquer l'effet
     }
 
 
-    public GridEntity getEntityFromCoord(Coordinates coord) {
+    public GridEntity getEntityFromCoord(Coordinate coord) {
         if (!isInside(coord)) return null;
         Cell targetCell = getCell(coord.getX(), coord.getY());
         if (targetCell != null) {
             return targetCell.getEntity();
         }
         return null;
+    }
+
+    /// /////////////////////////////////////
+
+    public Integer getSize(){return this.m_size;}
+    public boolean isAlreadyHit(Integer x, Integer y){
+        return getCell(x,y).isHit();
+    }
+
+    public void randomPlacementEntity(EntityType type){
+        List<Coordinate> coord = new ArrayList<>();
+        GridEntity entity = createEntityFromType(type);
+        Integer size = entity.getSize();
+        Integer nbCellOk = 0;
+
+
+        Random rand = new Random();
+
+        int x = rand.nextInt(this.m_size);
+        int y = rand.nextInt(this.m_size);
+
+        boolean vertical = x%2 == 0;
+
+        while(nbCellOk != size){
+            if(isInside(x,y) && !cellAlreadyFilled(x,y)){
+                coord.add(new Coordinate(x, y));
+                if(vertical){y ++;}
+                else{x ++;}
+                nbCellOk++;
+            }
+            else{
+                nbCellOk = 0;
+                coord.clear();
+                x = rand.nextInt(this.m_size);
+                y = rand.nextInt(this.m_size);
+            }
+        }
+        this.placeSingleEntity(entity, coord);
+    }
+
+    public boolean cellAlreadyFilled(Integer x, Integer y){
+        return this.getCell(x,y).isFilled();
     }
 }

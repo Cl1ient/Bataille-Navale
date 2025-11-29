@@ -5,7 +5,8 @@ import Model.GridEntity;
 public class Cell {
 
     private GridEntity m_entity;
-    private boolean m_hit;
+    private boolean m_hitBoat;
+    private boolean m_hitTrap;
     private boolean m_miss;
 
     /**
@@ -14,7 +15,8 @@ public class Cell {
      */
     public Cell() {
         this.m_entity = null;
-        this.m_hit = false;
+        this.m_hitBoat = false;
+        this.m_hitTrap = false;
         this.m_miss = false;
     }
 
@@ -49,4 +51,8 @@ public class Cell {
     public void setMiss(boolean miss) {
         this.m_miss = miss;
     }
+
+    public boolean isHit() {return this.m_hitBoat || this.m_hitTrap || this.m_miss;}
+
+    public boolean isFilled(){return this.m_entity == null;}
 }

@@ -28,10 +28,10 @@ public abstract class Player {
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
-        //this.m_ownGrid = new Grid(config.getGridSize(), config.getGridEntityPlacement());
+        this.m_ownGrid = new Grid(config.getGridSize());
         this.m_shotGrid = new Grid(config.getGridSize());
         this.availableWeapons = new ArrayList<>();
-        // this.m_nbBoatRemaning = A voir
+        this.m_nbBoatRemaning = 5;
         // this.traps = new ArrayList<>(); TODO
 
         this.placeEntity(config.getGridEntityPlacement());

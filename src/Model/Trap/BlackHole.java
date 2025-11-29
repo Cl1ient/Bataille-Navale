@@ -6,7 +6,7 @@ import Model.GridEntity;
 import Model.player.Player;
 
 public class BlackHole implements GridEntity {
-    private Integer size;
+    private Integer m_size = 1;
     public BlackHole(){}
 
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
@@ -19,5 +19,7 @@ public class BlackHole implements GridEntity {
     public String getType() {
         return "blackhole";
     }
+
+    public Integer getSize() {return this.m_size;}
 
 }

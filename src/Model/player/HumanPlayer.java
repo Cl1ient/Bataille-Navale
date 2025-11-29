@@ -11,8 +11,5 @@ public class HumanPlayer extends Player{
     public HumanPlayer(GameConfiguration config){
         super(config);
     }
-    @Override
-    public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
-        this.m_ownGrid.placeEntity(entityPlacement);
-    }
+
 }

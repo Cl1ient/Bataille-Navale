@@ -12,9 +12,6 @@ import java.util.Map;
 import java.util.Random;
 
 public class ComputerPlayer extends Player{
-    // ---------------------
-    // A BESOIN DE GRID POUR FRONCTIONNER CORRECTEMENT
-    // ---------------------
 
     public ComputerPlayer(GameConfiguration config) {
         super(config);
@@ -23,7 +20,9 @@ public class ComputerPlayer extends Player{
 
     @Override
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
-
+        for(Map.Entry<EntityType, List<Coordinate>> entry : entityPlacement.entrySet()){
+            this.m_ownGrid.randomPlacementEntity(entry.getKey());
+        }
     }
 
     public Coordinate choseCoord(){
@@ -34,7 +33,7 @@ public class ComputerPlayer extends Player{
         int x = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
         int y = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
 
-        while(!this.m_ownGrid.isAlreadyHit(x, y)){
+        while(this.m_ownGrid.isAlreadyHit(x, y)){
             x = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
             y = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
         }

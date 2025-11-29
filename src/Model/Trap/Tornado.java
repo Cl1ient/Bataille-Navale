@@ -8,7 +8,7 @@ import Model.player.Player;
 import java.util.Random;
 
 public class Tornado implements GridEntity {
-    private Integer size = 3;
+    private Integer m_size = 1;
     private Integer turnsLeft = 3;
 
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
@@ -32,5 +32,7 @@ public class Tornado implements GridEntity {
     public String getType() {
         return "Tornado";
     }
+
+    public Integer getSize() {return this.m_size;}
 
 }
