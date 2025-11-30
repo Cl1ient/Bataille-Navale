@@ -241,6 +241,8 @@ package model {
         interface Weapon {
             +generateTargets(coord : Coordinate, grid : Grid) : List<Coordinate>
             +getName() : String
+            +getUsesLeft() : Integer
+            +use()
         }
         class WeaponFactory{
             +<<create>> WeaponFactory()
