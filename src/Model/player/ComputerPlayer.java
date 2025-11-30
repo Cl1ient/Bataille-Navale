@@ -20,7 +20,9 @@ public class ComputerPlayer extends Player{
 
     @Override
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
+
         for(Map.Entry<EntityType, List<Coordinate>> entry : entityPlacement.entrySet()){
+
             this.m_ownGrid.randomPlacementEntity(entry.getKey());
         }
     }

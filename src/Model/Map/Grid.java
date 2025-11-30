@@ -1,5 +1,6 @@
 package Model.Map;
 
+import Model.Boat.BoatFactory;
 import Model.Coordinate;
 import Model.EntityType;
 import Model.GridEntity;
@@ -19,6 +20,7 @@ public class Grid {
     // TODO private final IslandItemFactory m_islandItemFactory;
     private final List<Boat> m_ownBoats;
     private final IslandItemFactory m_islandItemFactory;
+    private final BoatFactory m_boatFactory;
     /**
      * Constructor for the Grid.
      * Initializes the grid array (cells), size, and factories.
@@ -29,6 +31,7 @@ public class Grid {
         this.cells = new Cell[gridSize][gridSize];
         this.m_ownBoats = new ArrayList<>();
         this.m_islandItemFactory = new IslandItemFactory();
+        this.m_boatFactory = new BoatFactory();
         // TODO this.m_trapFactory = new TrapFactory();
         // TODO this.m_islandItemFactory = new IslandItemFactory();
 
@@ -79,6 +82,7 @@ public class Grid {
 
     private GridEntity createEntityFromType(EntityType type) {
         switch (type) {
+            /*
             case NEW_BOMB:
                 return m_islandItemFactory.createNewItemBomb();
 
@@ -90,7 +94,22 @@ public class Grid {
 
             case NEW_SONAR:
                 return m_islandItemFactory.createNewItemSonar();
-
+            */
+            case AIRCRAFT_CARRIER:
+                m_ownBoats.add(0,this.m_boatFactory.createAirCraftCarrier());
+                return this.m_ownBoats.get(0);
+            case CRUISER:
+                m_ownBoats.add(0,this.m_boatFactory.createCruiser());
+                return this.m_ownBoats.get(0);
+            case DESTROYER:
+                m_ownBoats.add(0,this.m_boatFactory.createDestroyer());
+                return this.m_ownBoats.get(0);
+            case SUBMARINE:
+                m_ownBoats.add(0,this.m_boatFactory.createSubmarine());
+                return this.m_ownBoats.get(0);
+            case TORPEDO:
+                m_ownBoats.add(0,this.m_boatFactory.createTorpedo());
+                return this.m_ownBoats.get(0);
             default:
                 return null;
         }
@@ -166,27 +185,41 @@ public class Grid {
         GridEntity entity = createEntityFromType(type);
         Integer size = entity.getSize();
         Integer nbCellOk = 0;
+        int x, y;
 
 
         Random rand = new Random();
-
-        int x = rand.nextInt(this.m_size);
-        int y = rand.nextInt(this.m_size);
-
-        boolean vertical = x%2 == 0;
+        boolean vertical = rand.nextBoolean();
+        if(vertical){
+            x = rand.nextInt(this.m_size);
+            y = rand.nextInt(this.m_size - size);
+        }
+        else{
+            x = rand.nextInt(this.m_size - size);
+            y = rand.nextInt(this.m_size);
+        }
 
         while(nbCellOk != size){
+
+
             if(isInside(x,y) && !cellAlreadyFilled(x,y)){
                 coord.add(new Coordinate(x, y));
                 if(vertical){y ++;}
                 else{x ++;}
                 nbCellOk++;
+
             }
             else{
                 nbCellOk = 0;
                 coord.clear();
-                x = rand.nextInt(this.m_size);
-                y = rand.nextInt(this.m_size);
+                if(vertical){
+                    x = rand.nextInt(this.m_size);
+                    y = rand.nextInt(this.m_size - size);
+                }
+                else{
+                    x = rand.nextInt(this.m_size - size);
+                    y = rand.nextInt(this.m_size);
+                }
             }
         }
         this.placeSingleEntity(entity, coord);
@@ -194,5 +227,18 @@ public class Grid {
 
     public boolean cellAlreadyFilled(Integer x, Integer y){
         return this.getCell(x,y).isFilled();
+    }
+    public void displayGrid() {
+        for (Integer r = 0; r < this.m_size; r++) {
+            for (Integer c = 0; c < this.m_size; c++) {
+                if(this.cells[r][c].getEntity() != null){
+                    System.out.print(" x");
+                }
+                else{
+                    System.out.print(" o");
+                }
+            }
+            System.out.println();
+        }
     }
 }

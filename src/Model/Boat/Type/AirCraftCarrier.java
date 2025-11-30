@@ -35,8 +35,8 @@ public class AirCraftCarrier implements Boat {
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
         // comportement d'un bateau lorsqu'il est touché
         this.m_nbShotReceive ++;
-        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
-        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
+        //defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        //attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
     /**

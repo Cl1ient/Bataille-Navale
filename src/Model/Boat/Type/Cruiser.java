@@ -7,7 +7,7 @@ import Model.player.Player;
 
 public class Cruiser implements Boat {
     private static final int CRUISER_SIZE = 4;
-    private final Integer size;
+    private final Integer m_size;
     private Integer m_nbShotReceive;
     private final String name = "Cruiser";
 
@@ -16,7 +16,7 @@ public class Cruiser implements Boat {
      * Initializes the size and damage array.
      */
     public Cruiser(){
-        this.size = CRUISER_SIZE;
+        this.m_size = CRUISER_SIZE;
         this.m_nbShotReceive = 0;
     }
 
@@ -26,15 +26,15 @@ public class Cruiser implements Boat {
      */
     @Override
     public boolean isSunk(){
-        return this.size == this.m_nbShotReceive;
+        return this.m_size == this.m_nbShotReceive;
     }
 
 
     @Override
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
         this.m_nbShotReceive ++;
-        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
-        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
+        //defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        //attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
     /**
@@ -44,4 +44,6 @@ public class Cruiser implements Boat {
     public String getType(){
         return name;
     }
+
+    public Integer getSize() {return this.m_size;}
 }

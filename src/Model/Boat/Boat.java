@@ -1,6 +1,8 @@
 package Model.Boat;
 
+import Model.Game.Game;
 import Model.GridEntity;
+import Model.player.Player;
 
 public interface Boat extends GridEntity {
     /**
@@ -9,11 +11,8 @@ public interface Boat extends GridEntity {
      */
     boolean isSunk();
 
-    /**
-     * Marks the specific segment of the ship that was hit.
-     * @param index index the position of the ship
-     */
-    void onHit(Integer index);
+
+    void onHit(Game game, Player attacker, Player defender, Integer x, Integer y);
 
     /**
      *
@@ -25,5 +24,5 @@ public interface Boat extends GridEntity {
      *
      * @return the name of the boat
      */
-    String getName();
+    String getType();
 }

@@ -8,10 +8,6 @@ public class Bomb implements Weapon{
         this.useLeft = 2;
     }
 
-    @Override
-    public ShotResult apply(Player targetPlayer, Coordinate targetCoordinate) {
-        return new ShotResult();
-    }
 
     @Override
     public String getName(){

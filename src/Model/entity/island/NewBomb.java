@@ -1,7 +1,7 @@
 package Model.entity.island;
 
 import Model.EntityType;
-import Model.Player.Player;
+import Model.player.Player;
 
 public class NewBomb {
     private EntityType m_type = EntityType.NEW_BOMB;

@@ -13,10 +13,6 @@ import java.util.Map;
 
 public abstract class Player {
 
-    // ---------------------
-    // A BESOIN DE GRID ET GAME_CONFIG POUR FRONCTIONNER CORRECTEMENT
-    // ---------------------
-
     protected String m_name;
     protected Grid m_ownGrid;
     protected Grid m_shotGrid;
@@ -73,6 +69,6 @@ public abstract class Player {
     public void receiveShot(Coordinate coord) {
         this.m_ownGrid.hit(coord.getX(),coord.getY());
     }
-
+    public String getNickName() {return this.m_name;}
 
 }

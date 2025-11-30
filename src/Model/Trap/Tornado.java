@@ -14,8 +14,8 @@ public class Tornado implements GridEntity {
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
         this.turnsLeft --;
         Coordinate coord = modifyCoordinates(defender.getGridSize());
-        defender.getOwnGrid().markHitTrap(coord);
-        game.proccessShot(attacker, defender, coord.getX(), coord.getY());
+        //defender.getOwnGrid().markHitTrap(coord);
+        //game.proccessShot(attacker, defender, coord.getX(), coord.getY());
     }
 
     public Coordinate modifyCoordinates(Integer size){

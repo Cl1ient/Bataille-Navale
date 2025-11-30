@@ -8,7 +8,7 @@ import Model.player.Player;
 public class Destroyer implements Boat {
 
     private static final int DESTROYER_SIZE = 3;
-    private final Integer size;
+    private final Integer m_size;
     private Integer m_nbShotReceive;
     private final String name = "Destroyer";
 
@@ -17,7 +17,7 @@ public class Destroyer implements Boat {
      * Initializes the size and damage array.
      */
     public Destroyer(){
-        this.size = DESTROYER_SIZE;
+        this.m_size = DESTROYER_SIZE;
         this.m_nbShotReceive = 0;
     }
 
@@ -27,18 +27,15 @@ public class Destroyer implements Boat {
      */
     @Override
     public boolean isSunk(){
-        return this.size == this.m_nbShotReceive;
+        return this.m_size == this.m_nbShotReceive;
     }
 
-    /**
-     * Marks the specific segment of the ship that was hit.
-     * @param index index the position of the ship
-     */
+
     @Override
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
         this.m_nbShotReceive ++;
-        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
-        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
+        //defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        //attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
     /**
@@ -46,7 +43,7 @@ public class Destroyer implements Boat {
      * @return the size of the boat
      */
     public Integer getSize(){
-        return this.size;
+        return this.m_size;
     }
 
     /**

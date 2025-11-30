@@ -41,7 +41,7 @@ public class Cell {
      * @param hit The new hit status.
      */
     public void setHit(boolean hit) {
-        this.m_hit = hit;
+        this.m_miss = hit;
     }
 
     /**
@@ -54,5 +54,5 @@ public class Cell {
 
     public boolean isHit() {return this.m_hitBoat || this.m_hitTrap || this.m_miss;}
 
-    public boolean isFilled(){return this.m_entity == null;}
+    public boolean isFilled(){return this.m_entity != null;}
 }

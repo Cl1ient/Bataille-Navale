@@ -1,17 +1,12 @@
 package Model.Weapon;
 
 import Model.Coordinate;
-import Model.Player.Player;
+import Model.player.Player;
 
 public class Sonar implements Weapon{
     private Integer useLeft;
     public Sonar(){
         this.useLeft = 2;
-    }
-
-    @Override
-    public ShotResult apply(Player targetPlayer, Coordinate targetCoordinate) {
-        return new ShotResult();
     }
 
     @Override
