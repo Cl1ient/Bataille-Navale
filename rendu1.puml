@@ -252,18 +252,24 @@ package model {
         class Missile {
             +<<create>> Missile()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
 
         class Bomb {
             - m_useLeft: Integer
             +<<create>> Bomb()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
 
         class Sonar {
             - m_useLeft: Integer
             +<<create>> Sonar()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
     }
 
