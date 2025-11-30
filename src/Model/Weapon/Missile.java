@@ -1,4 +1,34 @@
 package Model.Weapon;
 
-public class Missile {
+import Model.Coordinate;
+import Model.Map.Grid;
+
+import java.util.Collections;
+import java.util.List;
+
+public class Missile implements Weapon{
+    private static final Integer m_unlimited_uses = -1;
+
+    public Missile(){}
+
+    @Override
+    public List<Coordinate> generateTargets(Coordinate coord, Grid grid){
+        return Collections.singletonList(coord);
+    }
+
+    @Override
+    public String getName() {
+        return "Missile";
+    }
+
+    @Override
+    public Integer getUsesLeft() {
+        return m_unlimited_uses;
+    }
+
+    @Override
+    public void use() {
+        // Unlimited use
+    }
+
 }

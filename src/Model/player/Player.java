@@ -5,7 +5,7 @@ import Model.EntityType;
 import Model.Game.GameConfiguration;
 import Model.GridEntity;
 import Model.Map.Grid;
-import Model.Weapon.Weapon;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
