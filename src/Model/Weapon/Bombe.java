@@ -6,30 +6,30 @@ import Model.Map.Grid;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Sonar implements Weapon{
+public class Bombe implements Weapon{
     private Integer m_useLeft = 1;
-    public Sonar(){}
+
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord, Grid grid) {
+    public List<Coordinate> generateTargets(Coordinate coord, Grid grid){
         List<Coordinate> targets = new ArrayList<>();
 
-        for (int dy = -1; dy <= 1; dy++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                targets.add(coord.getRelative(dy, dx));
-            }
-        }
+        targets.add(coord);
+        targets.add(coord.getRelative(0,1)); // Right
+        targets.add(coord.getRelative(0,-1)); // Left
+        targets.add(coord.getRelative(1,0)); // Top
+        targets.add(coord.getRelative(-1,0)); // Bottom
 
         return targets;
     }
 
     @Override
     public String getName(){
-        return "Sonar";
+        return "Bombe";
     }
 
     @Override
     public Integer getUsesLeft(){
-        return this.m_useLeft;
+        return m_useLeft;
     }
 
     @Override
@@ -38,4 +38,5 @@ public class Sonar implements Weapon{
             this.m_useLeft--;
         }
     }
+
 }

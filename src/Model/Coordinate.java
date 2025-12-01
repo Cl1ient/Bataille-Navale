@@ -39,4 +39,8 @@ public class Coordinate {
     public Integer getY() {
         return this.m_column;
     }
+
+    public Coordinate getRelative(Integer dRow, Integer dCol) {
+        return new Coordinate(this.m_row + dRow, this.m_column + dCol);
+    }
 }

@@ -134,6 +134,7 @@ package model {
         +<<create>> Coordinate(x : integer, y : integer)
         +getX() : int
         +getY() : int
+        getRelative(dRow : Integer, dCol :  Integer)
     }
 
     class ScanResult {
@@ -241,6 +242,8 @@ package model {
         interface Weapon {
             +generateTargets(coord : Coordinate, grid : Grid) : List<Coordinate>
             +getName() : String
+            +getUsesLeft() : Integer
+            +use()
         }
         class WeaponFactory{
             +<<create>> WeaponFactory()
@@ -248,20 +251,27 @@ package model {
             +createBomb() : Bomb
         }
         class Missile {
+            - m_unlimited_uses: Integer
             +<<create>> Missile()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
 
         class Bomb {
             - m_useLeft: Integer
             +<<create>> Bomb()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
 
         class Sonar {
             - m_useLeft: Integer
             +<<create>> Sonar()
             +generateTargets(coord, grid)
+            +getUsesLeft() : Integer
+            +use()
         }
     }
 

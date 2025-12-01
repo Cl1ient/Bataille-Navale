@@ -2,8 +2,6 @@ package Model.Game;
 
 import Model.player.HumanPlayer;
 import Model.player.ComputerPlayer;
-import Model.Coordinate;
-import Model.Weapon.Weapon;
 import Model.player.Player;
 
 public class Game {
