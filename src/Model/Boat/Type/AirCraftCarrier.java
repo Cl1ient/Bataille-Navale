@@ -2,6 +2,7 @@ package Model.Boat.Type;
 
 import Model.Boat.Boat;
 import Model.Coordinate;
+import Model.EntityType;
 import Model.Game.Game;
 import Model.player.Player;
 
@@ -10,7 +11,7 @@ public class AirCraftCarrier implements Boat {
     private static final int AIRCRAFTCARRIER_SIZE = 5;
     private final Integer size;
     private Integer m_nbShotReceive;
-    private final String name = "AirCraftCarrier";
+    private final EntityType m_type = EntityType.AIRCRAFT_CARRIER;
 
     /**
      * Constructor for AirCraftCarrier boat
@@ -51,7 +52,5 @@ public class AirCraftCarrier implements Boat {
      * Returns the name of the boat
      * @return the name of the boat
      */
-    public String getType(){
-        return name;
-    }
+    public EntityType getType(){return this.m_type;}
 }

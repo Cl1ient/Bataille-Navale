@@ -1,5 +1,7 @@
 package Model.entity.island;
 
+import Model.GridEntity;
+
 public class IslandItemFactory {
     /**
      * Constructor of Island Factory
@@ -10,15 +12,15 @@ public class IslandItemFactory {
         return new NewStorm();
     }
 
-    public NewBomb createNewItemBomb(){
+    public GridEntity createNewItemBomb(){
         return new NewBomb();
     }
 
-    public NewSonar createNewItemSonar(){
+    public GridEntity createNewItemSonar(){
         return new NewSonar();
     }
 
-    public NewBlackHole createNEwItemBlackHole(){
+    public GridEntity createNEwItemBlackHole(){
         return new NewBlackHole();
     }
 }

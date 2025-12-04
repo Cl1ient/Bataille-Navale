@@ -12,7 +12,7 @@ public class Missile implements Weapon{
     public Missile(){}
 
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord, Grid grid){
+    public List<Coordinate> generateTargets(Coordinate coord){
         return Collections.singletonList(coord);
     }
 
@@ -20,6 +20,7 @@ public class Missile implements Weapon{
     public String getName() {
         return "Missile";
     }
+    public boolean isOffensive(){return true;}
 
     @Override
     public Integer getUsesLeft() {
