@@ -13,7 +13,7 @@ public class BlackHole implements Trap {
 
     @Override
     public void onHit(Player attacker, Player defender, int x, int y){
-        // TODO
+        // attacker.receiveShot(new Coordinate(x,y));
     }
 
     public EntityType getType() {
