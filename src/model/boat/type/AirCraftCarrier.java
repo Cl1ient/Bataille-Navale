@@ -37,6 +37,7 @@ public class AirCraftCarrier implements Boat {
         this.m_nbShotReceive ++;
         //defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
         //attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
+        defender.getOwnGrid().mar
     }
 
     /**

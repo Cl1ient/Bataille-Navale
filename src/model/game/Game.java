@@ -1,6 +1,7 @@
 package model.game;
 
 import model.*;
+import model.boat.Boat;
 import model.boat.BoatFactory;
 import model.map.Cell;
 import model.map.Grid;
@@ -14,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Game {
+public class Game implements GameMediator{
     private Player m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
     private Player m_currentPlayer;
@@ -30,9 +31,25 @@ public class Game {
         this.m_boatFactory = new BoatFactory();
         this.m_listeners = new ArrayList<>();
         this.displayGridPlayer();
+
+        this.m_humanPlayer.setMediator(this);
+        this.m_computerPlayer.setMediator(this);
     }
 
+    @Override
+    public void handleHit(Player defender, Coordinate coord) {
+        for (GameListener listener : m_listeners) {
+            listener.onCellUpdated(defender, coord);
+        }
+    }
 
+    @Override
+    public void handleShipSunk(Player defender, Boat sunkBoat) {
+        for (GameListener listener : m_listeners) {
+            listener.onShipSunk(defender);
+        }
+        this.checkGameOver();
+    }
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPositions){
         this.m_humanPlayer.placeEntity(entityPositions);
     }
@@ -60,11 +77,10 @@ public class Game {
     }
 
     public void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets){
-        Map<EntityType, List<Coordinate>> entityPositions = new HashMap<>();
-
         for(Coordinate target : targets){
             this.processShot(attacker, defender, target.getX(), target.getY());
         }
+        this.checkGameOver();
         // TODO notifier l'observer
     }
 

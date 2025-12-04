@@ -2,8 +2,11 @@ package model.player;
 
 import model.Coordinate;
 import model.EntityType;
+import model.boat.Boat;
+import model.game.Game;
 import model.game.GameConfiguration;
 import model.GridEntity;
+import model.game.GameMediator;
 import model.map.Cell;
 import model.map.Grid;
 import model.weapon.Weapon;
@@ -19,6 +22,7 @@ public abstract class Player {
     protected Grid m_ownGrid;
     protected Grid m_shotGrid;
     private Integer m_nbBoatRemaning;
+    private GameMediator m_mediator;
     protected List<Weapon> availableWeapons;
     //private WeaponFactory WFacto;
     // private  List<Trap> traps; TODO
@@ -75,4 +79,16 @@ public abstract class Player {
 
     public Cell getTargetCell(int x, int y) {return this.m_ownGrid.getCell(x, y);}
 
+    // TODO mettre dans l'uml
+
+    public void setMediator(GameMediator mediator) {
+        this.m_mediator = mediator;
+    }
+    public void notifySunkStatus(Boat sunkBoat) {
+        this.m_mediator.handleShipSunk(this, sunkBoat);
+    }
+
+    public void notifyHit(Player defender, Coordinate coord) {
+        this.m_mediator.handleShipHit(defender, coord);
+    }
 }
