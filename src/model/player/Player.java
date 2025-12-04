@@ -72,8 +72,8 @@ public abstract class Player {
         return this.m_nbBoatRemaning == 0;
     }
 
-    public void receiveShot(Coordinate coord) {
-        this.m_ownGrid.hit(coord.getX(),coord.getY());
+    public void receiveShot(Coordinate coord, Player attacker) {
+        this.m_ownGrid.hit(coord.getX(),coord.getY(), this, attacker);
     }
     public String getNickName() {return this.m_name;}
 
@@ -89,6 +89,6 @@ public abstract class Player {
     }
 
     public void notifyHit(Player defender, Coordinate coord) {
-        this.m_mediator.handleShipHit(defender, coord);
+        this.m_mediator.handleHit(defender, coord);
     }
 }

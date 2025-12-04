@@ -87,11 +87,10 @@ public class Game implements GameMediator{
     public void processShot(Player attacker, Player defender, int x, int y){
         Cell targetCell = defender.getTargetCell(x, y);
         if(targetCell.getEntity() != null){
-            targetCell.getEntity().onHit(attacker,defender,x,y);
+            defender.receiveShot(new Coordinate(x, y), attacker);
         }else{
             this.handleMiss(defender,x,y);
         }
-
         //TODO notifier l'observer
     }
 

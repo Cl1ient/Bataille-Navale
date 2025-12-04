@@ -5,6 +5,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.GridEntity;
 import model.boat.Boat;
+import model.player.Player;
 import model.trap.TrapFactory;
 import model.entity.island.IslandItemFactory;
 
@@ -140,13 +141,13 @@ public class Grid {
         return x >= 0 && x < m_size && y >= 0 && y < m_size;
     }
 
-    public void hit(Integer x, Integer y) {
+    public void hit(Integer x, Integer y, Player defender, Player attacker) {
         if (!isInside(x, y)) return;
         Cell targetCell = cells[x][y];
         targetCell.setHit(true);
         GridEntity entity = targetCell.getEntity();
         if (entity != null) {
-            // TODO entity.onHit(attacker, defender, x, y)
+            entity.onHit(attacker, defender, x, y);
         } else {
             targetCell.setMiss(true);
         }
