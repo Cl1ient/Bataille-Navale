@@ -4,6 +4,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.game.GameConfiguration;
 import model.GridEntity;
+import model.map.Cell;
 import model.map.Grid;
 import model.weapon.Weapon;
 
@@ -71,5 +72,7 @@ public abstract class Player {
         this.m_ownGrid.hit(coord.getX(),coord.getY());
     }
     public String getNickName() {return this.m_name;}
+
+    public Cell getTargetCell(int x, int y) {return this.m_ownGrid.getCell(x, y);}
 
 }
