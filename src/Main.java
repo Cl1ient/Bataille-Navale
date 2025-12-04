@@ -1,16 +1,3 @@
-import Controller.GameController;
-import Model.Coordinate;
-import Model.EntityType;
-import Model.Game.Game;
-import Model.Game.GameConfiguration;
-import View.ConfigView;
-import View.StartMenu;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class Main {
 
     public static void main( String[] args ) {
