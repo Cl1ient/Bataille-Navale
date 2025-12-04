@@ -8,6 +8,7 @@ public class Cell {
     private boolean m_hitBoat;
     private boolean m_hitTrap;
     private boolean m_miss;
+    private Integer m_indexInEntity;
 
     /**
      * Constructs a new Cell.
@@ -55,4 +56,12 @@ public class Cell {
     public boolean isHit() {return this.m_hitBoat || this.m_hitTrap || this.m_miss;}
 
     public boolean isFilled(){return this.m_entity != null;}
+
+    public Integer getIndexInEntity() {
+        return m_indexInEntity;
+    }
+
+    public void setIndexInEntity(Integer index) {
+        this.m_indexInEntity = index;
+    }
 }

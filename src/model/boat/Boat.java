@@ -13,7 +13,8 @@ public interface Boat extends GridEntity {
     boolean isSunk();
 
 
-    void onHit(Player attacker, Player defender, Integer x, Integer y);
+    void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex);
+
 
     /**
      *

@@ -64,18 +64,19 @@ public class Grid {
             Integer col = coord.getY();
 
             if (this.cells[row][col].getEntity() != null) {
-                return false; // Cell occuped
+                return false;
             }
         }
-
+        Integer indexInEntity = 0;
         for (Coordinate coord : coordinates) {
             Integer row = coord.getX();
             Integer col = coord.getY();
-
             this.cells[row][col].setEntity(entity);
+            this.cells[row][col].setIndexInEntity(indexInEntity);
             if (entity instanceof Boat && !m_ownBoats.contains(entity)) {
                 m_ownBoats.add((Boat) entity);
             }
+            indexInEntity++;
         }
         return true;
     }
@@ -147,7 +148,8 @@ public class Grid {
         targetCell.setHit(true);
         GridEntity entity = targetCell.getEntity();
         if (entity != null) {
-            entity.onHit(attacker, defender, x, y);
+            Integer segmentIndex = targetCell.getIndexInEntity();
+            entity.onHit(attacker, defender, x, y, segmentIndex);
         } else {
             targetCell.setMiss(true);
         }
