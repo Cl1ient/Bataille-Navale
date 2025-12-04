@@ -1,5 +1,6 @@
 package Model.Boat;
 
+import Model.EntityType;
 import Model.Game.Game;
 import Model.GridEntity;
 import Model.player.Player;
@@ -24,5 +25,5 @@ public interface Boat extends GridEntity {
      *
      * @return the name of the boat
      */
-    String getType();
+    EntityType getType();
 }

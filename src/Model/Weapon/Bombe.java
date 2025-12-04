@@ -10,7 +10,7 @@ public class Bombe implements Weapon{
     private Integer m_useLeft = 1;
 
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord, Grid grid){
+    public List<Coordinate> generateTargets(Coordinate coord){
         List<Coordinate> targets = new ArrayList<>();
 
         targets.add(coord);
@@ -31,6 +31,8 @@ public class Bombe implements Weapon{
     public Integer getUsesLeft(){
         return m_useLeft;
     }
+
+    public boolean isOffensive(){return true;}
 
     @Override
     public void use(){

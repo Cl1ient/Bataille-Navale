@@ -2,6 +2,7 @@ package Model.Boat.Type;
 
 import Model.Boat.Boat;
 import Model.Coordinate;
+import Model.EntityType;
 import Model.Game.Game;
 import Model.player.Player;
 
@@ -9,7 +10,7 @@ public class Torpedo implements Boat {
     private static final int Torpedo_SIZE = 2;
     private final Integer size;
     private Integer m_nbShotReceive;
-    private final String name = "Torpedo";
+    private final EntityType m_type = EntityType.TORPEDO;
 
     /**
      * Constructor for Torpedo boat
@@ -49,8 +50,6 @@ public class Torpedo implements Boat {
      * Returns the name of the boat
      * @return the name of the boat
      */
-    public String getType(){
-        return name;
-    }
+    public EntityType getType(){return this.m_type;}
 
 }

@@ -3,6 +3,7 @@ package Model.player;
 import Model.Coordinate;
 import Model.EntityType;
 import Model.Game.GameConfiguration;
+import Model.Weapon.Weapon;
 
 import java.util.List;
 import java.util.Map;

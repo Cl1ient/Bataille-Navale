@@ -5,6 +5,7 @@ import Model.Coordinate;
 import Model.EntityType;
 import Model.GridEntity;
 import Model.Boat.Boat;
+import Model.Trap.TrapFactory;
 import Model.entity.island.IslandItemFactory;
 
 import java.util.ArrayList;
@@ -16,11 +17,10 @@ public class Grid {
 
     private final Integer m_size;
     private final Cell[][] cells;
-    // TODO private final TrapFactory m_trapFactory;
-    // TODO private final IslandItemFactory m_islandItemFactory;
     private final List<Boat> m_ownBoats;
     private final IslandItemFactory m_islandItemFactory;
     private final BoatFactory m_boatFactory;
+    private final TrapFactory m_trapFactory;
     /**
      * Constructor for the Grid.
      * Initializes the grid array (cells), size, and factories.
@@ -32,8 +32,7 @@ public class Grid {
         this.m_ownBoats = new ArrayList<>();
         this.m_islandItemFactory = new IslandItemFactory();
         this.m_boatFactory = new BoatFactory();
-        // TODO this.m_trapFactory = new TrapFactory();
-        // TODO this.m_islandItemFactory = new IslandItemFactory();
+        this.m_trapFactory = new TrapFactory();
 
         // init all the cell
         for (Integer i = 0; i < gridSize; i++) {
@@ -82,7 +81,6 @@ public class Grid {
 
     private GridEntity createEntityFromType(EntityType type) {
         switch (type) {
-            /*
             case NEW_BOMB:
                 return m_islandItemFactory.createNewItemBomb();
 
@@ -94,22 +92,33 @@ public class Grid {
 
             case NEW_SONAR:
                 return m_islandItemFactory.createNewItemSonar();
-            */
+
             case AIRCRAFT_CARRIER:
                 m_ownBoats.add(0,this.m_boatFactory.createAirCraftCarrier());
                 return this.m_ownBoats.get(0);
+
             case CRUISER:
                 m_ownBoats.add(0,this.m_boatFactory.createCruiser());
                 return this.m_ownBoats.get(0);
+
             case DESTROYER:
                 m_ownBoats.add(0,this.m_boatFactory.createDestroyer());
                 return this.m_ownBoats.get(0);
+
             case SUBMARINE:
                 m_ownBoats.add(0,this.m_boatFactory.createSubmarine());
                 return this.m_ownBoats.get(0);
+
             case TORPEDO:
                 m_ownBoats.add(0,this.m_boatFactory.createTorpedo());
                 return this.m_ownBoats.get(0);
+
+            case STORM:
+                return this.m_trapFactory.createStorm();
+
+            case BLACK_HOLE:
+                return this.m_trapFactory.createBlackHole();
+
             default:
                 return null;
         }

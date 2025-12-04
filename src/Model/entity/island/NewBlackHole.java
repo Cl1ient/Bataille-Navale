@@ -1,19 +1,21 @@
 package Model.entity.island;
 
 import Model.EntityType;
+import Model.Game.Game;
+import Model.GridEntity;
 import Model.player.Player;
 
-public class NewBlackHole {
+public class NewBlackHole implements GridEntity {
 
     private EntityType m_type = EntityType.NEW_BLACKHOLE;
+    private Integer m_size = 1;
 
     public NewBlackHole(){}
 
-    public void onHit(Player attacker, Player defender, int x, int y){
+    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
 
     }
 
-    public EntityType getM_type(){
-        return this.m_type;
-    }
+    public EntityType getType(){return this.m_type;}
+    public Integer getSize(){return this.m_size;}
 }

@@ -13,7 +13,7 @@ public interface Weapon {
      * @param grid The grid being targeted.
      * @return A list of Coordinates that will receive an impact.
      */
-    List<Coordinate> generateTargets(Coordinate coord, Grid grid);
+    List<Coordinate> generateTargets(Coordinate coord);
 
     /**
      *
@@ -30,4 +30,6 @@ public interface Weapon {
      * Decrements the remaining uses of the weapon after it has been fired.
      */
     void use();
+
+    public boolean isOffensive();
 }

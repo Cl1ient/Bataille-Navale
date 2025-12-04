@@ -2,6 +2,7 @@ package Model.Boat.Type;
 
 import Model.Boat.Boat;
 import Model.Coordinate;
+import Model.EntityType;
 import Model.Game.Game;
 import Model.player.Player;
 
@@ -9,7 +10,7 @@ public class Cruiser implements Boat {
     private static final int CRUISER_SIZE = 4;
     private final Integer m_size;
     private Integer m_nbShotReceive;
-    private final String name = "Cruiser";
+    private final EntityType m_type = EntityType.CRUISER;
 
     /**
      * Constructor for Cruiser boat
@@ -37,13 +38,7 @@ public class Cruiser implements Boat {
         //attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
     }
 
-    /**
-     * Returns the name of the boat
-     * @return the name of the boat
-     */
-    public String getType(){
-        return name;
-    }
+    public EntityType getType(){return this.m_type;}
 
     public Integer getSize() {return this.m_size;}
 }

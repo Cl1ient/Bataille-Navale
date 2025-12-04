@@ -1,15 +1,17 @@
 package Model.Trap;
 
 import Model.Coordinate;
+import Model.EntityType;
 import Model.Game.Game;
 import Model.GridEntity;
 import Model.player.Player;
 
 import java.util.Random;
 
-public class Tornado implements GridEntity {
+public class Storm implements GridEntity {
     private Integer m_size = 1;
     private Integer turnsLeft = 3;
+    private final EntityType m_type = EntityType.STORM;
 
     public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
         this.turnsLeft --;
@@ -29,9 +31,7 @@ public class Tornado implements GridEntity {
     }
 
     @Override
-    public String getType() {
-        return "Tornado";
-    }
+    public EntityType getType(){return this.m_type;}
 
     public Integer getSize() {return this.m_size;}
 
