@@ -11,7 +11,7 @@ public class NewBomb implements GridEntity {
 
     public NewBomb(){}
 
-    public void onHit(Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
 
     }
 
