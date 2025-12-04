@@ -79,7 +79,7 @@ public class Grid {
         return true;
     }
 
-    private GridEntity createEntityFromType(EntityType type) {
+    public GridEntity createEntityFromType(EntityType type) {
         switch (type) {
             case NEW_BOMB:
                 return m_islandItemFactory.createNewItemBomb();

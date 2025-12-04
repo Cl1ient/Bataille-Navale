@@ -10,7 +10,7 @@ public class BlackHole implements GridEntity {
     private final EntityType m_type = EntityType.BLACK_HOLE;
     public BlackHole(){}
 
-    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y){
         //defender.getOwnGrid().markHitTrap(new Coordinate(x,y));
         //game.processShot(defender, attacker, x, y);
 

@@ -12,7 +12,7 @@ public class NewSonar implements GridEntity {
 
     public NewSonar(){}
 
-    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y){
 
     }
 

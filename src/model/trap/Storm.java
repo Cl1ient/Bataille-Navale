@@ -13,7 +13,7 @@ public class Storm implements GridEntity {
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
 
-    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y){
         this.turnsLeft --;
         Coordinate coord = modifyCoordinates(defender.getGridSize());
         //defender.getOwnGrid().markHitTrap(coord);

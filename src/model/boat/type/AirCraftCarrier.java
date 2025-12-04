@@ -32,7 +32,7 @@ public class AirCraftCarrier implements Boat {
 
 
     @Override
-    public void onHit(Game game, Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y){
         // comportement d'un bateau lorsqu'il est touché
         this.m_nbShotReceive ++;
         //defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
