@@ -91,4 +91,16 @@ public abstract class Player {
     public void notifyHit(Player defender, Coordinate coord) {
         this.m_mediator.handleHit(defender, coord);
     }
+
+    public void notifyBlackHoleHit(Player defender, Coordinate coord) {
+        this.m_mediator.handleBlackHoleHit(defender, coord);
+    }
+
+    public GridEntity getEntityAt(Coordinate coord) {
+        Cell targetCell = this.m_ownGrid.getCell(coord.getX(), coord.getY());
+        if (targetCell != null) {
+            return targetCell.getEntity();
+        }
+        return null;
+    }
 }

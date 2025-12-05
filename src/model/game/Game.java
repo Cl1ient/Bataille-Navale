@@ -3,6 +3,7 @@ package model.game;
 import model.*;
 import model.boat.Boat;
 import model.boat.BoatFactory;
+import model.entity.trap.BlackHole;
 import model.map.Cell;
 import model.map.Grid;
 import model.weapon.Weapon;
@@ -20,6 +21,7 @@ public class Game implements GameMediator{
     private ComputerPlayer m_computerPlayer;
     private Player m_currentPlayer;
     private BoatFactory m_boatFactory;
+    private Weapon m_currentWeaponUsed;
 
     private final List<GameListener> m_listeners;
 
@@ -50,6 +52,11 @@ public class Game implements GameMediator{
         }
         this.checkGameOver();
     }
+
+    @Override
+    public void handleBlackHoleHit(Player defender, Coordinate coord) {
+       // TODO je sais pas quoi faire encore ici
+    }
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPositions){
         this.m_humanPlayer.placeEntity(entityPositions);
     }
@@ -66,8 +73,8 @@ public class Game implements GameMediator{
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord){
         Player defender = getOpponent(attacker);
-
         List<Coordinate> targets = weapon.generateTargets(coord);
+
         // TODO revoir le scan
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
@@ -77,6 +84,32 @@ public class Game implements GameMediator{
     }
 
     public void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets){
+        Coordinate trapCoord = null;
+        Weapon originalWeapon = this.m_currentWeaponUsed; // Arme utilisée dans ce cycle
+
+        // Boucle de vérification : Cherche si un Trou Noir est dans la zone cible
+        for (Coordinate target : targets) {
+            GridEntity entity = defender.getEntityAt(target);
+
+            if (entity instanceof BlackHole) {
+                trapCoord = target; // Stocke l'endroit où le rebond doit être centré
+                break; // Le piège a été trouvé, on sort immédiatement de la boucle de vérif.
+            }
+        }
+
+        if (trapCoord != null) {
+            // Règle C3 : Le Trou Noir a été touché. Le rebond est prioritaire.
+
+            // Exécuter l'attaque inversée (la Bombe complète sur l'attaquant)
+            this.processAttack(defender, originalWeapon, trapCoord);
+
+            // IMPORTANT : Le Game doit aussi marquer la cellule du Trou Noir comme touchée
+            // sur la grille du défenseur (defender) pour le retirer.
+            this.processShot(attacker, defender, trapCoord.getX(), trapCoord.getY());
+
+            this.checkGameOver();
+            return; // Termine l'attaque sans exécuter les autres cibles de la Bombe
+        }
         for(Coordinate target : targets){
             this.processShot(attacker, defender, target.getX(), target.getY());
         }
@@ -146,4 +179,6 @@ public class Game implements GameMediator{
         System.out.println("grille de : " + this.m_computerPlayer.getNickName());
         this.m_computerPlayer.getOwnGrid().displayGrid();
     }
+
+
 }
