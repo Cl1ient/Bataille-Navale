@@ -11,6 +11,7 @@ import model.weapon.Missile;
 import model.weapon.Weapon;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,61 +28,21 @@ public class Main {
 
     public static void main(String[] args) {
 
-        SwingUtilities.invokeLater(() -> {
+       System.out.println("Main");
 
-            System.out.println("--- Démarrage du Test d'Architecture (FIN DE PARTIE) ---");
+        Map<EntityType, List<Coordinate>> placement = new HashMap<>();
+        placement.put(EntityType.CRUISER, new ArrayList<>(List.of(new Coordinate(1,2), new Coordinate(1,3), new Coordinate(1,4), new Coordinate(1,5))));
+        GameConfiguration config = new GameConfiguration(10, placement, false, "Valentin");
 
-            final int GRID_SIZE = 6;
-            final String PLAYER_NAME = "Capitaine Fin";
-            Weapon missile = new Missile();
-
-            Map<EntityType, List<Coordinate>> humanPlacement = new HashMap<>();
-            humanPlacement.put(EntityType.SUBMARINE, List.of(
-                    new Coordinate(1,1), new Coordinate(1,2), new Coordinate(1,3)
-            ));
-
-            Map<EntityType, List<Coordinate>> computerPlacement = new HashMap<>();
-            computerPlacement.put(EntityType.SUBMARINE, List.of(
-                    new Coordinate(2,0), new Coordinate(2,1), new Coordinate(2,2)
-            ));
-
-            GameConfiguration config = new GameConfiguration(
-                    GRID_SIZE,
-                    humanPlacement,
-                    false,
-                    PLAYER_NAME
-            );
-
-            HumanPlayer humanPlayer = new HumanPlayer(config);
-            ComputerPlayer computerPlayer = new ComputerPlayer(config);
-
-            Game game = new Game(config, humanPlayer, computerPlayer);
-            game.addListener(new TestGameListener());
-
-            game.placeComputerEntities(computerPlacement);
-
-            System.out.println("\n--- Grilles après placement ---");
-            game.displayGridPlayer();
-
-            System.out.println("\n--- DÉBUT DE LA PARTIE ---");
-
-            System.out.println("\n[TOUR 1 - Humain] : Segments 1 et 2");
-            game.processAttack(humanPlayer, missile, new Coordinate(2,0));
-            game.processAttack(humanPlayer, missile, new Coordinate(2,1));
+        Game game = new Game(config);
+        Player humanPlayer = game.getHumanPlayer();
+        ComputerPlayer computer = game.getM_computerPlayer();
+           game.addListener(new TestGameListener());
+        Weapon missile = new Missile();
+          game.processAttack(computer, missile, new Coordinate(1,2));
+            game.processAttack(computer, missile, new Coordinate(1,3));
+            game.processAttack(computer, missile, new Coordinate(1,4));
+            game.processAttack(computer, missile, new Coordinate(1,5));
             game.processComputerAttack(); // Ordinateur joue
-
-
-            System.out.println("\n[TOUR 2 - Humain] : Coup FATAL (Segment 3)");
-            game.processAttack(humanPlayer, missile, new Coordinate(2,2));
-            if (!game.isGameOver()) game.processComputerAttack();
-
-            System.out.println("\n--- FIN DE LA PARTIE ---");
-
-            if (game.isGameOver()) {
-                System.out.println("*** Statut final : L'Humain a gagné! ***");
-            } else {
-                System.out.println("*** Statut final : Partie non terminée (erreur) ***");
-            }
-        });
     }
 }

@@ -36,7 +36,7 @@ public abstract class Player {
         this.m_nbBoatRemaning = 1;
         // this.traps = new ArrayList<>(); TODO
 
-        //this.placeEntity(config.getGridEntityPlacement());
+        this.placeEntity(config.getGridEntityPlacement());
 
     }
 
