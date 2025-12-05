@@ -53,25 +53,21 @@ public class Game implements GameMediator {
     }
 
     public void placeEntity(Map<EntityType, List<Coordinate>> positions) {
-        System.out.println("[DEBUG] Placement des entités...");
         this.m_humanPlayer.placeEntity(positions);
     }
 
     public void placeComputerEntities(Map<EntityType, List<Coordinate>> positions) {
-        System.out.println("[DEBUG] Placement des entités de l'IA...");
         this.m_computerPlayer.placeEntity(positions);
     }
 
     public void processComputerAttack() {
 
-        System.out.println("[DEBUG] processComputerAttack()");
         if (isGameOver()) {
             System.out.println("[DEBUG] Impossible : Partie déjà terminée.");
             return;
         }
         Coordinate target = m_computerPlayer.choseCoord();
         Weapon weapon = m_computerPlayer.choseWeapon();
-        System.out.println("[DEBUG] L’ordinateur attaque en " + target);
         processAttack(m_computerPlayer, weapon, target);
         if (!checkGameOver()) {
             nextTurn();
