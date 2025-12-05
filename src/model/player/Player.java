@@ -69,7 +69,13 @@ public abstract class Player {
     }
 
     public boolean hasLost(){
-        return this.m_nbBoatRemaning == 0;
+        List<Boat> ownBoats = this.m_ownGrid.getOwnBoats();
+        for (Boat boat : ownBoats) {
+            if (!boat.isSunk()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public void receiveShot(Coordinate coord, Player attacker) {
@@ -102,5 +108,9 @@ public abstract class Player {
             return targetCell.getEntity();
         }
         return null;
+    }
+
+    public String getName() {
+        return this.m_name;
     }
 }

@@ -1,5 +1,6 @@
 package model.trap;
 
+import model.Coordinate;
 import model.EntityType;
 import model.game.Game;
 import model.GridEntity;
@@ -10,10 +11,11 @@ public class BlackHole implements GridEntity {
     private final EntityType m_type = EntityType.BLACK_HOLE;
     public BlackHole(){}
 
-    public void onHit(Player attacker, Player defender, Integer x, Integer y){
+    public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
         //defender.getOwnGrid().markHitTrap(new Coordinate(x,y));
         //game.processShot(defender, attacker, x, y);
-
+        Coordinate coord = new Coordinate(x, y);
+        defender.notifyBlackHoleHit(defender, coord);
     }
 
     @Override

@@ -253,4 +253,8 @@ public class Grid {
             System.out.println();
         }
     }
+
+    public List<Boat> getOwnBoats() {
+        return this.m_ownBoats;
+    }
 }

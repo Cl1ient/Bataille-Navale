@@ -35,10 +35,12 @@ public class Submarine implements Boat {
 
     @Override
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
+        System.out.println("Submarine hit");
         this.m_hits[segmentIndex] = true;
 
         defender.notifyHit(defender, new Coordinate(x, y));
         if(this.isSunk()){
+            System.out.println("Submarine is sunk dans le if");
             defender.loseOneBoat();
             defender.notifySunkStatus(this);
         }

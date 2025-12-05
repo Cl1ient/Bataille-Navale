@@ -4,78 +4,104 @@ import model.*;
 import model.boat.Boat;
 import model.boat.BoatFactory;
 import model.entity.trap.BlackHole;
+import model.entity.trap.TrapFactory;
 import model.map.Cell;
-import model.map.Grid;
-import model.weapon.Weapon;
 import model.player.HumanPlayer;
 import model.player.ComputerPlayer;
 import model.player.Player;
+import model.weapon.Weapon;
+import model.weapon.WeaponFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Game implements GameMediator{
+public class Game implements GameMediator {
+
+    private final TrapFactory m_trapFactory;
+    private final WeaponFactory m_weaponFactory;
+    private final BoatFactory m_boatFactory;
+
     private Player m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
     private Player m_currentPlayer;
-    private BoatFactory m_boatFactory;
+
     private Weapon m_currentWeaponUsed;
+    private GameConfiguration m_game;
 
     private final List<GameListener> m_listeners;
 
-    public Game(GameConfiguration config){
+    public Game(GameConfiguration config, Player hp, ComputerPlayer cp) {
 
-        this.m_humanPlayer = new HumanPlayer(config);
-        this.m_computerPlayer = new ComputerPlayer(config);
-        this.m_currentPlayer = m_humanPlayer;
+        System.out.println("[DEBUG] Initialisation du jeu…");
+
+        this.m_game = config;
+        this.m_humanPlayer = hp;
+        this.m_computerPlayer = cp;
+
+        this.m_trapFactory = new TrapFactory();
+        this.m_weaponFactory = new WeaponFactory();
         this.m_boatFactory = new BoatFactory();
         this.m_listeners = new ArrayList<>();
-        this.displayGridPlayer();
 
         this.m_humanPlayer.setMediator(this);
         this.m_computerPlayer.setMediator(this);
+
+        this.m_currentPlayer = m_humanPlayer;
+
+        displayGridPlayer();
     }
+
 
     @Override
     public void handleHit(Player defender, Coordinate coord) {
-        for (GameListener listener : m_listeners) {
-            listener.onCellUpdated(defender, coord);
-        }
-    }
-
-    @Override
-    public void handleShipSunk(Player defender, Boat sunkBoat) {
-        for (GameListener listener : m_listeners) {
-            listener.onShipSunk(defender);
-        }
-        this.checkGameOver();
+        for (GameListener li : m_listeners)
+            li.onCellUpdated(defender, coord);
     }
 
     @Override
     public void handleBlackHoleHit(Player defender, Coordinate coord) {
-       // TODO je sais pas quoi faire encore ici
-    }
-    public void placeEntity(Map<EntityType, List<Coordinate>> entityPositions){
-        this.m_humanPlayer.placeEntity(entityPositions);
+        System.out.println("[DEBUG] handleBlackHoleHit() : BlackHole touché à " + coord);
     }
 
-    public void processComputerAttack(){
-        // choisie les Coord et Weapon de manière random
-        Coordinate targetCoord = this.m_computerPlayer.choseCoord();
-        Weapon weapon = this.m_computerPlayer.choseWeapon();
-
-        this.processAttack(this.m_computerPlayer, weapon, targetCoord);
-        this.checkGameOver();
-        // TODO peut être implémenté un this.nextTurn();
+    @Override
+    public void handleShipSunk(Player defender, Boat boat) {
+        for (GameListener li : m_listeners)
+            li.onShipSunk(defender);
+        checkGameOver();
     }
 
-    public void processAttack(Player attacker, Weapon weapon, Coordinate coord){
+    public void placeEntity(Map<EntityType, List<Coordinate>> positions) {
+        System.out.println("[DEBUG] Placement des entités...");
+        this.m_humanPlayer.placeEntity(positions);
+    }
+
+    public void placeComputerEntities(Map<EntityType, List<Coordinate>> positions) {
+        System.out.println("[DEBUG] Placement des entités de l'IA...");
+        this.m_computerPlayer.placeEntity(positions);
+    }
+
+    public void processComputerAttack() {
+
+        System.out.println("[DEBUG] processComputerAttack()");
+        if (isGameOver()) {
+            System.out.println("[DEBUG] Impossible : Partie déjà terminée.");
+            return;
+        }
+        Coordinate target = m_computerPlayer.choseCoord();
+        Weapon weapon = m_computerPlayer.choseWeapon();
+        System.out.println("[DEBUG] L’ordinateur attaque en " + target);
+        processAttack(m_computerPlayer, weapon, target);
+        if (!checkGameOver()) {
+            nextTurn();
+        }
+    }
+
+    public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
+
+        this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         List<Coordinate> targets = weapon.generateTargets(coord);
-
-        // TODO revoir le scan
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
         } else {
@@ -83,102 +109,97 @@ public class Game implements GameMediator{
         }
     }
 
-    public void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets){
-        Coordinate trapCoord = null;
-        Weapon originalWeapon = this.m_currentWeaponUsed; // Arme utilisée dans ce cycle
-
-        // Boucle de vérification : Cherche si un Trou Noir est dans la zone cible
-        for (Coordinate target : targets) {
-            GridEntity entity = defender.getEntityAt(target);
-
-            if (entity instanceof BlackHole) {
-                trapCoord = target; // Stocke l'endroit où le rebond doit être centré
-                break; // Le piège a été trouvé, on sort immédiatement de la boucle de vérif.
+    private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
+        for (Coordinate t : targets) {
+            if (defender.getEntityAt(t) instanceof BlackHole) {
+                System.out.println("[DEBUG] → BlackHole détecté sur " + t);
+                processAttack(defender, m_currentWeaponUsed, t);
+                return;
             }
         }
 
-        if (trapCoord != null) {
-            // Règle C3 : Le Trou Noir a été touché. Le rebond est prioritaire.
-
-            // Exécuter l'attaque inversée (la Bombe complète sur l'attaquant)
-            this.processAttack(defender, originalWeapon, trapCoord);
-
-            // IMPORTANT : Le Game doit aussi marquer la cellule du Trou Noir comme touchée
-            // sur la grille du défenseur (defender) pour le retirer.
-            this.processShot(attacker, defender, trapCoord.getX(), trapCoord.getY());
-
-            this.checkGameOver();
-            return; // Termine l'attaque sans exécuter les autres cibles de la Bombe
+        for (Coordinate t : targets) {
+            processShot(attacker, defender, t.getX(), t.getY());
+            if (isGameOver()) {
+                checkGameOver();
+                return;
+            }
         }
-        for(Coordinate target : targets){
-            this.processShot(attacker, defender, target.getX(), target.getY());
-        }
-        this.checkGameOver();
-        // TODO notifier l'observer
+        checkGameOver();
     }
 
-    public void processShot(Player attacker, Player defender, int x, int y){
-        Cell targetCell = defender.getTargetCell(x, y);
-        if(targetCell.getEntity() != null){
+    private void processShot(Player attacker, Player defender, int x, int y) {
+        Cell cell = defender.getTargetCell(x, y);
+        if (cell == null) {
+            return;
+        }
+        if (cell.getEntity() != null) {
             defender.receiveShot(new Coordinate(x, y), attacker);
-        }else{
-            this.handleMiss(defender,x,y);
+        } else {
+            handleMiss(defender, x, y);
         }
-        //TODO notifier l'observer
     }
 
-    // TODO Revoir cette méthode
-    public void processScan(Player attacker, Player defender, List<Coordinate> targets){
+    private void processScan(Player attacker, Player defender, List<Coordinate> targets) {
         List<ScanResult> results = new ArrayList<>();
-
-        for(GameListener listener : m_listeners){
-            listener.onScanResult(attacker, results);
+        for (GameListener li : m_listeners){
+            li.onScanResult(attacker, results);
         }
     }
 
     public void handleMiss(Player defender, int x, int y) {
+        System.out.println("[DEBUG] handleMiss(" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
     }
 
     public boolean isGameOver() {
-        return m_humanPlayer.hasLost() || m_computerPlayer.hasLost();
+        boolean over = m_humanPlayer.hasLost() || m_computerPlayer.hasLost();
+        return over;
     }
 
-    public Player getWinner(){
-        if (m_humanPlayer.hasLost()){
-            return m_computerPlayer;
-        }
-        return m_humanPlayer;
-    }
-
-    public void addListener(GameListener listener){
-        this.m_listeners.add(listener);
-    }
-
-    public void removeListener(GameListener listener){
-        this.m_listeners.remove(listener);
-    }
-
-    private void checkGameOver(){
-        if(isGameOver()){
+    private boolean checkGameOver() {
+        if (isGameOver()) {
             Player winner = getWinner();
-            for(GameListener listener : m_listeners){
-                listener.onGameOver(winner);
-            }
+            for (GameListener li : m_listeners)
+                li.onGameOver(winner);
+            return true;
         }
+        return false;
+    }
+
+    public Player getWinner() {
+        return (m_humanPlayer.hasLost()) ? m_computerPlayer : m_humanPlayer;
     }
 
     public Player getOpponent(Player p) {
-        return (p == this.m_humanPlayer) ? this.m_computerPlayer : this.m_humanPlayer;
+        Player opp = (p == m_humanPlayer) ? m_computerPlayer : m_humanPlayer;
+        System.out.println("[DEBUG] getOpponent(" + p.getNickName() + ") -> " + opp.getNickName());
+        return opp;
     }
 
-    public void displayGridPlayer(){
-        System.out.println("grille de : " + this.m_humanPlayer.getNickName());
-        this.m_humanPlayer.getOwnGrid().displayGrid();
+    public void nextTurn() {
+        System.out.println("[DEBUG] nextTurn()");
 
-        System.out.println("grille de : " + this.m_computerPlayer.getNickName());
-        this.m_computerPlayer.getOwnGrid().displayGrid();
+        if (isGameOver()) {
+            System.out.println("[DEBUG] nextTurn() ignoré → Partie terminée");
+            return;
+        }
+
+        if (m_currentPlayer == m_humanPlayer)
+            m_currentPlayer = m_computerPlayer;
+        else
+            m_currentPlayer = m_humanPlayer;
+
+        System.out.println("[DEBUG] Nouveau joueur courant : " + m_currentPlayer.getNickName());
     }
 
+    public void displayGridPlayer() {
+        System.out.println("grille de : " + m_humanPlayer.getNickName());
+        m_humanPlayer.getOwnGrid().displayGrid();
 
+        System.out.println("grille de : " + m_computerPlayer.getNickName());
+        m_computerPlayer.getOwnGrid().displayGrid();
+    }
+
+    public void addListener(GameListener listener){ this.m_listeners.add(listener); }
 }

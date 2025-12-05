@@ -4,6 +4,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.game.GameConfiguration;
 import model.weapon.Weapon;
+import model.weapon.WeaponFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -11,18 +12,19 @@ import java.util.Random;
 
 public class ComputerPlayer extends Player{
 
+    private final WeaponFactory m_weaponFactory;
+
     public ComputerPlayer(GameConfiguration config) {
         super(config);
+        m_weaponFactory = new WeaponFactory();
         this.m_name = "Computer";
+        this.availableWeapons.add(this.m_weaponFactory.createMissile());
+
     }
 
     @Override
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
-
-        for(Map.Entry<EntityType, List<Coordinate>> entry : entityPlacement.entrySet()){
-
-            this.m_ownGrid.randomPlacementEntity(entry.getKey());
-        }
+        this.m_ownGrid.placeEntity(entityPlacement);
     }
 
     public Coordinate choseCoord(){
