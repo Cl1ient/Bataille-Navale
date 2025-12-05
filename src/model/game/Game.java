@@ -52,25 +52,6 @@ public class Game implements GameMediator {
         displayGridPlayer();
     }
 
-
-    @Override
-    public void handleHit(Player defender, Coordinate coord) {
-        for (GameListener li : m_listeners)
-            li.onCellUpdated(defender, coord);
-    }
-
-    @Override
-    public void handleBlackHoleHit(Player defender, Coordinate coord) {
-        System.out.println("[DEBUG] handleBlackHoleHit() : BlackHole touché à " + coord);
-    }
-
-    @Override
-    public void handleShipSunk(Player defender, Boat boat) {
-        for (GameListener li : m_listeners)
-            li.onShipSunk(defender);
-        checkGameOver();
-    }
-
     public void placeEntity(Map<EntityType, List<Coordinate>> positions) {
         System.out.println("[DEBUG] Placement des entités...");
         this.m_humanPlayer.placeEntity(positions);
@@ -107,6 +88,7 @@ public class Game implements GameMediator {
         } else {
             processScan(attacker, defender, targets);
         }
+
     }
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
@@ -141,15 +123,11 @@ public class Game implements GameMediator {
     }
 
     private void processScan(Player attacker, Player defender, List<Coordinate> targets) {
+        // TODO j'ai pas encore fait
         List<ScanResult> results = new ArrayList<>();
         for (GameListener li : m_listeners){
             li.onScanResult(attacker, results);
         }
-    }
-
-    public void handleMiss(Player defender, int x, int y) {
-        System.out.println("[DEBUG] handleMiss(" + x + "," + y + ")");
-        defender.getOwnGrid().markMiss(x, y);
     }
 
     public boolean isGameOver() {
@@ -202,4 +180,31 @@ public class Game implements GameMediator {
     }
 
     public void addListener(GameListener listener){ this.m_listeners.add(listener); }
+
+
+    // HANDLER
+
+    public void handleMiss(Player defender, int x, int y) {
+        System.out.println("[DEBUG] handleMiss(" + x + "," + y + ")");
+        defender.getOwnGrid().markMiss(x, y);
+    }
+
+    @Override
+    public void handleHit(Player defender, Coordinate coord) {
+        for (GameListener li : m_listeners)
+            li.onCellUpdated(defender, coord);
+    }
+
+    @Override
+    public void handleBlackHoleHit(Player defender, Coordinate coord) {
+        System.out.println("[DEBUG] handleBlackHoleHit() : BlackHole touché à " + coord);
+    }
+
+    @Override
+    public void handleShipSunk(Player defender, Boat boat) {
+        for (GameListener li : m_listeners)
+            li.onShipSunk(defender);
+        checkGameOver();
+    }
+
 }

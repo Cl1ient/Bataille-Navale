@@ -33,10 +33,10 @@ public abstract class Player {
         this.m_ownGrid = new Grid(config.getGridSize());
         this.m_shotGrid = new Grid(config.getGridSize());
         this.availableWeapons = new ArrayList<>();
-        this.m_nbBoatRemaning = 5;
+        this.m_nbBoatRemaning = 1;
         // this.traps = new ArrayList<>(); TODO
 
-        this.placeEntity(config.getGridEntityPlacement());
+        //this.placeEntity(config.getGridEntityPlacement());
 
     }
 
@@ -70,6 +70,7 @@ public abstract class Player {
 
     public boolean hasLost(){
         List<Boat> ownBoats = this.m_ownGrid.getOwnBoats();
+        System.out.println(ownBoats);
         for (Boat boat : ownBoats) {
             if (!boat.isSunk()) {
                 return false;
