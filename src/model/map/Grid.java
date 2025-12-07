@@ -17,7 +17,7 @@ import java.util.Random;
 public class Grid {
 
     private final Integer m_size;
-    private final Cell[][] cells;
+    private Cell[][] cells;
     private final List<Boat> m_ownBoats;
     private final IslandItemFactory m_islandItemFactory;
     private final BoatFactory m_boatFactory;
@@ -155,6 +155,9 @@ public class Grid {
         if (!isInside(x, y)) return;
         cells[x][y].setMiss(true);
     }
+    public void markHitBoat(Coordinate coord){
+        this.cells[coord.getX()][coord.getY()].setHitBoat(true);
+    }
 
     public void triggerTornado(Coordinate coord) {
         if (!isInside(coord)) return;
@@ -220,7 +223,14 @@ public class Grid {
     public void displayGrid() {
         for (int r = 0; r < m_size; r++) {
             for (int c = 0; c < m_size; c++) {
-                System.out.print(this.cells[r][c].getEntity() != null ? " x" : " o");
+                if(this.cells[r][c].isHit()){
+                    System.out.print(" -");
+                }
+                else if(this.cells[r][c].getEntity() != null){
+                    System.out.print(" x");
+                }
+                else {System.out.print(" o");}
+
             }
             System.out.println();
         }
@@ -229,4 +239,6 @@ public class Grid {
     public List<Boat> getOwnBoats() {
         return m_ownBoats;
     }
+
+
 }

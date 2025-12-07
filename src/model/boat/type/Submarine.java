@@ -39,6 +39,8 @@ public class Submarine implements Boat {
         this.m_hits[segmentIndex] = true;
 
         defender.notifyHit(defender, new Coordinate(x, y));
+        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
         if(this.isSunk()){
             System.out.println("Submarine is sunk dans le if");
             defender.loseOneBoat();

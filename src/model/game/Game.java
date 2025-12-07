@@ -89,6 +89,7 @@ public class Game implements GameMediator {
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
+            System.out.println("Je suis la");
             if (defender.getEntityAt(t) instanceof BlackHole) {
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
                 processAttack(defender, m_currentWeaponUsed, t);
