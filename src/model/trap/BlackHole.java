@@ -16,6 +16,7 @@ public class BlackHole implements GridEntity {
         //game.processShot(defender, attacker, x, y);
         Coordinate coord = new Coordinate(x, y);
         defender.notifyBlackHoleHit(defender, coord);
+        attacker.receiveShot(new Coordinate(x, y), defender);
     }
 
     @Override

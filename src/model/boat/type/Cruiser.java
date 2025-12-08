@@ -38,6 +38,9 @@ public class Cruiser implements Boat {
         this.m_hits[segmentIndex] = true;
 
         defender.notifyHit(defender, new Coordinate(x, y));
+        defender.getOwnGrid().markHitBoat(new Coordinate(x,y));
+        attacker.getShotGrid().markHitBoat(new Coordinate(x,y));
+
         if(this.isSunk()){
             defender.loseOneBoat();
             defender.notifySunkStatus(this);
