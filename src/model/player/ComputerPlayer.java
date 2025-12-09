@@ -55,6 +55,7 @@ public class ComputerPlayer extends Player{
         return this.availableWeapons.get(index);
     }
 
+    // test
     public void placeRandomEntities(Map<EntityType, Integer> entityCounts) {
         if (entityCounts == null) return;
         for (Map.Entry<EntityType, Integer> entry : entityCounts.entrySet()) {
