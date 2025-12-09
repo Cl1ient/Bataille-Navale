@@ -27,7 +27,6 @@ public class ComputerPlayer extends Player{
     }
     */
 
-
     public Coordinate choseCoord(){
         // choisis une coordonnée de manière aléatoire et la renvoie
 
@@ -50,5 +49,16 @@ public class ComputerPlayer extends Player{
         int nb = rand.nextInt(100);
         int index = nb % this.availableWeapons.size();
         return this.availableWeapons.get(index);
+    }
+
+    public void placeRandomEntities(Map<EntityType, Integer> entityCounts) {
+        if (entityCounts == null) return;
+        for (Map.Entry<EntityType, Integer> entry : entityCounts.entrySet()) {
+            EntityType type = entry.getKey();
+            int count = entry.getValue();
+            for (int i = 0; i < count; i++) {
+                this.m_ownGrid.randomPlacementEntity(type);
+            }
+        }
     }
 }
