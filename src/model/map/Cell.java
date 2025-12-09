@@ -64,4 +64,5 @@ public class Cell {
     public void setIndexInEntity(Integer index) {
         this.m_indexInEntity = index;
     }
+    public void setHitBoat(boolean status){this.m_hitBoat = status;}
 }

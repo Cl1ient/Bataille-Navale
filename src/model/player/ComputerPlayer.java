@@ -21,11 +21,15 @@ public class ComputerPlayer extends Player{
         this.availableWeapons.add(this.m_weaponFactory.createMissile());
 
     }
-    /*
+
+    @Override
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
-        this.m_ownGrid.placeEntity(entityPlacement);
+
+        for(Map.Entry<EntityType, List<Coordinate>> entry : entityPlacement.entrySet()){
+            this.m_ownGrid.randomPlacementEntity(entry.getKey());
+        }
     }
-    */
+
 
     public Coordinate choseCoord(){
         // choisis une coordonnée de manière aléatoire et la renvoie

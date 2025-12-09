@@ -31,13 +31,13 @@ public class Game implements GameMediator {
 
     private final List<GameListener> m_listeners;
 
-    public Game(GameConfiguration config, Player hp, ComputerPlayer cp) {
+    public Game(GameConfiguration config) {
 
         System.out.println("[DEBUG] Initialisation du jeu…");
 
         this.m_game = config;
-        this.m_humanPlayer = hp;
-        this.m_computerPlayer = cp;
+        this.m_humanPlayer = new HumanPlayer(config);
+        this.m_computerPlayer = new ComputerPlayer(config);
 
         this.m_trapFactory = new TrapFactory();
         this.m_weaponFactory = new WeaponFactory();
@@ -75,7 +75,7 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
-
+        System.out.println("tets");
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         List<Coordinate> targets = weapon.generateTargets(coord);
@@ -89,6 +89,7 @@ public class Game implements GameMediator {
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
+            System.out.println("Je suis la");
             if (defender.getEntityAt(t) instanceof BlackHole) {
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
                 processAttack(defender, m_currentWeaponUsed, t);
@@ -187,6 +188,7 @@ public class Game implements GameMediator {
 
     @Override
     public void handleHit(Player defender, Coordinate coord) {
+        System.out.println("hit");
         for (GameListener li : m_listeners)
             li.onCellUpdated(defender, coord);
     }
@@ -201,6 +203,14 @@ public class Game implements GameMediator {
         for (GameListener li : m_listeners)
             li.onShipSunk(defender);
         checkGameOver();
+    }
+
+    public Player getHumanPlayer(){
+        return this.m_humanPlayer;
+    }
+
+    public ComputerPlayer getM_computerPlayer(){
+        return this.m_computerPlayer;
     }
 
 }
