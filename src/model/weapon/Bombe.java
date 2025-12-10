@@ -17,7 +17,6 @@ public class Bombe implements Weapon{
         targets.add(coord.getRelative(0,-1)); // Left
         targets.add(coord.getRelative(1,0)); // Top
         targets.add(coord.getRelative(-1,0)); // Bottom
-        use();
         return targets;
     }
 
@@ -35,7 +34,7 @@ public class Bombe implements Weapon{
 
     @Override
     public void use(){
-        if(this.m_useLeft > 0){
+        if(this.m_useLeft > 0 ){
             this.m_useLeft--;
         }
     }

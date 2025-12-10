@@ -85,7 +85,7 @@ public class GameController {
             return;
         }
 
-        Weapon currentWeapon;
+        Weapon currentWeapon = m_missile;
         switch (this.currentWeaponMode) {
             case "BOMB":
                 currentWeapon = m_bombe;
@@ -97,6 +97,13 @@ public class GameController {
             default:
                 currentWeapon = m_missile;
                 break;
+        }
+
+        if (currentWeapon.getUsesLeft() == 0) {
+            if (gameView != null) {
+                gameView.setStatus("ERREUR : " + this.currentWeaponMode + " épuisé ! Choisissez une autre arme.");
+            }
+            return;
         }
 
         gameView.setStatus("Tir en cours...");

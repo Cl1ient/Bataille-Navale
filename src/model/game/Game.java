@@ -84,7 +84,7 @@ public class Game implements GameMediator {
         } else {
             processScan(attacker, defender, targets);
         }
-
+        weapon.use();
     }
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
