@@ -1,3 +1,4 @@
+import controller.GameController;
 import model.Coordinate;
 import model.EntityType;
 import model.ScanResult;
@@ -29,8 +30,10 @@ class TestGameListener implements GameListener {
 public class Main {
 
     public static void main(String[] args) {
+        new GameController();
 
-       System.out.println("Main");
+        /*
+        System.out.println("Main");
 
         Map<EntityType, List<Coordinate>> placement = new HashMap<>();
         placement.put(EntityType.CRUISER, new ArrayList<>(List.of(new Coordinate(1,2), new Coordinate(1,3), new Coordinate(1,4), new Coordinate(1,5))));
@@ -48,5 +51,7 @@ public class Main {
         //game.processAttack(computer, missile, new Coordinate(1,4));
         //game.processAttack(computer, missile, new Coordinate(1,5));
         //game.processComputerAttack(); // Ordinateur joue
+        */
+
     }
 }

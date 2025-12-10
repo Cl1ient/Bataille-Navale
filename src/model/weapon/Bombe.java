@@ -17,7 +17,7 @@ public class Bombe implements Weapon{
         targets.add(coord.getRelative(0,-1)); // Left
         targets.add(coord.getRelative(1,0)); // Top
         targets.add(coord.getRelative(-1,0)); // Bottom
-
+        use();
         return targets;
     }
 
