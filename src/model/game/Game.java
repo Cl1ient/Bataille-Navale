@@ -75,7 +75,6 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
-        System.out.println("tets");
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         List<Coordinate> targets = weapon.generateTargets(coord);
@@ -115,6 +114,7 @@ public class Game implements GameMediator {
         if (cell.getEntity() != null) {
             defender.receiveShot(new Coordinate(x, y), attacker);
         } else {
+            handleHit(defender, new Coordinate(x, y));
             handleMiss(defender, x, y);
         }
     }
@@ -182,7 +182,7 @@ public class Game implements GameMediator {
     // HANDLER
 
     public void handleMiss(Player defender, int x, int y) {
-        System.out.println("[DEBUG] handleMiss(" + x + "," + y + ")");
+        System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
     }
 
@@ -195,7 +195,7 @@ public class Game implements GameMediator {
 
     @Override
     public void handleBlackHoleHit(Player defender, Coordinate coord) {
-        System.out.println("[DEBUG] handleBlackHoleHit() : BlackHole touché à " + coord);
+        System.out.println("[HANDLE] handleBlackHoleHit() : BlackHole touché à " + coord);
     }
 
     @Override

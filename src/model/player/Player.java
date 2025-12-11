@@ -70,7 +70,6 @@ public abstract class Player {
 
     public boolean hasLost(){
         List<Boat> ownBoats = this.m_ownGrid.getOwnBoats();
-        System.out.println(ownBoats);
         for (Boat boat : ownBoats) {
             if (!boat.isSunk()) {
                 return false;

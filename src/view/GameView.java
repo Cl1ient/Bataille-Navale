@@ -1,17 +1,23 @@
 package view;
 
 import controller.GameController;
+import model.Coordinate;
+import model.GameListener;
+import model.ScanResult;
 import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
 import model.player.Player;
+import model.weapon.Weapon;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Map;
 
-public class GameView extends JFrame {
+public class GameView extends JFrame implements GameListener {
 
     private final GameController controller;
     private final Game game;
@@ -28,6 +34,7 @@ public class GameView extends JFrame {
     public GameView(GameController controller, Game game) {
         this.controller = controller;
         this.game = game;
+        this.game.addListener(this);
         this.gridSize = game.getHumanPlayer().getGridSize();
 
         this.playerCells = new JPanel[gridSize][gridSize];
@@ -90,11 +97,11 @@ public class GameView extends JFrame {
 
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(new JLabel("MA FLOTTE", SwingConstants.CENTER), BorderLayout.NORTH);
-        leftPanel.add(createGridPanel(playerCells, false), BorderLayout.CENTER); // false = pas cliquable
+        leftPanel.add(createGridPanel(playerCells, false), BorderLayout.CENTER);
 
         JPanel rightPanel = new JPanel(new BorderLayout());
         rightPanel.add(new JLabel("RADAR (ATTAQUEZ ICI)", SwingConstants.CENTER), BorderLayout.NORTH);
-        rightPanel.add(createGridPanel(opponentCells, true), BorderLayout.CENTER); // true = cliquable
+        rightPanel.add(createGridPanel(opponentCells, true), BorderLayout.CENTER);
 
         container.add(leftPanel);
         container.add(rightPanel);
@@ -130,6 +137,7 @@ public class GameView extends JFrame {
                         }
                     });
                 }
+
                 cellsArray[row][col] = cell;
                 grid.add(cell);
             }
@@ -142,7 +150,6 @@ public class GameView extends JFrame {
         Player computer = game.getM_computerPlayer();
 
         updateSingleGrid(playerCells, human.getOwnGrid(), true);
-
         updateSingleGrid(opponentCells, computer.getOwnGrid(), false);
         this.repaint();
     }
@@ -155,7 +162,7 @@ public class GameView extends JFrame {
 
                 Color color = new Color(173, 216, 230);
 
-                if (cell.isHit() || isMissed(cell)) {
+                if (cell.isHit()) {
                     if (cell.getEntity() != null) {
                         color = Color.RED;
                     } else {
@@ -170,10 +177,6 @@ public class GameView extends JFrame {
         }
     }
 
-    private boolean isMissed(Cell cell) {
-        return cell.isHit() && cell.getEntity() == null;
-    }
-
     public void setStatus(String text) {
         statusLabel.setText(text);
     }
@@ -185,5 +188,48 @@ public class GameView extends JFrame {
 
     public void showScreen() {
         setVisible(true);
+    }
+
+
+    @Override
+    public void turnEnded(Player a, Map<Coordinate, String> s) {
+        setStatus("-> [LISTENER]: Tour terminé.");
+    }
+
+    @Override
+    public void onCellUpdated(Player p, Coordinate c) {
+        System.out.println("-> [LISTENER]: Cellule mise à jour: " + c);
+        this.updateGrids();
+        if (p.equals(game.getHumanPlayer()) && !game.isGameOver()) {
+            this.setInputEnabled(true);
+            this.setStatus("À vous de jouer !");
+        }
+    }
+
+    @Override
+    public void onShipSunk(Player defender) {
+        setStatus("-> [LISTENER]: BATEAU COULÉ! par " + defender.getNickName());
+        System.out.println("-> [LISTENER]: bateeeeeeeeeeeeeeau coulé");
+
+        controller.checkVictory();
+    }
+
+    @Override
+    public void onGameOver(Player winner) {
+        System.out.println("-> [LISTENER]: *** JEU TERMINÉ. Vainqueur: " + winner.getNickName() + " ***");
+
+        this.setInputEnabled(false);
+        this.setStatus("PARTIE TERMINÉE ! Vainqueur: " + winner.getNickName());
+
+        JOptionPane.showMessageDialog(this,
+                "Victoire de " + winner.getNickName() + " !",
+                "Fin de Partie",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void onScanResult(Player player, List<ScanResult> results) {
+        System.out.println("-> [LISTENER]: Sonar détecté.");
+        setStatus("Sonar détecté. Entités trouvées : " + results.size());
     }
 }
