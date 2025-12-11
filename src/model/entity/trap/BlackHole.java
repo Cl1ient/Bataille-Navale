@@ -21,4 +21,5 @@ public class BlackHole implements Trap {
         return this.m_type;
     }
 
+
 }

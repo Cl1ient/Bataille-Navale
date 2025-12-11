@@ -1,5 +1,7 @@
 package model.map;
 
+import model.Coordinate;
+import model.EntityType;
 import model.GridEntity;
 
 public class Cell {
@@ -65,4 +67,9 @@ public class Cell {
         this.m_indexInEntity = index;
     }
     public void setHitBoat(boolean status){this.m_hitBoat = status;}
+
+    public EntityType getTypeEntityFromCell(Coordinate coord){
+        if(this.m_entity == null){return null;}
+        return this.m_entity.getType();
+    }
 }

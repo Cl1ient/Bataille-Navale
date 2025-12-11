@@ -8,8 +8,11 @@ import model.player.Player;
 
 public class BlackHole implements GridEntity {
     private Integer m_size = 1;
+    private boolean m_activate;
     private final EntityType m_type = EntityType.BLACK_HOLE;
-    public BlackHole(){}
+    public BlackHole(boolean islandMod){
+        this.m_activate = !islandMod;
+    }
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
         //defender.getOwnGrid().markHitTrap(new Coordinate(x,y));
@@ -23,5 +26,9 @@ public class BlackHole implements GridEntity {
     public EntityType getType(){return this.m_type;}
 
     public Integer getSize() {return this.m_size;}
+
+    public void activate(){
+        this.m_activate = true;
+    }
 
 }

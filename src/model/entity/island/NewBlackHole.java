@@ -4,6 +4,7 @@ import model.EntityType;
 import model.game.Game;
 import model.GridEntity;
 import model.player.Player;
+import model.trap.BlackHole;
 
 public class NewBlackHole implements GridEntity {
 
@@ -13,6 +14,7 @@ public class NewBlackHole implements GridEntity {
     public NewBlackHole(){}
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex) {
+        attacker.activateTrap(EntityType.BLACK_HOLE);
 
     }
 

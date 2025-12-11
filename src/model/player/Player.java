@@ -3,6 +3,7 @@ package model.player;
 import model.Coordinate;
 import model.EntityType;
 import model.boat.Boat;
+import model.entity.trap.Trap;
 import model.game.Game;
 import model.game.GameConfiguration;
 import model.GridEntity;
@@ -25,7 +26,7 @@ public abstract class Player {
     private GameMediator m_mediator;
     protected List<Weapon> availableWeapons;
     //private WeaponFactory WFacto;
-    // private  List<Trap> traps; TODO
+    private  List<Trap> m_traps;
 
 
     public Player(GameConfiguration config) {
@@ -34,7 +35,7 @@ public abstract class Player {
         this.m_shotGrid = new Grid(config.getGridSize());
         this.availableWeapons = new ArrayList<>();
         this.m_nbBoatRemaning = 1;
-        // this.traps = new ArrayList<>(); TODO
+        this.m_traps = new ArrayList<>();
 
         this.placeEntity(config.getGridEntityPlacement());
 
@@ -42,6 +43,10 @@ public abstract class Player {
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
         this.m_ownGrid.placeEntity(entityPlacement);
+    }
+
+    public void placeRandomNewEntity(){
+
     }
 
     public Grid getOwnGrid(){return this.m_ownGrid;}
@@ -103,12 +108,19 @@ public abstract class Player {
         this.m_mediator.handleBlackHoleHit(defender, coord);
     }
 
-    public GridEntity getEntityAt(Coordinate coord) {
-        Cell targetCell = this.m_ownGrid.getCell(coord.getX(), coord.getY());
-        if (targetCell != null) {
-            return targetCell.getEntity();
+    public EntityType getTypeEntityAt(Coordinate coord) {
+        EntityType type = this.m_ownGrid.getTypeEntityFromGrid(coord);
+        return type;
+
+    }
+
+    public void activateTrap(EntityType type){
+        Integer i = 0;
+        while(type != this.m_traps.get(i).getType() && i < this.m_traps.size()){
+            i++;
         }
-        return null;
+        this.m_traps.get(i).activate();
+
     }
 
     public String getName() {

@@ -169,6 +169,10 @@ public class Grid {
         return getCell(coord.getX(), coord.getY()).getEntity();
     }
 
+    public EntityType getTypeEntityFromGrid(Coordinate coord){
+        return getCell(coord.getX(), coord.getY()).getTypeEntityFromCell(coord);
+    }
+
     public int getSize() {
         return m_size;
     }
@@ -214,6 +218,61 @@ public class Grid {
         }
 
         placeSingleEntity(entity, coord);
+    }
+
+    private List<Integer> getIslandPositions(){
+        Integer islandSize = this.m_size/2 - 1;
+        List<Integer> indexIsland = new ArrayList<>(List.of(3));
+        switch (islandSize){
+            case 4:
+                indexIsland.add(4);
+                indexIsland.add(5);
+                indexIsland.add(6);
+                break;
+            case 3:
+                indexIsland.add(4);
+                indexIsland.add(5);
+                break;
+            case 2:
+                indexIsland.add(2);
+                break;
+        }
+        return indexIsland;
+    }
+
+    private boolean freeCellToPlaceTrap(){
+        List<Integer> indexIsland = getIslandPositions();
+        for(Integer x=0; x<this.m_size; x++){
+            for(Integer y=0; y<this.m_size; y++){
+                if(!isAlreadyHit(x,y) || !cellAlreadyFilled(x,y)){
+                    if(!(indexIsland.contains(x) && indexIsland.contains(y))){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void randomTrapIslandPlacement(){
+        List<Integer> indexIsland = getIslandPositions();
+        int x, y;
+        Random rand = new Random();
+        x = rand.nextInt(this.m_size);
+        y = rand.nextInt(this.m_size);
+        boolean trapPlace = false;
+
+        while (!trapPlace) {
+            if(isInside(x, y) && !cellAlreadyFilled(x, y) && isAlreadyHit(x,y) == !freeCellToPlaceTrap()){
+                if(!(indexIsland.contains(x) && indexIsland.contains(y))){
+                    trapPlace = true;
+                }
+            }
+            else{
+                x = rand.nextInt(this.m_size);
+                y = rand.nextInt(this.m_size);
+            }
+        }
     }
 
     public boolean cellAlreadyFilled(int x, int y) {

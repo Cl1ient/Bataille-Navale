@@ -52,14 +52,6 @@ public class Game implements GameMediator {
         displayGridPlayer();
     }
 
-    public void placeEntity(Map<EntityType, List<Coordinate>> positions) {
-        this.m_humanPlayer.placeEntity(positions);
-    }
-
-    public void placeComputerEntities(Map<EntityType, List<Coordinate>> positions) {
-        this.m_computerPlayer.placeEntity(positions);
-    }
-
     public void processComputerAttack() {
 
         if (isGameOver()) {
@@ -89,14 +81,14 @@ public class Game implements GameMediator {
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
-            System.out.println("Je suis la");
-            if (defender.getEntityAt(t) instanceof BlackHole) {
+            if (defender.getTypeEntityAt(t) == EntityType.BLACK_HOLE) {
+                System.out.println("Je suis la");
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
                 processAttack(defender, m_currentWeaponUsed, t);
                 return;
             }
         }
-
+        System.out.println("Je suis toujours la");
         for (Coordinate t : targets) {
             processShot(attacker, defender, t.getX(), t.getY());
             if (isGameOver()) {
