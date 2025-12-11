@@ -210,8 +210,6 @@ public class GameView extends JFrame implements GameListener {
     public void onShipSunk(Player defender) {
         setStatus("-> [LISTENER]: BATEAU COULÉ! par " + defender.getNickName());
         System.out.println("-> [LISTENER]: bateeeeeeeeeeeeeeau coulé");
-
-        controller.checkVictory();
     }
 
     @Override

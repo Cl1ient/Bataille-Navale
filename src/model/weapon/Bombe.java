@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bombe implements Weapon{
-    private Integer m_useLeft = 1;
+    private Integer m_useLeft = 100;
 
     @Override
     public List<Coordinate> generateTargets(Coordinate coord){

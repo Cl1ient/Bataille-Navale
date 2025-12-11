@@ -134,10 +134,4 @@ public class GameController {
         game.processComputerAttack();
     }
 
-    public boolean checkVictory() {
-        if (game.isGameOver()) {
-            return true;
-        }
-        return false;
-    }
 }
