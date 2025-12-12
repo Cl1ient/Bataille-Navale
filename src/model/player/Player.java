@@ -45,6 +45,10 @@ public abstract class Player {
         this.m_ownGrid.placeEntity(entityPlacement);
     }
 
+    public void placeRandomNewEntity(){
+
+    }
+
     public Grid getOwnGrid(){return this.m_ownGrid;}
     public Grid getShotGrid(){return this.m_shotGrid;}
     public Integer getGridSize(){return this.m_ownGrid.getSize();}
@@ -102,12 +106,19 @@ public abstract class Player {
         this.m_mediator.handleBlackHoleHit(defender, coord);
     }
 
-    public GridEntity getEntityAt(Coordinate coord) {
-        Cell targetCell = this.m_ownGrid.getCell(coord.getX(), coord.getY());
-        if (targetCell != null) {
-            return targetCell.getEntity();
+    public EntityType getTypeEntityAt(Coordinate coord) {
+        EntityType type = this.m_ownGrid.getTypeEntityFromGrid(coord);
+        return type;
+
+    }
+
+    public void activateTrap(EntityType type){
+        Integer i = 0;
+        while(type != this.m_traps.get(i).getType() && i < this.m_traps.size()){
+            i++;
         }
-        return null;
+        this.m_traps.get(i).activate();
+
     }
 
     public String getName() {

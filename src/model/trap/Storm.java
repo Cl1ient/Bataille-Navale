@@ -16,8 +16,7 @@ public class Storm implements GridEntity {
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
         this.turnsLeft --;
         Coordinate coord = modifyCoordinates(defender.getGridSize());
-        //defender.getOwnGrid().markHitTrap(coord);
-        //game.proccessShot(attacker, defender, coord.getX(), coord.getY());
+        defender.receiveShot(coord, attacker);
     }
 
     public Coordinate modifyCoordinates(Integer size){
