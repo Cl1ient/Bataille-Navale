@@ -3,8 +3,6 @@ package model.player;
 import model.Coordinate;
 import model.EntityType;
 import model.boat.Boat;
-import model.entity.trap.Trap;
-import model.game.Game;
 import model.game.GameConfiguration;
 import model.GridEntity;
 import model.game.GameMediator;
@@ -13,8 +11,10 @@ import model.map.Grid;
 import model.weapon.Weapon;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public abstract class Player {
@@ -25,9 +25,9 @@ public abstract class Player {
     private Integer m_nbBoatRemaning;
     private GameMediator m_mediator;
     protected List<Weapon> availableWeapons;
-    //private WeaponFactory WFacto;
-    private  List<Trap> m_traps;
 
+    private Coordinate m_lastMove = null;
+    private int m_totalShipSegments = 0;
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
@@ -35,10 +35,10 @@ public abstract class Player {
         this.m_shotGrid = new Grid(config.getGridSize());
         this.availableWeapons = new ArrayList<>();
         this.m_nbBoatRemaning = 1;
-        this.m_traps = new ArrayList<>();
 
         this.placeEntity(config.getGridEntityPlacement());
 
+        this.m_totalShipSegments = calculateTotalShipSegments();
     }
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
@@ -75,7 +75,6 @@ public abstract class Player {
 
     public boolean hasLost(){
         List<Boat> ownBoats = this.m_ownGrid.getOwnBoats();
-        System.out.println(ownBoats);
         for (Boat boat : ownBoats) {
             if (!boat.isSunk()) {
                 return false;
@@ -86,12 +85,11 @@ public abstract class Player {
 
     public void receiveShot(Coordinate coord, Player attacker) {
         this.m_ownGrid.hit(coord.getX(),coord.getY(), this, attacker);
+        attacker.setLastMove(coord);
     }
     public String getNickName() {return this.m_name;}
 
     public Cell getTargetCell(int x, int y) {return this.m_ownGrid.getCell(x, y);}
-
-    // TODO mettre dans l'uml
 
     public void setMediator(GameMediator mediator) {
         this.m_mediator = mediator;
@@ -125,5 +123,74 @@ public abstract class Player {
 
     public String getName() {
         return this.m_name;
+    }
+
+    public Map<String, Integer> getShipStatusStats() {
+        int intact = 0;
+        int hit = 0;
+        int sunk = 0;
+
+        for (Boat boat : m_ownGrid.getOwnBoats()) {
+            if (boat.isSunk()) {
+                sunk++;
+            }
+            else if (boat.getSegmentsHit() > 0) {
+                hit++;
+            }
+            else {
+                intact++;
+            }
+        }
+
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("intact", intact);
+        stats.put("hit", hit);
+        stats.put("sunk", sunk);
+        return stats;
+    }
+
+    public Map<String, Integer> getHitAccuracyStats(Player defender) {
+        int hits = 0;
+        int misses = 0;
+
+        Grid opponentGrid = defender.getOwnGrid();
+        int size = opponentGrid.getSize();
+
+        for (int r = 0; r < size; r++) {
+            for (int c = 0; c < size; c++) {
+                Cell cell = opponentGrid.getCell(r, c);
+                if (cell.isHit()) {
+                    if (cell.getEntity() != null) {
+                        hits++;
+                    } else {
+                        misses++;
+                    }
+                }
+            }
+        }
+
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("hits", hits);
+        stats.put("misses", misses);
+        return stats;
+    }
+
+    public int getTotalShipSegments() {
+        return m_totalShipSegments;
+    }
+
+    public void setLastMove(Coordinate coord) {
+        this.m_lastMove = coord;
+    }
+
+    public String getLastMove() {
+        if (m_lastMove == null) return "N/A";
+        return "(" + (m_lastMove.getX() + 1) + "," + (char) ('A' + m_lastMove.getY()) + ")";
+    }
+
+    private int calculateTotalShipSegments() {
+        return m_ownGrid.getOwnBoats().stream()
+                .mapToInt(Boat::getSize)
+                .sum();
     }
 }
