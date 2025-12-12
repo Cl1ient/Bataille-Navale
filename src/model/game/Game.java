@@ -28,7 +28,7 @@ public class Game implements GameMediator {
 
     private Weapon m_currentWeaponUsed;
     private GameConfiguration m_game;
-
+    private int turnNumber;
     private final List<GameListener> m_listeners;
 
     public Game(GameConfiguration config) {
@@ -48,7 +48,7 @@ public class Game implements GameMediator {
         this.m_computerPlayer.setMediator(this);
 
         this.m_currentPlayer = m_humanPlayer;
-
+        this.turnNumber = 1;
         displayGridPlayer();
     }
 
@@ -212,5 +212,10 @@ public class Game implements GameMediator {
     public ComputerPlayer getM_computerPlayer(){
         return this.m_computerPlayer;
     }
-
+    public void incrementTurnNumber() {
+        this.turnNumber++;
+    }
+    public int getTurnNumber() {
+        return turnNumber;
+    }
 }

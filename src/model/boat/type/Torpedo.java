@@ -62,4 +62,15 @@ public class Torpedo implements Boat {
     @Override
     public EntityType getType(){return this.m_type;}
 
+    @Override
+    public Integer getSegmentsHit(){
+        int count = 0;
+        for (boolean hit : m_hits) {
+            if (hit) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }

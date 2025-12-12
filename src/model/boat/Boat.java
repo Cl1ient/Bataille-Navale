@@ -27,4 +27,6 @@ public interface Boat extends GridEntity {
      * @return the name of the boat
      */
     EntityType getType();
+
+    Integer getSegmentsHit();
 }

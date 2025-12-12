@@ -134,4 +134,10 @@ public class GameController {
         game.processComputerAttack();
     }
 
+    public String getTurnNumber() {
+        if (this.game != null) {
+            return String.valueOf(this.game.getTurnNumber());
+        }
+        return "N/A";
+    }
 }

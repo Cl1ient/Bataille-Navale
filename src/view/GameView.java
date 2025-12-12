@@ -4,6 +4,7 @@ import controller.GameController;
 import model.Coordinate;
 import model.GameListener;
 import model.ScanResult;
+import model.boat.Boat;
 import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
@@ -11,6 +12,7 @@ import model.player.Player;
 import model.weapon.Weapon;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,6 +29,8 @@ public class GameView extends JFrame implements GameListener {
     private final JPanel[][] opponentCells;
 
     private final JLabel statusLabel;
+    private final JLabel turnLabel;
+    private JPanel infoPanel;
     private ButtonGroup weaponGroup;
 
     private boolean inputEnabled = true;
@@ -39,13 +43,23 @@ public class GameView extends JFrame implements GameListener {
 
         this.playerCells = new JPanel[gridSize][gridSize];
         this.opponentCells = new JPanel[gridSize][gridSize];
+        this.turnLabel = new JLabel("Tour : 1", SwingConstants.CENTER);
 
         setTitle("Bataille Navale - En Jeu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
+        JPanel eastPanel = new JPanel(new BorderLayout());
+        eastPanel.add(createInfoPanel(), BorderLayout.CENTER);
+
+        // Panneau principal CENTRE
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.add(createDualGridPanel(), BorderLayout.CENTER);
+        centerPanel.add(this.turnLabel, BorderLayout.NORTH); // Numéro de tour en haut
+
         add(createWeaponPanel(), BorderLayout.WEST);
-        add(createDualGridPanel(), BorderLayout.CENTER);
+        add(centerPanel, BorderLayout.CENTER);
+        add(eastPanel, BorderLayout.EAST); // Nouveau panneau d'infos
 
         this.statusLabel = new JLabel("À vous de jouer ! Cliquez sur la grille de droite.", SwingConstants.CENTER);
         this.statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -57,7 +71,70 @@ public class GameView extends JFrame implements GameListener {
         updateGrids();
     }
 
+    private JPanel createInfoPanel() {
+        infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        infoPanel.setBorder(BorderFactory.createTitledBorder("Statistiques"));
+        infoPanel.setPreferredSize(new Dimension(300, 0));
+        updateInfoPanel();
+        return infoPanel;
+    }
+
+    private void updateInfoPanel() {
+        infoPanel.removeAll();
+        Player human = game.getHumanPlayer();
+        Player computer = game.getM_computerPlayer();
+
+        infoPanel.add(new JLabel("<html><h3>Tour " + controller.getTurnNumber() + "</h3></html>"));
+        infoPanel.add(Box.createVerticalStrut(10));
+
+        infoPanel.add(new JLabel("<html><b>--- Capitaine " + human.getNickName() + " (Vous) ---</b></html>"));
+        infoPanel.add(createPlayerStats(human, computer));
+        infoPanel.add(Box.createVerticalStrut(10));
+
+
+        infoPanel.add(new JLabel("<html><b>--- Adversaire (IA) ---</b></html>"));
+        infoPanel.add(createPlayerStats(computer, human));
+
+        infoPanel.revalidate();
+        infoPanel.repaint();
+    }
+
+
+    private JPanel createPlayerStats(Player targetPlayer, Player opponentPlayer) {
+        JPanel stats = new JPanel(new GridLayout(0, 1));
+        stats.setBorder(new EmptyBorder(5, 10, 5, 10));
+
+        Map<String, Integer> shipStatus = targetPlayer.getShipStatusStats();
+        Map<String, Integer> hitStats = opponentPlayer.getHitAccuracyStats(targetPlayer);
+
+        // 1. Statut de la Flotte
+        stats.add(new JLabel("Bateaux intacts/touchés/coulés : " +
+                shipStatus.getOrDefault("intact", 0) + "/" +
+                shipStatus.getOrDefault("hit", 0) + "/" +
+                shipStatus.getOrDefault("sunk", 0)));
+
+        // 2. Dernier Coup (Simulé)
+        stats.add(new JLabel("Dernier coup joué : " + targetPlayer.getLastMove()));
+
+        // 3. Tirs effectués/restants (Précision)
+        int totalShots = hitStats.getOrDefault("hits", 0) + hitStats.getOrDefault("misses", 0);
+        stats.add(new JLabel("Tirs dans l'eau : " + hitStats.getOrDefault("misses", 0)));
+        stats.add(new JLabel("Cases touchées / Cases restantes : " +
+                hitStats.getOrDefault("hits", 0) + " / " +
+                (targetPlayer.getTotalShipSegments() - hitStats.getOrDefault("hits", 0))));
+
+        // 4. Armes (Simulé)
+        // stats.add(new JLabel("Armes (Bombe/Sonar) : " + targetPlayer.getWeaponUsesLeft("BOMB") + " / " + targetPlayer.getWeaponUsesLeft("SONAR")));
+
+        // 5. Île (Simulé)
+        // stats.add(new JLabel("Cases d'île à fouiller : " + targetPlayer.getIslandSegmentsLeft()));
+
+        return stats;
+    }
+
     private JPanel createWeaponPanel() {
+        // ... (Méthode inchangée) ...
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createTitledBorder("Arsenal"));
@@ -151,6 +228,10 @@ public class GameView extends JFrame implements GameListener {
 
         updateSingleGrid(playerCells, human.getOwnGrid(), true);
         updateSingleGrid(opponentCells, computer.getOwnGrid(), false);
+
+        this.turnLabel.setText("Tour : " + controller.getTurnNumber());
+        updateInfoPanel();
+
         this.repaint();
     }
 
@@ -172,6 +253,10 @@ public class GameView extends JFrame implements GameListener {
                 else if (showShips && cell.getEntity() != null) {
                     color = Color.DARK_GRAY;
                 }
+
+                // TODO: Logique D11 et D8
+                // else if (cell.isIsland()) { color = Color.YELLOW; }
+
                 panel.setBackground(color);
             }
         }
@@ -193,13 +278,13 @@ public class GameView extends JFrame implements GameListener {
 
     @Override
     public void turnEnded(Player a, Map<Coordinate, String> s) {
-        setStatus("-> [LISTENER]: Tour terminé.");
+
     }
 
     @Override
     public void onCellUpdated(Player p, Coordinate c) {
-        System.out.println("-> [LISTENER]: Cellule mise à jour: " + c);
         this.updateGrids();
+
         if (p.equals(game.getHumanPlayer()) && !game.isGameOver()) {
             this.setInputEnabled(true);
             this.setStatus("À vous de jouer !");
@@ -209,13 +294,10 @@ public class GameView extends JFrame implements GameListener {
     @Override
     public void onShipSunk(Player defender) {
         setStatus("-> [LISTENER]: BATEAU COULÉ! par " + defender.getNickName());
-        System.out.println("-> [LISTENER]: bateeeeeeeeeeeeeeau coulé");
     }
 
     @Override
     public void onGameOver(Player winner) {
-        System.out.println("-> [LISTENER]: *** JEU TERMINÉ. Vainqueur: " + winner.getNickName() + " ***");
-
         this.setInputEnabled(false);
         this.setStatus("PARTIE TERMINÉE ! Vainqueur: " + winner.getNickName());
 
@@ -227,7 +309,6 @@ public class GameView extends JFrame implements GameListener {
 
     @Override
     public void onScanResult(Player player, List<ScanResult> results) {
-        System.out.println("-> [LISTENER]: Sonar détecté.");
         setStatus("Sonar détecté. Entités trouvées : " + results.size());
     }
 }
