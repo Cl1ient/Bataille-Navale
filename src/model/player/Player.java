@@ -3,6 +3,7 @@ package model.player;
 import model.Coordinate;
 import model.EntityType;
 import model.boat.Boat;
+import model.entity.trap.Trap;
 import model.game.GameConfiguration;
 import model.GridEntity;
 import model.game.GameMediator;
@@ -25,7 +26,7 @@ public abstract class Player {
     private Integer m_nbBoatRemaning;
     private GameMediator m_mediator;
     protected List<Weapon> availableWeapons;
-
+    private List<Trap> m_traps;
     private Coordinate m_lastMove = null;
     private int m_totalShipSegments = 0;
 
@@ -35,7 +36,7 @@ public abstract class Player {
         this.m_shotGrid = new Grid(config.getGridSize());
         this.availableWeapons = new ArrayList<>();
         this.m_nbBoatRemaning = 1;
-
+        this.m_traps = new ArrayList<>();
         this.placeEntity(config.getGridEntityPlacement());
 
         this.m_totalShipSegments = calculateTotalShipSegments();

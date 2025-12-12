@@ -20,6 +20,9 @@ public class BlackHole implements Trap {
     public EntityType getType() {
         return this.m_type;
     }
-
+    @Override
+    public void activate(){
+        // TODO
+    }
 
 }
