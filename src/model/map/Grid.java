@@ -111,7 +111,7 @@ public class Grid {
             case STORM:
                 return m_trapFactory.createStorm();
             case BLACK_HOLE:
-                return m_trapFactory.createBlackHole();
+                //return m_trapFactory.createBlackHole();
 
             default:
                 return null;

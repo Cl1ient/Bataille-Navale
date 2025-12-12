@@ -7,4 +7,6 @@ public interface Trap {
 
     void onHit(Player attacker, Player defender, int x, int y);
     EntityType getType();
+
+    void activate();
 }
