@@ -190,8 +190,6 @@ public abstract class Player {
     }
 
     private int calculateTotalShipSegments() {
-        return m_ownGrid.getOwnBoats().stream()
-                .mapToInt(Boat::getSize)
-                .sum();
+        return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
     }
 }
