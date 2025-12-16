@@ -17,8 +17,10 @@ public class ComputerPlayer extends Player{
     public ComputerPlayer(GameConfiguration config) {
         super(config);
         m_weaponFactory = new WeaponFactory();
-        this.m_name = "Computer";
+        this.m_name = "Le Goat En Personne";
         this.availableWeapons.add(this.m_weaponFactory.createMissile());
+        this.availableWeapons.add(this.m_weaponFactory.createBomb());
+        this.availableWeapons.add(this.m_weaponFactory.createSonar());
 
     }
 
@@ -32,10 +34,8 @@ public class ComputerPlayer extends Player{
 
 
     public Coordinate choseCoord(){
-        // choisis une coordonnée de manière aléatoire et la renvoie
 
         Random rand = new Random();
-
         int x = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
         int y = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
 
@@ -55,7 +55,6 @@ public class ComputerPlayer extends Player{
         return this.availableWeapons.get(index);
     }
 
-    // test
     public void placeRandomEntities(Map<EntityType, Integer> entityCounts) {
         if (entityCounts == null) return;
         for (Map.Entry<EntityType, Integer> entry : entityCounts.entrySet()) {

@@ -98,11 +98,11 @@ public abstract class Player {
     public Trap findTrap(EntityType type){
         Trap trap = null;
         switch (type){
-            case EntityType.BLACK_HOLE :
+            case BLACK_HOLE :
                 trap = (Trap) m_trapFacto.createBlackHole(true);
                 this.m_traps.add(trap);
                 break;
-            case EntityType.STORM:
+            case STORM:
                 trap = (Trap) m_trapFacto.createStorm(true);
                 this.m_traps.add(trap);
                 break;
@@ -113,11 +113,11 @@ public abstract class Player {
     public void findWeapon(EntityType type){
         Weapon weapon = null;
         switch (type){
-            case EntityType.BOMB:
+            case BOMB:
                 weapon = (Weapon) m_weaponFacto.createBomb();
                 this.availableWeapons.add(weapon);
                 break;
-            case EntityType.SONAR:
+            case SONAR:
                 weapon = (Weapon) m_weaponFacto.createSonar();
                 this.availableWeapons.add(weapon);
                 break;
