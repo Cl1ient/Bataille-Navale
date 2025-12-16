@@ -82,7 +82,7 @@ public class GameView extends JFrame implements GameListener {
         Player human = game.getHumanPlayer();
         Player computer = game.getM_computerPlayer();
 
-        infoPanel.add(new JLabel("<html><h3>Tour " + controller.getTurnNumber() + "</h3></html>"));
+        infoPanel.add(new JLabel("<html><h3>Tour " + game.getTurnNumber() + "</h3></html>"));
         infoPanel.add(Box.createVerticalStrut(10));
 
         infoPanel.add(new JLabel("<html><b>--- Capitaine " + human.getNickName() + " (Vous) ---</b></html>"));
@@ -103,7 +103,7 @@ public class GameView extends JFrame implements GameListener {
     }
 
     private void showHistory() {
-        String historyLog = controller.getGameHistory();
+        String historyLog = game.getHistory();
         JTextArea textArea = new JTextArea(historyLog);
         textArea.setEditable(false);
         textArea.setLineWrap(true);
@@ -235,7 +235,7 @@ public class GameView extends JFrame implements GameListener {
         updateSingleGrid(playerCells, human.getOwnGrid(), true);
         updateSingleGrid(opponentCells, computer.getOwnGrid(), false);
 
-        this.turnLabel.setText("Tour : " + controller.getTurnNumber());
+        this.turnLabel.setText("Tour : " + game.getTurnNumber());
         updateInfoPanel();
 
         this.repaint();

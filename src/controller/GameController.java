@@ -133,18 +133,4 @@ public class GameController {
     private void playComputerTurn() {
         game.processComputerAttack();
     }
-
-    public String getTurnNumber() {
-        if (this.game != null) {
-            return String.valueOf(this.game.getTurnNumber());
-        }
-        return "N/A";
-    }
-
-    public String getGameHistory() {
-        if (this.game != null) {
-            return this.game.getHistory();
-        }
-        return "Aucune partie en cours.";
-    }
 }
