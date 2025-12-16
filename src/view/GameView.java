@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,8 @@ public class GameView extends JFrame implements GameListener {
     private final JLabel turnLabel;
     private JPanel infoPanel;
     private ButtonGroup weaponGroup;
+
+    private List<Coordinate> lastScannedArea = new ArrayList<>();
 
     private boolean inputEnabled = true;
 
@@ -247,6 +250,8 @@ public class GameView extends JFrame implements GameListener {
     }
 
     private void updateSingleGrid(JPanel[][] cellsUI, Grid gridModel, boolean showShips) {
+        Color SONAR_COLOR = new Color(255, 255, 153);
+        boolean isOpponentGrid = gridModel == game.getM_computerPlayer().getOwnGrid();
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
                 Cell cell = gridModel.getCell(r, c);
@@ -272,8 +277,21 @@ public class GameView extends JFrame implements GameListener {
                     // else if (cell.isIsland()) { color = Color.YELLOW; } // Pour la fonctionnalité D11
                 }
 
+                if (isOpponentGrid) {
+                    // Créer l'objet Coordinate pour la comparaison
+                    Coordinate currentCoord = new Coordinate(r, c);
+
+                    // Si la case fait partie de la zone scannée ET que sa couleur est encore la couleur de l'eau
+                    if (lastScannedArea.contains(currentCoord) && color.equals(Color.BLUE)) {
+                        color = SONAR_COLOR;
+                    }
+                }
+
                 panel.setBackground(color);
             }
+        }
+        if (isOpponentGrid) {
+            lastScannedArea.clear();
         }
     }
 
@@ -323,9 +341,15 @@ public class GameView extends JFrame implements GameListener {
     }
 
     @Override
-    public void onScanResult(Player player, List<ScanResult> results) {
-        setStatus("Sonar détecté. Entités trouvées : " + results.size());
-        // TODO: Mettre à jour la grille pour afficher les résultats du scan (couleur/marque)
-        this.updateGrids();
+    public void onScanResult(Player player, List<Coordinate> scannedArea, List<ScanResult> results) {
+        setStatus("Sonar activé ! " + results.size() + " présence(s) détectée(s) dans la zone.");
+        this.lastScannedArea = scannedArea;
+        updateGrids();
+        if (player instanceof model.player.ComputerPlayer) {
+            this.setInputEnabled(true);
+            this.setStatus("À vous de jouer ! (L'ennemi a utilisé son Sonar)");
+        }
     }
+
+
 }

@@ -17,7 +17,6 @@ public class Sonar implements Weapon{
                 targets.add(coord.getRelative(dy, dx));
             }
         }
-
         return targets;
     }
 

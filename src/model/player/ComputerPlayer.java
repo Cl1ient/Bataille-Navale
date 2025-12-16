@@ -3,9 +3,11 @@ package model.player;
 import model.Coordinate;
 import model.EntityType;
 import model.game.GameConfiguration;
+import model.map.Grid;
 import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -33,26 +35,33 @@ public class ComputerPlayer extends Player{
     }
 
 
-    public Coordinate choseCoord(){
-
+    public Coordinate choseCoord(Grid opponentGrid) {
         Random rand = new Random();
-        int x = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
-        int y = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
-
-        while(this.m_ownGrid.isAlreadyHit(x, y)){
-            x = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
-            y = rand.nextInt(this.m_ownGrid.getSize()); // 0 à 9
+        int size = opponentGrid.getSize();
+        int x = rand.nextInt(size);
+        int y = rand.nextInt(size);
+        while(opponentGrid.isAlreadyHit(x, y)){
+            x = rand.nextInt(size);
+            y = rand.nextInt(size);
         }
         return new Coordinate(x, y);
     }
 
     public Weapon choseWeapon(){
-        // choisis une arme de manière aléatoire parmi la liste d'arme disponible et la renvoie
 
+        List<Weapon> usableWeapons = new ArrayList<>();
+
+        for (Weapon w : this.availableWeapons) {
+            if (w.getUsesLeft() != 0) {
+                usableWeapons.add(w);
+            }
+        }
+        if (usableWeapons.isEmpty()) {
+            return null;
+        }
         Random rand = new Random();
-        int nb = rand.nextInt(100);
-        int index = nb % this.availableWeapons.size();
-        return this.availableWeapons.get(index);
+        int index = rand.nextInt(usableWeapons.size());
+        return usableWeapons.get(index);
     }
 
     public void placeRandomEntities(Map<EntityType, Integer> entityCounts) {

@@ -71,7 +71,7 @@ public class Game implements GameMediator {
             System.out.println("[DEBUG] Impossible : Partie déjà terminée.");
             return;
         }
-        Coordinate target = m_computerPlayer.choseCoord();
+        Coordinate target = m_computerPlayer.choseCoord(m_humanPlayer.getOwnGrid());
         Weapon weapon = m_computerPlayer.choseWeapon();
 
         processAttack(m_computerPlayer, weapon, target);
@@ -136,10 +136,22 @@ public class Game implements GameMediator {
     }
 
     private void processScan(Player attacker, Player defender, List<Coordinate> targets) {
-        addToHistory(" -> Scan effectué sur " + targets.size() + " cases.");
         List<ScanResult> results = new ArrayList<>();
+        int foundCount = 0;
+
+        for (Coordinate target : targets) {
+            Cell cell = defender.getOwnGrid().getCell(target.getX(), target.getY());
+
+            if (cell != null && cell.isFilled()) {
+                foundCount++;
+                results.add(new ScanResult(target, cell.getEntity().getType()));
+            }
+        }
+
+        addToHistory(" -> Sonar utilisé en " + targets.get(0) + " : " + foundCount + " entités détectées.");
+
         for (GameListener li : m_listeners){
-            li.onScanResult(attacker, results);
+            li.onScanResult(attacker, targets, results);
         }
     }
 
@@ -199,6 +211,9 @@ public class Game implements GameMediator {
         System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
         addToHistory(" -> Tir dans l'eau en (" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
+        for (GameListener li : m_listeners) {
+            li.onCellUpdated(defender, new Coordinate(x, y));
+        }
     }
 
     @Override
