@@ -52,4 +52,16 @@ public class Cruiser implements Boat {
 
     @Override
     public Integer getSize() {return this.m_size;}
+
+    @Override
+    public Integer getSegmentsHit(){
+        int count = 0;
+        for (boolean hit : m_hits) {
+            if (hit) {
+                count++;
+            }
+        }
+        return count;
+    }
+
 }

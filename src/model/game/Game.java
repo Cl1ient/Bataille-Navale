@@ -27,7 +27,7 @@ public class Game implements GameMediator {
 
     private Weapon m_currentWeaponUsed;
     private GameConfiguration m_game;
-
+    private int turnNumber;
     private final List<GameListener> m_listeners;
 
     public Game(GameConfiguration config) {
@@ -47,7 +47,7 @@ public class Game implements GameMediator {
         this.m_computerPlayer.setMediator(this);
 
         this.m_currentPlayer = m_humanPlayer;
-
+        this.turnNumber = 1;
         displayGridPlayer();
     }
 
@@ -66,7 +66,6 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
-        System.out.println("tets");
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         List<Coordinate> targets = weapon.generateTargets(coord);
@@ -75,6 +74,7 @@ public class Game implements GameMediator {
         } else {
             processScan(attacker, defender, targets);
         }
+        weapon.use();
     }
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
@@ -105,6 +105,7 @@ public class Game implements GameMediator {
         if (cell.getEntity() != null) {
             defender.receiveShot(new Coordinate(x, y), attacker);
         } else {
+            handleHit(defender, new Coordinate(x, y));
             handleMiss(defender, x, y);
         }
     }
@@ -172,7 +173,7 @@ public class Game implements GameMediator {
     // HANDLER
 
     public void handleMiss(Player defender, int x, int y) {
-        System.out.println("[DEBUG] handleMiss(" + x + "," + y + ")");
+        System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
     }
 
@@ -185,7 +186,7 @@ public class Game implements GameMediator {
 
     @Override
     public void handleBlackHoleHit(Player defender, Coordinate coord) {
-        System.out.println("[DEBUG] handleBlackHoleHit() : BlackHole touché à " + coord);
+        System.out.println("[HANDLE] handleBlackHoleHit() : BlackHole touché à " + coord);
     }
 
     @Override
@@ -202,5 +203,10 @@ public class Game implements GameMediator {
     public ComputerPlayer getM_computerPlayer(){
         return this.m_computerPlayer;
     }
-
+    public void incrementTurnNumber() {
+        this.turnNumber++;
+    }
+    public int getTurnNumber() {
+        return turnNumber;
+    }
 }

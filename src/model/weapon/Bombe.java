@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bombe implements Weapon{
-    private Integer m_useLeft = 1;
+    private Integer m_useLeft = 100;
 
     @Override
     public List<Coordinate> generateTargets(Coordinate coord){
@@ -17,7 +17,6 @@ public class Bombe implements Weapon{
         targets.add(coord.getRelative(0,-1)); // Left
         targets.add(coord.getRelative(1,0)); // Top
         targets.add(coord.getRelative(-1,0)); // Bottom
-
         return targets;
     }
 
@@ -35,7 +34,7 @@ public class Bombe implements Weapon{
 
     @Override
     public void use(){
-        if(this.m_useLeft > 0){
+        if(this.m_useLeft > 0 ){
             this.m_useLeft--;
         }
     }

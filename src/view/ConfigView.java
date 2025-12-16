@@ -1,23 +1,29 @@
 package view;
 
 import controller.GameController;
+import model.Coordinate;
+import model.EntityType;
 import model.boat.BoatType;
+import model.game.GameConfiguration;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ConfigView extends JFrame {
 
-    //private final GameController controller;
+    private final GameController controller;
 
+    private JTextField txtNickname; // Champ ajouté
     private JComboBox<Integer> cbGridSize;
     private JCheckBox chkIslandMode;
     private JComboBox<Integer> cbPlacementLevel;
 
-    private Map<BoatType, JSpinner> boatSpinners;
+    private final Map<BoatType, JSpinner> boatSpinners;
     private static final Integer MIN_BOATS = 1;
     private static final Integer MAX_BOATS = 3;
 
@@ -26,18 +32,17 @@ public class ConfigView extends JFrame {
      * @param controller The GameController instance to handle configuration submission.
      */
     public ConfigView(GameController controller) {
-        //this.controller = controller;
+        this.controller = controller;
         this.boatSpinners = new HashMap<>();
-
 
         setTitle("Configuration de la Partie (Niveau 1 & 2)");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(15, 15));
 
-
         JPanel settingsPanel = createSettingsPanel();
 
         JButton btnNext = new JButton("Passer au Placement des Entités");
+        btnNext.setFont(new Font("Arial", Font.BOLD, 14));
         btnNext.addActionListener(this::onNextStepClicked);
 
         add(settingsPanel, BorderLayout.CENTER);
@@ -60,23 +65,36 @@ public class ConfigView extends JFrame {
 
         int row = 0;
 
-        gbc.gridx = 0; gbc.gridy = row; panel.add(new JLabel("Taille de la Grille (6x6 à 10x10):"), gbc);
-        cbGridSize = new JComboBox<>(new Integer[]{6, 7, 8, 9, 10});
-        cbGridSize.setSelectedItem(10); // Défaut à 10x10
-        gbc.gridx = 1; panel.add(cbGridSize, gbc);
+        gbc.gridx = 0; gbc.gridy = row;
+        panel.add(new JLabel("Pseudo du Capitaine :"), gbc);
+
+        txtNickname = new JTextField("Capitaine Fin", 10); // Initialisation du champ
+        gbc.gridx = 1;
+        panel.add(txtNickname, gbc);
         row++;
 
+        gbc.gridx = 0; gbc.gridy = row;
+        panel.add(new JLabel("Taille de la Grille (6x6 à 10x10):"), gbc);
+
+        cbGridSize = new JComboBox<>(new Integer[]{6, 7, 8, 9, 10});
+        cbGridSize.setSelectedItem(10);
+        gbc.gridx = 1;
+        panel.add(cbGridSize, gbc);
+        row++;
 
         chkIslandMode = new JCheckBox("Activer le Mode Île (Règle C5)");
-        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2; panel.add(chkIslandMode, gbc);
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
+        panel.add(chkIslandMode, gbc);
         row++;
 
-        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1; panel.add(new JLabel("Placement Joueur (Niveau 1-3):"), gbc);
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1;
+        panel.add(new JLabel("Placement Joueur (Niveau 1-3):"), gbc);
+
         cbPlacementLevel = new JComboBox<>(new Integer[]{1, 2, 3});
         cbPlacementLevel.setSelectedItem(3);
-        gbc.gridx = 1; panel.add(cbPlacementLevel, gbc);
+        gbc.gridx = 1;
+        panel.add(cbPlacementLevel, gbc);
         row++;
-
 
         gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
         panel.add(new JSeparator(SwingConstants.HORIZONTAL), gbc);
@@ -85,10 +103,9 @@ public class ConfigView extends JFrame {
         gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
         panel.add(new JLabel("Nombre de Bateaux par Type (1 à 3):"), gbc);
         row++;
-        Integer jspinner = 1;
-
+        Integer spin = 1;
         for (BoatType type : BoatType.values()) {
-            JSpinner spinner = new JSpinner(new SpinnerNumberModel(MIN_BOATS, MIN_BOATS, MAX_BOATS, jspinner));
+            JSpinner spinner = new JSpinner(new SpinnerNumberModel(MIN_BOATS, MIN_BOATS, MAX_BOATS, spin));
             boatSpinners.put(type, spinner);
 
             gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1;
@@ -100,23 +117,86 @@ public class ConfigView extends JFrame {
         return panel;
     }
 
+    /**
+     *  Constructs the GameConfiguration object from the form fields.
+     */
+    private GameConfiguration createConfigurationObject() {
+        String nickname = txtNickname.getText().trim();
+        if (nickname.isEmpty()) nickname = "Entrez votre nom ici";
+
+        Integer gridSize = (Integer) cbGridSize.getSelectedItem();
+        boolean isIslandMode = chkIslandMode.isSelected();
+
+        Map<EntityType, List<Coordinate>> emptyPlacement = new HashMap<>();
+
+        return new GameConfiguration(gridSize, emptyPlacement, isIslandMode, nickname);
+    }
+
+    /**
+     * Retrieves the number of boats requested for each type (for the controller).
+     */
+    private Map<EntityType, Integer> getRequestedBoatCounts() {
+        Map<EntityType, Integer> counts = new HashMap<>();
+
+        for (Map.Entry<BoatType, JSpinner> entry : boatSpinners.entrySet()) {
+            BoatType bType = entry.getKey();
+            Integer count = (Integer) entry.getValue().getValue();
+
+            // vue -> model
+            try {
+                EntityType eType = EntityType.valueOf(bType.name());
+                counts.put(eType, count);
+            } catch (IllegalArgumentException e) {
+                System.err.println("Erreur de mapping BoatType -> EntityType pour : " + bType);
+            }
+        }
+        return counts;
+    }
+
+    /**
+     * Check that the configuration makes sense (not too many boats for the grid).
+     */
+    private boolean validateConfiguration(GameConfiguration config) {
+        int gridSize = config.getGridSize();
+        int totalCells = gridSize * gridSize;
+        int usedCells = 0;
+
+        Map<EntityType, Integer> counts = getRequestedBoatCounts();
+        Map<EntityType, Integer> boatSizes = Map.of(
+                EntityType.AIRCRAFT_CARRIER, 5,
+                EntityType.CRUISER, 4,
+                EntityType.DESTROYER, 3,
+                EntityType.SUBMARINE, 3,
+                EntityType.TORPEDO, 2
+        );
+
+        for (Map.Entry<EntityType, Integer> entry : counts.entrySet()) {
+            int size = boatSizes.getOrDefault(entry.getKey(), 3);
+            usedCells += (entry.getValue() * size);
+        }
+
+        double ratio = (double) usedCells / totalCells;
+        if (ratio > 0.45) {
+            JOptionPane.showMessageDialog(this,
+                    "Trop de bateaux pour une grille de taille " + gridSize + "x" + gridSize + " !\n" +
+                            "Occupation estimée : " + String.format("%.0f", ratio * 100) + "% (Max conseillé 45%).",
+                    "Configuration Invalide",
+                    JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
 
     private void onNextStepClicked(ActionEvent event) {
 
-        /*
         GameConfiguration config = createConfigurationObject();
-
         if (!validateConfiguration(config)) {
-            JOptionPane.showMessageDialog(this,
-                "Erreur: La configuration dépasse les limites du jeu.",
-                "Validation",
-                JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        //controller.setGameConfig(config);
-        //controller.callPlaceEntityView();
-        */
+        controller.setGameConfig(config);
+        controller.setBoatsToPlace(getRequestedBoatCounts());
+        controller.callPlaceEntityView();
 
         this.dispose();
     }
