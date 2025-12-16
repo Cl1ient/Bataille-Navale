@@ -126,8 +126,10 @@ public class Game implements GameMediator {
         }
         if (cell.getEntity() != null) {
             defender.receiveShot(new Coordinate(x, y), attacker);
+            attacker.setLastMove(new Coordinate(x,y));
         } else {
             handleHit(defender, new Coordinate(x, y));
+            attacker.setLastMove(new Coordinate(x,y));
             handleMiss(defender, x, y);
         }
     }

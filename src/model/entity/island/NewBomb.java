@@ -16,8 +16,10 @@ public class NewBomb implements GridEntity {
     }
 
     public EntityType getType(){return this.m_type;}
+
     public Integer getSize(){return this.m_size;}
-        @Override
+
+    @Override
     public boolean isSunk(){
         return false;
     }

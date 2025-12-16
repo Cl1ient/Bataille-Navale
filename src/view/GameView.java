@@ -257,7 +257,6 @@ public class GameView extends JFrame implements GameListener {
                 if (cell.isHit()) {
                     if (cell.getEntity() != null) {
                         if (cell.getEntity().isSunk()) {
-                            System.out.println(cell.getEntity() + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
                             color = new Color(128, 0, 0);
                         } else {
                             color = Color.RED;
