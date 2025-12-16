@@ -187,4 +187,30 @@ public abstract class Player {
     private int calculateTotalShipSegments() {
         return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
     }
+
+    public String getWeaponUsesLeft(String weaponType) {
+
+        String targetClassName;
+        switch (weaponType) {
+            case "BOMB":
+                targetClassName = "Bombe";
+                break;
+            case "SONAR":
+                targetClassName = "Sonar";
+                break;
+            case "MISSILE":
+                targetClassName = "Missile";
+                break;
+            default:
+                return "N/D";
+        }
+
+        for (Weapon weapon : availableWeapons) {
+            if (weapon.getClass().getSimpleName().equals(targetClassName)) {
+                return String.valueOf(weapon.getUsesLeft());
+            }
+        }
+        return "N/A";
+    }
+
 }

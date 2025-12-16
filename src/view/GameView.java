@@ -1,9 +1,7 @@
 package view;
 
 import controller.GameController;
-import model.Coordinate;
-import model.GameListener;
-import model.ScanResult;
+import model.*;
 import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
@@ -131,11 +129,18 @@ public class GameView extends JFrame implements GameListener {
 
         stats.add(new JLabel("Dernier coup joué : " + targetPlayer.getLastMove()));
 
-        int totalShots = hitStats.getOrDefault("hits", 0) + hitStats.getOrDefault("misses", 0);
         stats.add(new JLabel("Tirs dans l'eau : " + hitStats.getOrDefault("misses", 0)));
         stats.add(new JLabel("Cases touchées / Cases restantes : " +
                 hitStats.getOrDefault("hits", 0) + " / " +
                 (targetPlayer.getTotalShipSegments() - hitStats.getOrDefault("hits", 0))));
+
+        stats.add(new JLabel("<html><b>Armes disponibles :</b></html>"));
+        stats.add(new JLabel(" - Bombe (Reste) : " + targetPlayer.getWeaponUsesLeft("BOMB")));
+        stats.add(new JLabel(" - Sonar (Reste) : " + targetPlayer.getWeaponUsesLeft("SONAR")));
+
+
+        // stats.add(new JLabel(" - Pièges restants : " + targetPlayer.getRemainingTrapsCount()));
+        // stats.add(new JLabel("Île à fouiller : " + targetPlayer.getIslandSegmentsLeft()));
 
         return stats;
     }
@@ -251,13 +256,21 @@ public class GameView extends JFrame implements GameListener {
 
                 if (cell.isHit()) {
                     if (cell.getEntity() != null) {
-                        color = Color.RED;
+                        if (cell.getEntity().isSunk()) {
+                            System.out.println(cell.getEntity() + "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+                            color = new Color(128, 0, 0);
+                        } else {
+                            color = Color.RED;
+                        }
                     } else {
                         color = Color.WHITE;
                     }
                 }
-                else if (showShips && cell.getEntity() != null) {
-                    color = Color.DARK_GRAY;
+                else if (showShips) {
+                    if (cell.getEntity() != null) {
+                        color = Color.DARK_GRAY;
+                    }
+                    // else if (cell.isIsland()) { color = Color.YELLOW; } // Pour la fonctionnalité D11
                 }
 
                 panel.setBackground(color);
@@ -295,7 +308,8 @@ public class GameView extends JFrame implements GameListener {
 
     @Override
     public void onShipSunk(Player defender) {
-        setStatus("-> [LISTENER]: BATEAU COULÉ! par " + defender.getNickName());
+        setStatus("-> BATEAU COULÉ! par " + defender.getNickName());
+        this.updateGrids();
     }
 
     @Override
@@ -312,5 +326,7 @@ public class GameView extends JFrame implements GameListener {
     @Override
     public void onScanResult(Player player, List<ScanResult> results) {
         setStatus("Sonar détecté. Entités trouvées : " + results.size());
+        // TODO: Mettre à jour la grille pour afficher les résultats du scan (couleur/marque)
+        this.updateGrids();
     }
 }
