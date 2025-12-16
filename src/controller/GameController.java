@@ -140,4 +140,11 @@ public class GameController {
         }
         return "N/A";
     }
+
+    public String getGameHistory() {
+        if (this.game != null) {
+            return this.game.getHistory();
+        }
+        return "Aucune partie en cours.";
+    }
 }

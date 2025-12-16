@@ -31,6 +31,8 @@ public class Game implements GameMediator {
     private int turnNumber;
     private final List<GameListener> m_listeners;
 
+    private StringBuilder historyLog;
+
     public Game(GameConfiguration config) {
 
         System.out.println("[DEBUG] Initialisation du jeu…");
@@ -49,7 +51,19 @@ public class Game implements GameMediator {
 
         this.m_currentPlayer = m_humanPlayer;
         this.turnNumber = 1;
+
+        this.historyLog = new StringBuilder();
+        this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
+
         displayGridPlayer();
+    }
+
+    public String getHistory() {
+        return historyLog.toString();
+    }
+
+    private void addToHistory(String action) {
+        this.historyLog.append("[Tour ").append(turnNumber).append("] ").append(action).append("\n");
     }
 
     public void processComputerAttack() {
@@ -60,7 +74,11 @@ public class Game implements GameMediator {
         }
         Coordinate target = m_computerPlayer.choseCoord();
         Weapon weapon = m_computerPlayer.choseWeapon();
+
         processAttack(m_computerPlayer, weapon, target);
+
+        incrementTurnNumber();
+
         if (!checkGameOver()) {
             nextTurn();
         }
@@ -69,6 +87,9 @@ public class Game implements GameMediator {
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
+
+        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + coord);
+
         List<Coordinate> targets = weapon.generateTargets(coord);
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
@@ -83,6 +104,7 @@ public class Game implements GameMediator {
             if (defender.getTypeEntityAt(t) == EntityType.BLACK_HOLE) {
                 System.out.println("Je suis la");
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
+                addToHistory(" -> ABSORBÉ par un Trou Noir en " + t + " !");
                 processAttack(defender, m_currentWeaponUsed, t);
                 return;
             }
@@ -112,7 +134,7 @@ public class Game implements GameMediator {
     }
 
     private void processScan(Player attacker, Player defender, List<Coordinate> targets) {
-        // TODO j'ai pas encore fait
+        addToHistory(" -> Scan effectué sur " + targets.size() + " cases.");
         List<ScanResult> results = new ArrayList<>();
         for (GameListener li : m_listeners){
             li.onScanResult(attacker, results);
@@ -127,6 +149,7 @@ public class Game implements GameMediator {
     private boolean checkGameOver() {
         if (isGameOver()) {
             Player winner = getWinner();
+            addToHistory("=== FIN DE PARTIE : Victoire de " + winner.getNickName() + " ===");
             for (GameListener li : m_listeners)
                 li.onGameOver(winner);
             return true;
@@ -170,17 +193,15 @@ public class Game implements GameMediator {
 
     public void addListener(GameListener listener){ this.m_listeners.add(listener); }
 
-
-    // HANDLER
-
     public void handleMiss(Player defender, int x, int y) {
         System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
+        addToHistory(" -> Tir dans l'eau en (" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
     }
 
     @Override
     public void handleHit(Player defender, Coordinate coord) {
-        System.out.println("hit");
+        addToHistory(" -> TOUCHÉ en " + coord + " !");
         for (GameListener li : m_listeners)
             li.onCellUpdated(defender, coord);
     }
@@ -188,10 +209,12 @@ public class Game implements GameMediator {
     @Override
     public void handleBlackHoleHit(Player defender, Coordinate coord) {
         System.out.println("[HANDLE] handleBlackHoleHit() : BlackHole touché à " + coord);
+        addToHistory(" -> TROU NOIR activé en " + coord);
     }
 
     @Override
     public void handleShipSunk(Player defender, Boat boat) {
+        addToHistory(" -> BATEAU COULÉ (" + defender.getNickName() + ") !");
         for (GameListener li : m_listeners)
             li.onShipSunk(defender);
         checkGameOver();
@@ -204,9 +227,11 @@ public class Game implements GameMediator {
     public ComputerPlayer getM_computerPlayer(){
         return this.m_computerPlayer;
     }
+
     public void incrementTurnNumber() {
         this.turnNumber++;
     }
+
     public int getTurnNumber() {
         return turnNumber;
     }
