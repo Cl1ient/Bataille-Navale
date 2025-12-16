@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Bombe implements Weapon{
-    private Integer m_useLeft = 100;
+    private Integer m_useLeft = 1;
 
 
     @Override
@@ -32,7 +32,7 @@ public class Bombe implements Weapon{
 
     @Override
     public String getName(){
-        return "Bombe";
+        return "BOMB";
     }
 
     @Override

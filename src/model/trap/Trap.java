@@ -3,8 +3,7 @@ package model.trap;
 import model.EntityType;
 import model.player.Player;
 
-public interface Trap {
-    void onHit(Player attacker, Player defender, int x, int y);
+public interface Trap{
     EntityType getType();
     void activate();
 }

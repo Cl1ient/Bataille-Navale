@@ -54,7 +54,7 @@ public class Game implements GameMediator {
         this.historyLog = new StringBuilder();
         this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
 
-        displayGridPlayer();
+
     }
 
     public String getHistory() {
@@ -84,6 +84,7 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
+        displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         int gridSize = this.m_game.getGridSize();

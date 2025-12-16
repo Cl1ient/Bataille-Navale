@@ -8,7 +8,7 @@ import model.player.Player;
 
 import java.util.Random;
 
-public class Storm implements GridEntity {
+public class Storm implements GridEntity, Trap {
     private Integer m_size = 1;
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
