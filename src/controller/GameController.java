@@ -27,9 +27,7 @@ public class GameController {
     private GameConfiguration gameConfig;
     private Map<EntityType, Integer> boatsToPlace;
 
-    private final Weapon missilePrototype;
-    private final Weapon bombPrototype;
-    private final Weapon sonarPrototype;
+
 
     private String currentWeaponMode = "MISSILE";
 
@@ -38,9 +36,7 @@ public class GameController {
     private GameView gameView;
 
     public GameController() {
-        this.missilePrototype = new Missile();
-        this.bombPrototype = new Bombe();
-        this.sonarPrototype = new Sonar();
+
         this.currentWeaponMode = "MISSILE";
 
         this.configView = new ConfigView(this);
@@ -76,6 +72,9 @@ public class GameController {
         hp.placeEntity(humanPlacement);
         cp.placeRandomEntities(this.boatsToPlace);
 
+        hp.updateTotalShipSegments();
+        cp.updateTotalShipSegments();
+
         if (this.placementView != null) this.placementView.dispose();
 
         this.gameView = new GameView(this, game);
@@ -86,7 +85,7 @@ public class GameController {
         Coordinate target = new Coordinate(x, y);
         HumanPlayer hp = (HumanPlayer) this.game.getHumanPlayer();
 
-        Weapon currentWeapon = getUsableWeapon(this.currentWeaponMode);
+        Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
         if (currentWeapon == null) {
             gameView.setStatus("ERREUR : L'arme " + this.currentWeaponMode + " est épuisée ou non disponible !");
@@ -102,20 +101,6 @@ public class GameController {
         game.processAttack(hp, currentWeapon, target);
 
         triggerComputerTurn();
-    }
-
-    private Weapon getUsableWeapon(String mode) {
-        Weapon prototype = switch (mode) {
-            case "BOMB" -> this.bombPrototype;
-            case "SONAR" -> this.sonarPrototype;
-            case "MISSILE" -> this.missilePrototype;
-            default -> this.missilePrototype;
-        };
-
-        if (prototype.getUsesLeft() != 0) {
-            return prototype;
-        }
-        return null;
     }
 
     private void triggerComputerTurn() {
