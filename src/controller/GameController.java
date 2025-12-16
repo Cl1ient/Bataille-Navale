@@ -85,12 +85,9 @@ public class GameController {
         Coordinate target = new Coordinate(x, y);
         HumanPlayer hp = (HumanPlayer) this.game.getHumanPlayer();
 
-        Weapon currentWeapon = getUsableWeapon(this.currentWeaponMode);
-        System.out.println(this.currentWeaponMode);
-        //Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
+        Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
-
-        if (!hp.isPocessWeapon(this.currentWeaponMode) || currentWeapon == null) {
+        if (currentWeapon == null) {
             gameView.setStatus("ERREUR : L'arme " + this.currentWeaponMode + " est épuisée ou non disponible !");
             return;
         }
