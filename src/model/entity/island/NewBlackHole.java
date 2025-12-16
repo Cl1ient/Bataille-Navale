@@ -15,7 +15,6 @@ public class NewBlackHole implements GridEntity {
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex) {
         attacker.activateTrap(EntityType.BLACK_HOLE);
-
     }
 
     public EntityType getType(){return this.m_type;}

@@ -13,6 +13,10 @@ public class Storm implements GridEntity {
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
 
+    public Storm(boolean isIsland){
+        if(isIsland){turnsLeft = 0;}
+    }
+
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
         this.turnsLeft --;
         Coordinate coord = modifyCoordinates(defender.getGridSize());
@@ -33,5 +37,7 @@ public class Storm implements GridEntity {
     public EntityType getType(){return this.m_type;}
 
     public Integer getSize() {return this.m_size;}
+
+    public void activate(){turnsLeft = 3;}
 
 }

@@ -3,8 +3,7 @@ package model.game;
 import model.*;
 import model.boat.Boat;
 import model.boat.BoatFactory;
-import model.entity.trap.BlackHole;
-import model.entity.trap.TrapFactory;
+import model.trap.*;
 import model.map.Cell;
 import model.player.HumanPlayer;
 import model.player.ComputerPlayer;
@@ -76,7 +75,6 @@ public class Game implements GameMediator {
         } else {
             processScan(attacker, defender, targets);
         }
-
     }
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
