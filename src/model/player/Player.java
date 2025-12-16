@@ -3,7 +3,8 @@ package model.player;
 import model.Coordinate;
 import model.EntityType;
 import model.boat.Boat;
-import model.entity.trap.Trap;
+import model.trap.*;
+import model.game.Game;
 import model.game.GameConfiguration;
 import model.GridEntity;
 import model.game.GameMediator;
@@ -32,8 +33,8 @@ public abstract class Player {
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
-        this.m_ownGrid = new Grid(config.getGridSize());
-        this.m_shotGrid = new Grid(config.getGridSize());
+        this.m_ownGrid = new Grid(config.getGridSize(), config.isIslandMode());
+        this.m_shotGrid = new Grid(config.getGridSize(), config.isIslandMode());
         this.availableWeapons = new ArrayList<>();
         this.m_nbBoatRemaning = 1;
         this.m_traps = new ArrayList<>();
@@ -109,7 +110,6 @@ public abstract class Player {
     public EntityType getTypeEntityAt(Coordinate coord) {
         EntityType type = this.m_ownGrid.getTypeEntityFromGrid(coord);
         return type;
-
     }
 
     public void activateTrap(EntityType type){
@@ -118,7 +118,6 @@ public abstract class Player {
             i++;
         }
         this.m_traps.get(i).activate();
-
     }
 
     public String getName() {

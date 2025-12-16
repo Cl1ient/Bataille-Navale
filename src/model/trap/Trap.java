@@ -1,12 +1,10 @@
-package model.entity.trap;
+package model.trap;
 
 import model.EntityType;
 import model.player.Player;
 
 public interface Trap {
-
     void onHit(Player attacker, Player defender, int x, int y);
     EntityType getType();
-
     void activate();
 }

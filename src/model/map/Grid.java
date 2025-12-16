@@ -22,14 +22,16 @@ public class Grid {
     private final IslandItemFactory m_islandItemFactory;
     private final BoatFactory m_boatFactory;
     private final TrapFactory m_trapFactory;
+    private boolean m_islandMod;
 
-    public Grid(Integer gridSize) {
+    public Grid(Integer gridSize, boolean isIsland) {
         this.m_size = gridSize;
         this.cells = new Cell[gridSize][gridSize];
         this.m_ownBoats = new ArrayList<>();
         this.m_islandItemFactory = new IslandItemFactory();
         this.m_boatFactory = new BoatFactory();
         this.m_trapFactory = new TrapFactory();
+        this.m_islandMod = isIsland;
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
@@ -109,9 +111,9 @@ public class Grid {
 
             // Pièges
             case STORM:
-                return m_trapFactory.createStorm();
+                return m_trapFactory.createStorm(m_islandMod);
             case BLACK_HOLE:
-                //return m_trapFactory.createBlackHole();
+                return m_trapFactory.createBlackHole(m_islandMod);
 
             default:
                 return null;
@@ -263,7 +265,7 @@ public class Grid {
         boolean trapPlace = false;
 
         while (!trapPlace) {
-            if(isInside(x, y) && !cellAlreadyFilled(x, y) && isAlreadyHit(x,y) == !freeCellToPlaceTrap()){
+            if(isInside(x, y) && !cellAlreadyFilled(x, y) && !isAlreadyHit(x,y) == freeCellToPlaceTrap()){
                 if(!(indexIsland.contains(x) && indexIsland.contains(y))){
                     trapPlace = true;
                 }
