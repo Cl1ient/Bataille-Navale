@@ -87,7 +87,7 @@ public class GameController {
 
         Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
-        if (currentWeapon == null) {
+        if (currentWeapon == null || currentWeapon.getUsesLeft() == 0) {
             gameView.setStatus("ERREUR : L'arme " + this.currentWeaponMode + " est épuisée ou non disponible !");
             return;
         }
