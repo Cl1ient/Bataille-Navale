@@ -27,9 +27,7 @@ public class GameController {
     private GameConfiguration gameConfig;
     private Map<EntityType, Integer> boatsToPlace;
 
-    private final Weapon missilePrototype;
-    private final Weapon bombPrototype;
-    private final Weapon sonarPrototype;
+
 
     private String currentWeaponMode = "MISSILE";
 
@@ -38,9 +36,7 @@ public class GameController {
     private GameView gameView;
 
     public GameController() {
-        this.missilePrototype = new Missile();
-        this.bombPrototype = new Bombe();
-        this.sonarPrototype = new Sonar();
+
         this.currentWeaponMode = "MISSILE";
 
         this.configView = new ConfigView(this);
@@ -76,6 +72,9 @@ public class GameController {
         hp.placeEntity(humanPlacement);
         cp.placeRandomEntities(this.boatsToPlace);
 
+        hp.updateTotalShipSegments();
+        cp.updateTotalShipSegments();
+
         if (this.placementView != null) this.placementView.dispose();
 
         this.gameView = new GameView(this, game);
@@ -88,6 +87,7 @@ public class GameController {
 
         Weapon currentWeapon = getUsableWeapon(this.currentWeaponMode);
         System.out.println(this.currentWeaponMode);
+        //Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
 
         if (!hp.isPocessWeapon(this.currentWeaponMode) || currentWeapon == null) {
@@ -106,20 +106,6 @@ public class GameController {
         triggerComputerTurn();
     }
 
-    private Weapon getUsableWeapon(String mode) {
-        Weapon prototype = switch (mode) {
-            case "BOMB" -> this.bombPrototype;
-            case "SONAR" -> this.sonarPrototype;
-            case "MISSILE" -> this.missilePrototype;
-            default -> this.missilePrototype;
-        };
-
-        if (prototype.getUsesLeft() != 0) {
-            return prototype;
-        }
-        return null;
-    }
-
     private void triggerComputerTurn() {
         gameView.setInputEnabled(false);
         gameView.setStatus("L'adversaire réfléchit...");
@@ -134,19 +120,5 @@ public class GameController {
 
     private void playComputerTurn() {
         game.processComputerAttack();
-    }
-
-    public String getTurnNumber() {
-        if (this.game != null) {
-            return String.valueOf(this.game.getTurnNumber());
-        }
-        return "N/A";
-    }
-
-    public String getGameHistory() {
-        if (this.game != null) {
-            return this.game.getHistory();
-        }
-        return "Aucune partie en cours.";
     }
 }

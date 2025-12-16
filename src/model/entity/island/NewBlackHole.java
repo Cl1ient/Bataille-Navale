@@ -24,6 +24,10 @@ public class NewBlackHole implements GridEntity {
 
     public EntityType getType(){return this.m_type;}
     public Integer getSize(){return this.m_size;}
+        @Override
+    public boolean isSunk(){
+        return false;
+    }
     public void attachListener(IslandListener listener){
         m_listeners.add(listener);
     }

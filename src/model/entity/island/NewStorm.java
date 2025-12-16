@@ -30,4 +30,8 @@ public class NewStorm implements GridEntity {
             listener.notifyPlaceIslandEntity(entity);
         }
     }
+        @Override
+    public boolean isSunk(){
+        return false;
+    }
 }

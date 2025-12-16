@@ -75,5 +75,4 @@ public class Submarine implements Boat {
         return count;
     }
 
-
 }

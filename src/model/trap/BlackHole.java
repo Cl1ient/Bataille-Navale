@@ -31,4 +31,9 @@ public class BlackHole implements GridEntity, Trap {
         this.m_activate = true;
     }
 
+    @Override
+    public boolean isSunk(){
+        return false;
+    }
+
 }

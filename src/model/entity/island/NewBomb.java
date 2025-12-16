@@ -23,6 +23,7 @@ public class NewBomb implements GridEntity {
     }
 
     public EntityType getType(){return this.m_type;}
+
     public Integer getSize(){return this.m_size;}
 
     public void attachListener(IslandListener listener){
@@ -33,5 +34,10 @@ public class NewBomb implements GridEntity {
         for(IslandListener listener : m_listeners){
             listener.notifyWeaponFind(weaponType);
         }
+    }
+
+    @Override
+    public boolean isSunk(){
+        return false;
     }
 }
