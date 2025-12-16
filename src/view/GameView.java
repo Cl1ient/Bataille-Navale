@@ -4,12 +4,10 @@ import controller.GameController;
 import model.Coordinate;
 import model.GameListener;
 import model.ScanResult;
-import model.boat.Boat;
 import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
 import model.player.Player;
-import model.weapon.Weapon;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -52,14 +50,13 @@ public class GameView extends JFrame implements GameListener {
         JPanel eastPanel = new JPanel(new BorderLayout());
         eastPanel.add(createInfoPanel(), BorderLayout.CENTER);
 
-        // Panneau principal CENTRE
         JPanel centerPanel = new JPanel(new BorderLayout());
         centerPanel.add(createDualGridPanel(), BorderLayout.CENTER);
-        centerPanel.add(this.turnLabel, BorderLayout.NORTH); // Numéro de tour en haut
+        centerPanel.add(this.turnLabel, BorderLayout.NORTH);
 
         add(createWeaponPanel(), BorderLayout.WEST);
         add(centerPanel, BorderLayout.CENTER);
-        add(eastPanel, BorderLayout.EAST); // Nouveau panneau d'infos
+        add(eastPanel, BorderLayout.EAST);
 
         this.statusLabel = new JLabel("À vous de jouer ! Cliquez sur la grille de droite.", SwingConstants.CENTER);
         this.statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -92,49 +89,58 @@ public class GameView extends JFrame implements GameListener {
         infoPanel.add(createPlayerStats(human, computer));
         infoPanel.add(Box.createVerticalStrut(10));
 
-
         infoPanel.add(new JLabel("<html><b>--- Adversaire (IA) ---</b></html>"));
         infoPanel.add(createPlayerStats(computer, human));
+
+        infoPanel.add(Box.createVerticalStrut(20));
+        JButton historyBtn = new JButton("Voir l'historique complet");
+        historyBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        historyBtn.addActionListener(e -> showHistory());
+        infoPanel.add(historyBtn);
 
         infoPanel.revalidate();
         infoPanel.repaint();
     }
 
+    private void showHistory() {
+        String historyLog = controller.getGameHistory();
+        JTextArea textArea = new JTextArea(historyLog);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(500, 400));
+
+        JOptionPane.showMessageDialog(this, scrollPane, "Historique de la partie", JOptionPane.INFORMATION_MESSAGE);
+    }
 
     private JPanel createPlayerStats(Player targetPlayer, Player opponentPlayer) {
         JPanel stats = new JPanel(new GridLayout(0, 1));
         stats.setBorder(new EmptyBorder(5, 10, 5, 10));
+        stats.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         Map<String, Integer> shipStatus = targetPlayer.getShipStatusStats();
         Map<String, Integer> hitStats = opponentPlayer.getHitAccuracyStats(targetPlayer);
 
-        // 1. Statut de la Flotte
         stats.add(new JLabel("Bateaux intacts/touchés/coulés : " +
                 shipStatus.getOrDefault("intact", 0) + "/" +
                 shipStatus.getOrDefault("hit", 0) + "/" +
                 shipStatus.getOrDefault("sunk", 0)));
 
-        // 2. Dernier Coup (Simulé)
         stats.add(new JLabel("Dernier coup joué : " + targetPlayer.getLastMove()));
 
-        // 3. Tirs effectués/restants (Précision)
         int totalShots = hitStats.getOrDefault("hits", 0) + hitStats.getOrDefault("misses", 0);
         stats.add(new JLabel("Tirs dans l'eau : " + hitStats.getOrDefault("misses", 0)));
         stats.add(new JLabel("Cases touchées / Cases restantes : " +
                 hitStats.getOrDefault("hits", 0) + " / " +
                 (targetPlayer.getTotalShipSegments() - hitStats.getOrDefault("hits", 0))));
 
-        // 4. Armes (Simulé)
-        // stats.add(new JLabel("Armes (Bombe/Sonar) : " + targetPlayer.getWeaponUsesLeft("BOMB") + " / " + targetPlayer.getWeaponUsesLeft("SONAR")));
-
-        // 5. Île (Simulé)
-        // stats.add(new JLabel("Cases d'île à fouiller : " + targetPlayer.getIslandSegmentsLeft()));
-
         return stats;
     }
 
     private JPanel createWeaponPanel() {
-        // ... (Méthode inchangée) ...
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createTitledBorder("Arsenal"));
@@ -254,9 +260,6 @@ public class GameView extends JFrame implements GameListener {
                     color = Color.DARK_GRAY;
                 }
 
-                // TODO: Logique D11 et D8
-                // else if (cell.isIsland()) { color = Color.YELLOW; }
-
                 panel.setBackground(color);
             }
         }
@@ -274,7 +277,6 @@ public class GameView extends JFrame implements GameListener {
     public void showScreen() {
         setVisible(true);
     }
-
 
     @Override
     public void turnEnded(Player a, Map<Coordinate, String> s) {

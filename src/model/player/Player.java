@@ -99,7 +99,6 @@ public abstract class Player {
     public void notifySunkStatus(Boat sunkBoat) {
         this.m_mediator.handleShipSunk(this, sunkBoat);
     }
-
     public void notifyHit(Player defender, Coordinate coord) {
         this.m_mediator.handleHit(defender, coord);
     }
@@ -152,10 +151,8 @@ public abstract class Player {
     public Map<String, Integer> getHitAccuracyStats(Player defender) {
         int hits = 0;
         int misses = 0;
-
         Grid opponentGrid = defender.getOwnGrid();
         int size = opponentGrid.getSize();
-
         for (int r = 0; r < size; r++) {
             for (int c = 0; c < size; c++) {
                 Cell cell = opponentGrid.getCell(r, c);
@@ -168,7 +165,6 @@ public abstract class Player {
                 }
             }
         }
-
         Map<String, Integer> stats = new HashMap<>();
         stats.put("hits", hits);
         stats.put("misses", misses);
@@ -189,8 +185,6 @@ public abstract class Player {
     }
 
     private int calculateTotalShipSegments() {
-        return m_ownGrid.getOwnBoats().stream()
-                .mapToInt(Boat::getSize)
-                .sum();
+        return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
     }
 }
