@@ -17,7 +17,7 @@ public class Missile implements Weapon{
 
     @Override
     public String getName() {
-        return "Missile";
+        return "MISSILE";
     }
     public boolean isOffensive(){return true;}
 

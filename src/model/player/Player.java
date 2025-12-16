@@ -11,6 +11,7 @@ import model.game.GameMediator;
 import model.map.Cell;
 import model.map.Grid;
 import model.weapon.Weapon;
+import model.weapon.WeaponFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ public abstract class Player {
     private List<Trap> m_traps;
     private Coordinate m_lastMove = null;
     private int m_totalShipSegments = 0;
+    private TrapFactory m_trapFacto = new TrapFactory();
+    private WeaponFactory m_weaponFacto = new WeaponFactory();
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
@@ -112,12 +115,52 @@ public abstract class Player {
         return type;
     }
 
-    public void activateTrap(EntityType type){
+    public Trap findTrap(EntityType type){
+        Trap trap = null;
+        switch (type){
+            case EntityType.BLACK_HOLE :
+                trap = (Trap) m_trapFacto.createBlackHole(true);
+                this.m_traps.add(trap);
+                break;
+            case EntityType.STORM:
+                trap = (Trap) m_trapFacto.createStorm(true);
+                this.m_traps.add(trap);
+                break;
+        }
+        return trap;
+    }
+
+    public void findWeapon(EntityType type){
+        Weapon weapon = null;
+        switch (type){
+            case EntityType.BOMB:
+                weapon = (Weapon) m_weaponFacto.createBomb();
+                this.availableWeapons.add(weapon);
+                break;
+            case EntityType.SONAR:
+                weapon = (Weapon) m_weaponFacto.createSonar();
+                this.availableWeapons.add(weapon);
+                break;
+        }
+    }
+
+    public boolean isPocessWeapon(String weaponName){
+        System.out.println(availableWeapons.size());
+        for(Weapon weapon : availableWeapons){
+            System.out.println(weapon.getName());
+            if(weapon.getName() == weaponName){return true;}
+
+        }
+        return false;
+    }
+
+    public Trap activateTrap(EntityType type){
         Integer i = 0;
         while(type != this.m_traps.get(i).getType() && i < this.m_traps.size()){
             i++;
         }
         this.m_traps.get(i).activate();
+        return m_traps.get(i);
     }
 
     public String getName() {

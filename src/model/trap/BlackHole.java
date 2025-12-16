@@ -5,7 +5,7 @@ import model.EntityType;
 import model.GridEntity;
 import model.player.Player;
 
-public class BlackHole implements GridEntity {
+public class BlackHole implements GridEntity, Trap {
     private Integer m_size = 1;
     private boolean m_activate;
     private final EntityType m_type = EntityType.BLACK_HOLE;
