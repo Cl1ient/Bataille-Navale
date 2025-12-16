@@ -11,7 +11,7 @@ public class Missile implements Weapon{
     public Missile(){}
 
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord){
+    public List<Coordinate> generateTargets(Coordinate coord, int gridSize){
         return Collections.singletonList(coord);
     }
 

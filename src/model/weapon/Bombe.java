@@ -10,14 +10,23 @@ public class Bombe implements Weapon{
 
 
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord){
-        List<Coordinate> targets = new ArrayList<>();
+    public List<Coordinate> generateTargets(Coordinate coord, int gridSize){
+       List<Coordinate> targets = new ArrayList<>();
 
-        targets.add(coord);
-        targets.add(coord.getRelative(0,1)); // Right
-        targets.add(coord.getRelative(0,-1)); // Left
-        targets.add(coord.getRelative(1,0)); // Top
-        targets.add(coord.getRelative(-1,0)); // Bottom
+        List<Coordinate> potentialTargets = new ArrayList<>();
+        potentialTargets.add(coord);
+        potentialTargets.add(coord.getRelative(0, 1));  // Droite
+        potentialTargets.add(coord.getRelative(0, -1)); // Gauche
+        potentialTargets.add(coord.getRelative(1, 0));  // HAUT
+        potentialTargets.add(coord.getRelative(-1, 0)); // Bas
+
+        for (Coordinate potential : potentialTargets) {
+            int x = potential.getX();
+            int y = potential.getY();
+            if (x >= 0 && x < gridSize && y >= 0 && y < gridSize) {
+                targets.add(potential);
+            }
+        }
         return targets;
     }
 

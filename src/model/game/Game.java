@@ -86,10 +86,10 @@ public class Game implements GameMediator {
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
-
+        int gridSize = this.m_game.getGridSize();
         addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + coord);
 
-        List<Coordinate> targets = weapon.generateTargets(coord);
+        List<Coordinate> targets = weapon.generateTargets(coord, gridSize);
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
         } else {
