@@ -250,48 +250,37 @@ public class GameView extends JFrame implements GameListener {
     }
 
     private void updateSingleGrid(JPanel[][] cellsUI, Grid gridModel, boolean showShips) {
-        Color SONAR_COLOR = new Color(255, 255, 153);
+        Color SONAR_REVEAL_COLOR = Color.YELLOW;
         boolean isOpponentGrid = gridModel == game.getM_computerPlayer().getOwnGrid();
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
                 Cell cell = gridModel.getCell(r, c);
                 JPanel panel = cellsUI[r][c];
-
                 Color color = new Color(173, 216, 230);
-
                 if (cell.isHit()) {
                     if (cell.getEntity() != null) {
                         if (cell.getEntity().isSunk()) {
-                            color = new Color(128, 0, 0);
+                            color = new Color(128, 0, 0); // Coulé
                         } else {
-                            color = Color.RED;
+                            color = Color.RED; // Touché
                         }
                     } else {
-                        color = Color.WHITE;
+                        color = Color.WHITE; // Raté
                     }
                 }
-                else if (showShips) {
-                    if (cell.getEntity() != null) {
-                        color = Color.DARK_GRAY;
-                    }
-                    // else if (cell.isIsland()) { color = Color.YELLOW; } // Pour la fonctionnalité D11
+                else if (showShips && cell.getEntity() != null) {
+                    color = Color.DARK_GRAY;
                 }
-
                 if (isOpponentGrid) {
-                    // Créer l'objet Coordinate pour la comparaison
                     Coordinate currentCoord = new Coordinate(r, c);
-
-                    // Si la case fait partie de la zone scannée ET que sa couleur est encore la couleur de l'eau
-                    if (lastScannedArea.contains(currentCoord) && color.equals(Color.BLUE)) {
-                        color = SONAR_COLOR;
+                    if (lastScannedArea.contains(currentCoord)) {
+                        if (cell.getEntity() != null && !cell.isHit()) {
+                            color = SONAR_REVEAL_COLOR;
+                        }
                     }
                 }
-
                 panel.setBackground(color);
             }
-        }
-        if (isOpponentGrid) {
-            lastScannedArea.clear();
         }
     }
 

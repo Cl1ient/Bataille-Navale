@@ -43,4 +43,17 @@ public class Coordinate {
     public Coordinate getRelative(Integer dRow, Integer dCol) {
         return new Coordinate(this.m_row + dRow, this.m_column + dCol);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Coordinate that = (Coordinate) o;
+        return m_row.equals(that.m_row) && m_column.equals(that.m_column);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(m_row, m_column);
+    }
 }
