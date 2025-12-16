@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 public abstract class Player {
@@ -39,41 +38,22 @@ public abstract class Player {
         this.m_nbBoatRemaning = 1;
         this.m_traps = new ArrayList<>();
         this.placeEntity(config.getGridEntityPlacement());
-
-        this.m_totalShipSegments = calculateTotalShipSegments();
     }
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
         this.m_ownGrid.placeEntity(entityPlacement);
     }
 
-    public void placeRandomNewEntity(){
-
-    }
-
     public Grid getOwnGrid(){return this.m_ownGrid;}
     public Grid getShotGrid(){return this.m_shotGrid;}
     public Integer getGridSize(){return this.m_ownGrid.getSize();}
+    public GridEntity getGridEntityFromCoord(Coordinate coord){return this.m_ownGrid.getEntityFromCoord(coord);}
+    public void loseOneBoat(){this.m_nbBoatRemaning --;}
 
     public void addWeapon(Weapon w){
         availableWeapons.add(w);
     }
 
-    public void markMiss(Coordinate coord){
-        this.m_ownGrid.markMiss(coord.getX(), coord.getY());
-    }
-
-    public GridEntity getGridEntityFromCoord(Coordinate coord){
-        return this.m_ownGrid.getEntityFromCoord(coord);
-    }
-
-    public void triggerTornado(Coordinate coord){
-        this.m_ownGrid.triggerTornado(coord);
-    }
-
-    public void loseOneBoat(){
-        this.m_nbBoatRemaning --;
-    }
 
     public boolean hasLost(){
         List<Boat> ownBoats = this.m_ownGrid.getOwnBoats();
@@ -186,5 +166,40 @@ public abstract class Player {
 
     private int calculateTotalShipSegments() {
         return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
+    }
+
+    public void updateTotalShipSegments() {
+        this.m_totalShipSegments = calculateTotalShipSegments();
+    }
+
+    public String getWeaponUsesLeft(String weaponType) {
+        Weapon weapon = getWeapon(weaponType);
+        if (weapon != null) {
+            return String.valueOf(weapon.getUsesLeft());
+        }
+        return "N/A";
+    }
+
+    public Weapon getWeapon(String weaponType) {
+        String targetClassName;
+        switch (weaponType) {
+            case "BOMB":
+                targetClassName = "Bombe";
+                break;
+            case "SONAR":
+                targetClassName = "Sonar";
+                break;
+            case "MISSILE":
+                targetClassName = "Missile";
+                break;
+            default:
+                return null;
+        }
+        for (Weapon weapon : availableWeapons) {
+            if (weapon.getClass().getSimpleName().equals(targetClassName)) {
+                return weapon;
+            }
+        }
+        return null;
     }
 }

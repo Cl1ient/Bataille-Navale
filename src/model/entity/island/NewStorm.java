@@ -18,4 +18,8 @@ public class NewStorm implements GridEntity {
     public EntityType getType(){return this.m_type;}
     @Override
     public Integer getSize(){return this.m_size;}
+        @Override
+    public boolean isSunk(){
+        return false;
+    }
 }

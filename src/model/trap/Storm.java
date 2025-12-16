@@ -39,5 +39,9 @@ public class Storm implements GridEntity {
     public Integer getSize() {return this.m_size;}
 
     public void activate(){turnsLeft = 3;}
+        @Override
+    public boolean isSunk(){
+        return false;
+    }
 
 }

@@ -9,7 +9,7 @@ public class Sonar implements Weapon{
     private Integer m_useLeft = 1;
     public Sonar(){}
     @Override
-    public List<Coordinate> generateTargets(Coordinate coord) {
+    public List<Coordinate> generateTargets(Coordinate coord, int gridSize) {
         List<Coordinate> targets = new ArrayList<>();
 
         for (int dy = -1; dy <= 1; dy++) {
