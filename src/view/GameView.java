@@ -6,6 +6,7 @@ import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
 import model.player.Player;
+import model.trap.Trap;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -15,7 +16,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Map;
 
-public class GameView extends JFrame implements GameListener {
+public class GameView extends JFrame implements GameListener, IslandListener {
 
     private final GameController controller;
     private final Game game;
@@ -327,5 +328,15 @@ public class GameView extends JFrame implements GameListener {
         setStatus("Sonar détecté. Entités trouvées : " + results.size());
         // TODO: Mettre à jour la grille pour afficher les résultats du scan (couleur/marque)
         this.updateGrids();
+    }
+
+    public void notifyPlaceIslandEntity(Trap entity, Player player){
+
+    }
+    public void notifyWeaponFind(EntityType weaponType){
+        this.statusLabel.setText("Vous avez trouvé : " + weaponType.toString());
+    }
+    public void notifyTrapWrongPlacement(){
+
     }
 }

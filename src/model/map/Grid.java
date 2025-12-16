@@ -6,6 +6,7 @@ import model.EntityType;
 import model.GridEntity;
 import model.boat.Boat;
 import model.player.Player;
+import model.trap.Trap;
 import model.trap.TrapFactory;
 import model.entity.island.IslandItemFactory;
 
@@ -38,6 +39,12 @@ public class Grid {
                 this.cells[i][j] = new Cell();
             }
         }
+    }
+
+
+
+    public void placeTrap(Trap trap, Coordinate coord){
+        cells[coord.getX()][coord.getY()].setEntity( (GridEntity) trap);
     }
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPosition) {

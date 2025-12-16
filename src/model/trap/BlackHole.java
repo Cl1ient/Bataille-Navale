@@ -9,9 +9,7 @@ public class BlackHole implements GridEntity, Trap {
     private Integer m_size = 1;
     private boolean m_activate;
     private final EntityType m_type = EntityType.BLACK_HOLE;
-    public BlackHole(boolean islandMod){
-        this.m_activate = !islandMod;
-    }
+    public BlackHole(){}
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
         if(m_activate){

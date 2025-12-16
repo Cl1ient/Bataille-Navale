@@ -13,9 +13,7 @@ public class Storm implements GridEntity, Trap {
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
 
-    public Storm(boolean isIsland){
-        if(isIsland){turnsLeft = 0;}
-    }
+    public Storm(){}
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
         this.turnsLeft --;

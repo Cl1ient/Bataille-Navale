@@ -2,6 +2,7 @@ package model.player;
 
 import model.Coordinate;
 import model.EntityType;
+import model.IslandListener;
 import model.boat.Boat;
 import model.trap.*;
 import model.game.Game;
@@ -32,6 +33,8 @@ public abstract class Player {
     private int m_totalShipSegments = 0;
     private TrapFactory m_trapFacto = new TrapFactory();
     private WeaponFactory m_weaponFacto = new WeaponFactory();
+    private List<IslandListener> m_listeners;
+
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
@@ -99,11 +102,11 @@ public abstract class Player {
         Trap trap = null;
         switch (type){
             case EntityType.BLACK_HOLE :
-                trap = (Trap) m_trapFacto.createBlackHole(true);
+                trap = (Trap) m_trapFacto.createBlackHole();
                 this.m_traps.add(trap);
                 break;
             case EntityType.STORM:
-                trap = (Trap) m_trapFacto.createStorm(true);
+                trap = (Trap) m_trapFacto.createStorm();
                 this.m_traps.add(trap);
                 break;
         }
@@ -244,5 +247,24 @@ public abstract class Player {
             }
         }
         return null;
+    }
+
+    public void placeNewTrap(Trap trap, Coordinate coord){
+        if(this.m_ownGrid.isAlreadyHit(coord.getX(), coord.getY()) || this.m_ownGrid.cellAlreadyFilled(coord.getX(), coord.getY())){
+            this.notifyWrongPlacement();
+        }
+        else{
+            this.m_ownGrid.placeTrap(trap, coord);
+        }
+    }
+
+    public void attachListener(IslandListener listener){
+        m_listeners.add(listener);
+    }
+
+    public void notifyWrongPlacement(){
+        for(IslandListener listener : m_listeners){
+            listener.notifyTrapWrongPlacement();
+        }
     }
 }
