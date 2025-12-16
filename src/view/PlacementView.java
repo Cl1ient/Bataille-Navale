@@ -261,12 +261,29 @@ public class PlacementView extends JFrame {
             for (int c = 0; c < gridSize; c++) {
                 JPanel cell = gridCells[r][c];
                 Coordinate currentCoord = new Coordinate(r, c);
-
-                if (isCoordinatePlaced(currentCoord)) {
-                    cell.setBackground(Color.DARK_GRAY);
-                } else {
-                    cell.setBackground(Color.WHITE);
+                EntityType placedType = getPlacedEntityType(currentCoord);
+                Color color = Color.WHITE;
+                if (placedType != null) {
+                    switch (placedType) {
+                        case AIRCRAFT_CARRIER:
+                        case CRUISER:
+                        case DESTROYER:
+                        case SUBMARINE:
+                        case TORPEDO:
+                            color = Color.DARK_GRAY;
+                            break;
+                        case BLACK_HOLE:
+                            color = new Color(75, 0, 130);
+                            break;
+                        case STORM:
+                            color = new Color(100, 100, 255);
+                            break;
+                        default:
+                            color = Color.PINK;
+                            break;
+                    }
                 }
+                cell.setBackground(color);
             }
         }
         gridPanel.revalidate();
@@ -328,6 +345,7 @@ public class PlacementView extends JFrame {
             case CRUISER -> 4;
             case DESTROYER, SUBMARINE -> 3;
             case TORPEDO -> 2;
+            case BLACK_HOLE, STORM -> 1;
             default -> 1;
         };
     }
@@ -335,4 +353,20 @@ public class PlacementView extends JFrame {
     public void showScreen() {
         this.setVisible(true);
     }
+
+    /**
+     * Retourne le type d'entité placé à une coordonnée spécifique.
+     */
+    private EntityType getPlacedEntityType(Coordinate coord) {
+        for (Map.Entry<EntityType, List<Coordinate>> entry : placedEntitiesMap.entrySet()) {
+            for (Coordinate placedCoord : entry.getValue()) {
+                if (placedCoord.getX() == coord.getX() && placedCoord.getY() == coord.getY()) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+
 }
