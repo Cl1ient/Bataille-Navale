@@ -142,9 +142,6 @@ public class GameView extends JFrame implements GameListener {
         stats.add(new JLabel(" - Sonar (Reste) : " + targetPlayer.getWeaponUsesLeft("SONAR")));
 
 
-        // stats.add(new JLabel(" - Pièges restants : " + targetPlayer.getRemainingTrapsCount()));
-        // stats.add(new JLabel("Île à fouiller : " + targetPlayer.getIslandSegmentsLeft()));
-
         return stats;
     }
 
@@ -250,7 +247,6 @@ public class GameView extends JFrame implements GameListener {
     }
 
     private void updateSingleGrid(JPanel[][] cellsUI, Grid gridModel, boolean showShips) {
-        Color SONAR_REVEAL_COLOR = Color.YELLOW;
         boolean isOpponentGrid = gridModel == game.getM_computerPlayer().getOwnGrid();
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
@@ -271,16 +267,11 @@ public class GameView extends JFrame implements GameListener {
                 else if (showShips && cell.getEntity() != null) {
                     color = Color.DARK_GRAY;
                 }
-                if (isOpponentGrid) {
-                    Coordinate currentCoord = new Coordinate(r, c);
-                    if (lastScannedArea.contains(currentCoord)) {
-                        if (cell.getEntity() != null && !cell.isHit()) {
-                            color = SONAR_REVEAL_COLOR;
-                        }
-                    }
-                }
                 panel.setBackground(color);
             }
+        }
+        if (isOpponentGrid) {
+            lastScannedArea.clear();
         }
     }
 
@@ -339,6 +330,4 @@ public class GameView extends JFrame implements GameListener {
             this.setStatus("À vous de jouer ! (L'ennemi a utilisé son Sonar)");
         }
     }
-
-
 }

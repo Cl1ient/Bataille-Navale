@@ -50,7 +50,6 @@ public class ComputerPlayer extends Player{
     public Weapon choseWeapon(){
 
         List<Weapon> usableWeapons = new ArrayList<>();
-
         for (Weapon w : this.availableWeapons) {
             if (w.getUsesLeft() != 0) {
                 usableWeapons.add(w);
@@ -74,4 +73,5 @@ public class ComputerPlayer extends Player{
             }
         }
     }
+
 }

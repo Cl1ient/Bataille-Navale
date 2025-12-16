@@ -93,6 +93,7 @@ public class Game implements GameMediator {
         List<Coordinate> targets = weapon.generateTargets(coord, gridSize);
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
+            weapon.use();
         } else {
             processScan(attacker, defender, targets);
         }
