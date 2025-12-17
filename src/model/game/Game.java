@@ -48,7 +48,10 @@ public class Game implements GameMediator {
 
         this.m_currentPlayer = m_humanPlayer;
         this.turnNumber = 1;
-        if (m_game.isIslandMode()) {
+        boolean isIsland = m_game.isIslandMode();
+        m_humanPlayer.getOwnGrid().setIslandMod(isIsland);
+        m_computerPlayer.getOwnGrid().setIslandMod(isIsland);
+        if (isIsland) {
             m_humanPlayer.getOwnGrid().initIslandItems();
             m_computerPlayer.getOwnGrid().initIslandItems();
             m_humanPlayer.getWeapon("BOMB").use();
