@@ -206,6 +206,7 @@ public class PlacementView extends JFrame {
         return coords;
     }
 
+
     private boolean validatePlacement(List<Coordinate> coords) {
         boolean islandMode = controller.getGameConfiguration().isIslandMode();
 
@@ -213,13 +214,11 @@ public class PlacementView extends JFrame {
             if (coord.getX() < 0 || coord.getX() >= gridSize || coord.getY() < 0 || coord.getY() >= gridSize) {
                 return false;
             }
-
-            if (islandMode && isBoat(selectedEntityType)) {
+            if (islandMode) {
                 if (coord.getX() >= 3 && coord.getX() <= 6 && coord.getY() >= 3 && coord.getY() <= 6) {
                     return false;
                 }
             }
-
             if (isOccupied(coord)) {
                 return false;
             }
@@ -244,8 +243,9 @@ public class PlacementView extends JFrame {
 
                 Color color = Color.WHITE;
 
+                // Affichage de l'île
                 if (islandMode && r >= 3 && r <= 6 && c >= 3 && c <= 6) {
-                    color = new Color(238, 214, 175);
+                    color = new Color(238, 214, 175); // Couleur sable
                 }
 
                 if (placedType != null) {

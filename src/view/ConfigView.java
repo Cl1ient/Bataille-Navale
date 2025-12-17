@@ -12,13 +12,12 @@ import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class ConfigView extends JFrame {
 
     private final GameController controller;
 
-    private JTextField txtNickname; // Champ ajouté
+    private JTextField txtNickname;
     private JComboBox<Integer> cbGridSize;
     private JCheckBox chkIslandMode;
     private JComboBox<Integer> cbPlacementLevel;
@@ -35,7 +34,7 @@ public class ConfigView extends JFrame {
         this.controller = controller;
         this.boatSpinners = new HashMap<>();
 
-        setTitle("Configuration de la Partie (Niveau 1 & 2)");
+        setTitle("Configuration de la Partie");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(15, 15));
 
@@ -52,9 +51,6 @@ public class ConfigView extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    /**
-     * Create configuration pannel with configuration option.
-     */
     private JPanel createSettingsPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -68,7 +64,7 @@ public class ConfigView extends JFrame {
         gbc.gridx = 0; gbc.gridy = row;
         panel.add(new JLabel("Pseudo du Capitaine :"), gbc);
 
-        txtNickname = new JTextField("Capitaine Fin", 10); // Initialisation du champ
+        txtNickname = new JTextField("Capitaine", 10);
         gbc.gridx = 1;
         panel.add(txtNickname, gbc);
         row++;
@@ -117,12 +113,10 @@ public class ConfigView extends JFrame {
         return panel;
     }
 
-    /**
-     *  Constructs the GameConfiguration object from the form fields.
-     */
+
     private GameConfiguration createConfigurationObject() {
         String nickname = txtNickname.getText().trim();
-        if (nickname.isEmpty()) nickname = "Entrez votre nom ici";
+        if (nickname.isEmpty()) nickname = "Joueur";
 
         Integer gridSize = (Integer) cbGridSize.getSelectedItem();
         boolean isIslandMode = chkIslandMode.isSelected();
@@ -132,9 +126,7 @@ public class ConfigView extends JFrame {
         return new GameConfiguration(gridSize, emptyPlacement, isIslandMode, nickname);
     }
 
-    /**
-     * Retrieves the number of boats requested for each type (for the controller).
-     */
+
     private Map<EntityType, Integer> getRequestedBoatCounts() {
         Map<EntityType, Integer> counts = new HashMap<>();
 
@@ -142,7 +134,6 @@ public class ConfigView extends JFrame {
             BoatType bType = entry.getKey();
             Integer count = (Integer) entry.getValue().getValue();
 
-            // vue -> model
             try {
                 EntityType eType = EntityType.valueOf(bType.name());
                 counts.put(eType, count);
@@ -150,15 +141,15 @@ public class ConfigView extends JFrame {
                 System.err.println("Erreur de mapping BoatType -> EntityType pour : " + bType);
             }
         }
-        // TODO a revoir plus tard
-        counts.put(EntityType.STORM, 1);
-        counts.put(EntityType.BLACK_HOLE, 1);
+
+        if (!chkIslandMode.isSelected()) {
+            counts.put(EntityType.STORM, 1);
+            counts.put(EntityType.BLACK_HOLE, 1);
+        }
+
         return counts;
     }
 
-    /**
-     * Check that the configuration makes sense (not too many boats for the grid).
-     */
     private boolean validateConfiguration(GameConfiguration config) {
         int gridSize = config.getGridSize();
         int totalCells = gridSize * gridSize;
@@ -174,14 +165,14 @@ public class ConfigView extends JFrame {
         );
 
         for (Map.Entry<EntityType, Integer> entry : counts.entrySet()) {
-            int size = boatSizes.getOrDefault(entry.getKey(), 3);
+            int size = boatSizes.getOrDefault(entry.getKey(), 1);
             usedCells += (entry.getValue() * size);
         }
 
         double ratio = (double) usedCells / totalCells;
         if (ratio > 0.45) {
             JOptionPane.showMessageDialog(this,
-                    "Trop de bateaux pour une grille de taille " + gridSize + "x" + gridSize + " !\n" +
+                    "Trop d'entités pour une grille de taille " + gridSize + "x" + gridSize + " !\n" +
                             "Occupation estimée : " + String.format("%.0f", ratio * 100) + "% (Max conseillé 45%).",
                     "Configuration Invalide",
                     JOptionPane.WARNING_MESSAGE);
@@ -191,12 +182,11 @@ public class ConfigView extends JFrame {
     }
 
     private void onNextStepClicked(ActionEvent event) {
-
         GameConfiguration config = createConfigurationObject();
+
         if (!validateConfiguration(config)) {
             return;
         }
-
         controller.setGameConfig(config);
         controller.setBoatsToPlace(getRequestedBoatCounts());
         controller.callPlaceEntityView();
