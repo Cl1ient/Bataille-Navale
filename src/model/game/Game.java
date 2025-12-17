@@ -51,6 +51,10 @@ public class Game implements GameMediator {
         if (m_game.isIslandMode()) {
             m_humanPlayer.getOwnGrid().initIslandItems();
             m_computerPlayer.getOwnGrid().initIslandItems();
+            m_humanPlayer.getWeapon("BOMB").use();
+            m_humanPlayer.getWeapon("SONAR").use();
+            m_computerPlayer.getWeapon("SONAR").use();
+            m_computerPlayer.getWeapon("BOMB").use();
         }
         this.historyLog = new StringBuilder();
         this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
