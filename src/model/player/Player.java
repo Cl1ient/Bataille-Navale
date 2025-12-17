@@ -52,13 +52,6 @@ public abstract class Player {
         this.m_ownGrid.placeEntity(entityPlacement);
     }
 
-    public void triggerTornadoEffect() {
-        this.mTornadoTurnsRemaining = 3;
-    }
-
-    public boolean isUnderTornadoInfluence() {
-        return this.mTornadoTurnsRemaining > 0;
-    }
 
     public void decrementTornadoEffect() {
         if (this.mTornadoTurnsRemaining > 0) {
@@ -69,11 +62,26 @@ public abstract class Player {
     public Grid getOwnGrid(){return this.m_ownGrid;}
     public Grid getShotGrid(){return this.m_shotGrid;}
     public Integer getGridSize(){return this.m_ownGrid.getSize();}
-    public GridEntity getGridEntityFromCoord(Coordinate coord){return this.m_ownGrid.getEntityFromCoord(coord);}
+    public String getNickName() {return this.m_name;}
     public void loseOneBoat(){this.m_nbBoatRemaning --;}
-
-    public void addWeapon(Weapon w){
-        availableWeapons.add(w);
+    private int calculateTotalShipSegments() {
+        return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
+    }
+    public void updateTotalShipSegments() {
+        this.m_totalShipSegments = calculateTotalShipSegments();
+    }
+    public void triggerTornadoEffect() {
+        this.mTornadoTurnsRemaining = 3;
+    }
+    public boolean isUnderTornadoInfluence() {
+        return this.mTornadoTurnsRemaining > 0;
+    }
+    public Cell getTargetCell(int x, int y) {return this.m_ownGrid.getCell(x, y);}
+    public int getTotalShipSegments() {
+        return m_totalShipSegments;
+    }
+    public void setLastMove(Coordinate coord) {
+        this.m_lastMove = coord;
     }
 
 
@@ -91,9 +99,7 @@ public abstract class Player {
         this.m_ownGrid.hit(coord.getX(),coord.getY(), this, attacker);
         attacker.setLastMove(coord);
     }
-    public String getNickName() {return this.m_name;}
 
-    public Cell getTargetCell(int x, int y) {return this.m_ownGrid.getCell(x, y);}
 
     public void setMediator(GameMediator mediator) {
         this.m_mediator = mediator;
@@ -133,33 +139,14 @@ public abstract class Player {
         Weapon weapon = null;
         switch (type){
             case BOMB:
-                weapon = (Weapon) m_weaponFacto.createBomb();
+                weapon = m_weaponFacto.createBomb();
                 this.availableWeapons.add(weapon);
                 break;
             case SONAR:
-                weapon = (Weapon) m_weaponFacto.createSonar();
+                weapon = m_weaponFacto.createSonar();
                 this.availableWeapons.add(weapon);
                 break;
         }
-    }
-
-    public boolean isPocessWeapon(String weaponName){
-        System.out.println(availableWeapons.size());
-        for(Weapon weapon : availableWeapons){
-            System.out.println(weapon.getName());
-            if(weapon.getName() == weaponName){return true;}
-
-        }
-        return false;
-    }
-
-    public Trap activateTrap(EntityType type){
-        Integer i = 0;
-        while(type != this.m_traps.get(i).getType() && i < this.m_traps.size()){
-            i++;
-        }
-        this.m_traps.get(i).activate();
-        return m_traps.get(i);
     }
 
     public String getName() {
@@ -213,25 +200,9 @@ public abstract class Player {
         return stats;
     }
 
-    public int getTotalShipSegments() {
-        return m_totalShipSegments;
-    }
-
-    public void setLastMove(Coordinate coord) {
-        this.m_lastMove = coord;
-    }
-
     public String getLastMove() {
         if (m_lastMove == null) return "N/A";
         return "(" + (m_lastMove.getX() + 1) + "," + (char) ('A' + m_lastMove.getY()) + ")";
-    }
-
-    private int calculateTotalShipSegments() {
-        return m_ownGrid.getOwnBoats().stream().mapToInt(Boat::getSize).sum();
-    }
-
-    public void updateTotalShipSegments() {
-        this.m_totalShipSegments = calculateTotalShipSegments();
     }
 
     public String getWeaponUsesLeft(String weaponType) {
@@ -272,7 +243,6 @@ public abstract class Player {
             case NEW_SONAR: weaponName = "SONAR"; break;
             default: return;
         }
-
         Weapon w = getWeapon(weaponName);
         if (w != null) {
             w.setUsesLeft();
@@ -282,16 +252,13 @@ public abstract class Player {
         }
     }
 
-
     public void placeNewTrap(Trap trap, Coordinate coord) {
         boolean isValid = this.m_ownGrid.isInside(coord)
                 && !this.m_ownGrid.cellAlreadyFilled(coord.getX(), coord.getY())
                 && !this.m_ownGrid.isAlreadyHit(coord.getX(), coord.getY())
                 && !this.m_ownGrid.coordIsinIsland(coord);
-
         if (isValid) {
             this.m_ownGrid.placeTrap(trap, coord);
-            System.out.println("[INFO] Piège " + trap.getType() + " placé en " + coord);
         } else {
             this.m_mediator.notifyTrapPlacementError();
         }
