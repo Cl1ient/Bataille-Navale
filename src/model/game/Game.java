@@ -124,7 +124,7 @@ public class Game implements GameMediator {
                 for (GameListener li : m_listeners) {
                     li.onCellUpdated(defender, t);
                 }
-                addToHistory(" -> ABSORBÉ par un Trou Noir en " + t + " !");
+                handleBlackHoleHit(defender, t);
                 processAttack(defender, m_currentWeaponUsed, t);
                 return;
             }
