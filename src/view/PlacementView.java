@@ -298,19 +298,28 @@ public class PlacementView extends JFrame {
 
     private void updateEntitySelector() {
         cbEntitySelector.removeAllItems();
-
-        List<EntityType> remainingTypes = boatsToPlace.entrySet().stream()
+        boolean boatsRemaining = boatsToPlace.entrySet().stream()
+                .anyMatch(entry -> entry.getValue() > 0 && isBoat(entry.getKey()));
+        List<EntityType> availableTypes = boatsToPlace.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .map(Map.Entry::getKey)
+                .filter(type -> {
+                    if (boatsRemaining) {
+                        return isBoat(type);
+                    }
+                    else {
+                        return !isBoat(type);
+                    }
+                })
                 .collect(Collectors.toList());
 
-        for (EntityType type : remainingTypes) {
+        for (EntityType type : availableTypes) {
             cbEntitySelector.addItem(type);
         }
 
-        if (!remainingTypes.isEmpty()) {
+        if (!availableTypes.isEmpty()) {
             cbEntitySelector.setSelectedIndex(0);
-            selectedEntityType = remainingTypes.get(0);
+            selectedEntityType = availableTypes.get(0);
         } else {
             selectedEntityType = null;
         }
@@ -319,12 +328,22 @@ public class PlacementView extends JFrame {
     private void updateStatus() {
         int totalRemaining = boatsToPlace.values().stream().mapToInt(Integer::intValue).sum();
 
+        boolean boatsRemaining = boatsToPlace.entrySet().stream()
+                .anyMatch(entry -> entry.getValue() > 0 && isBoat(entry.getKey()));
+
         if (totalRemaining == 0) {
-            statusLabel.setText("SUCCESS: Toutes les entités sont placées. Cliquez sur Valider.");
+            statusLabel.setText("PRÊT ! Tous les navires et pièges sont placés. Validez pour jouer.");
+            statusLabel.setForeground(new Color(0, 100, 0)); // Vert foncé
             btnValidate.setEnabled(true);
         } else {
-            statusLabel.setText("Entités restantes à placer : " + totalRemaining);
             btnValidate.setEnabled(false);
+            statusLabel.setForeground(Color.BLACK);
+
+            if (boatsRemaining) {
+                statusLabel.setText("PHASE 1 : Placez vos navires (Reste : " + totalRemaining + ")");
+            } else {
+                statusLabel.setText("PHASE 2 : Placez vos pièges (Reste : " + totalRemaining + ")");
+            }
         }
     }
 
@@ -334,7 +353,6 @@ public class PlacementView extends JFrame {
             return;
         }
 
-        // env du placement au controlleur
         controller.startGame(placedEntitiesMap);
         this.dispose();
     }
@@ -366,6 +384,19 @@ public class PlacementView extends JFrame {
             }
         }
         return null;
+    }
+
+    private boolean isBoat(EntityType type) {
+        switch (type) {
+            case AIRCRAFT_CARRIER:
+            case CRUISER:
+            case DESTROYER:
+            case SUBMARINE:
+            case TORPEDO:
+                return true;
+            default:
+                return false;
+        }
     }
 
 

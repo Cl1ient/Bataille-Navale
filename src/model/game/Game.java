@@ -84,13 +84,23 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
+
+        Coordinate targetCoord = coord;
+
+        if (attacker.isUnderTornadoInfluence() && weapon.isOffensive()) {
+            targetCoord = generateRandomCoordinate(attacker.getGridSize());
+            attacker.decrementTornadoEffect();
+            addToHistory("🌪️ TORNADE : Le tir de " + attacker.getNickName() + " est dévié vers " + targetCoord + " !"); // TODO pour le debug pour le moment mais à enlevé pour plus tard
+        }
+
         displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         int gridSize = this.m_game.getGridSize();
-        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + coord);
+        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + targetCoord);
 
-        List<Coordinate> targets = weapon.generateTargets(coord, gridSize);
+        List<Coordinate> targets = weapon.generateTargets(targetCoord, gridSize);
+
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
             weapon.use();
@@ -100,11 +110,20 @@ public class Game implements GameMediator {
         weapon.use();
     }
 
+
+    private Coordinate generateRandomCoordinate(int gridSize) {
+        java.util.Random rand = new java.util.Random();
+        return new Coordinate(rand.nextInt(gridSize), rand.nextInt(gridSize));
+    }
+
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
             if (defender.getTypeEntityAt(t) == EntityType.BLACK_HOLE) {
-                System.out.println("Je suis la");
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
+                defender.getOwnGrid().getCell(t.getX(), t.getY()).setHit(true);
+                for (GameListener li : m_listeners) {
+                    li.onCellUpdated(defender, t);
+                }
                 addToHistory(" -> ABSORBÉ par un Trou Noir en " + t + " !");
                 processAttack(defender, m_currentWeaponUsed, t);
                 return;

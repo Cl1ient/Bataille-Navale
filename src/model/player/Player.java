@@ -32,6 +32,7 @@ public abstract class Player {
     private int m_totalShipSegments = 0;
     private TrapFactory m_trapFacto = new TrapFactory();
     private WeaponFactory m_weaponFacto = new WeaponFactory();
+    private int mTornadoTurnsRemaining = 0;
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
@@ -45,6 +46,20 @@ public abstract class Player {
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
         this.m_ownGrid.placeEntity(entityPlacement);
+    }
+
+    public void triggerTornadoEffect() {
+        this.mTornadoTurnsRemaining = 3;
+    }
+
+    public boolean isUnderTornadoInfluence() {
+        return this.mTornadoTurnsRemaining > 0;
+    }
+
+    public void decrementTornadoEffect() {
+        if (this.mTornadoTurnsRemaining > 0) {
+            this.mTornadoTurnsRemaining--;
+        }
     }
 
     public Grid getOwnGrid(){return this.m_ownGrid;}

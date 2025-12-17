@@ -115,7 +115,7 @@ public class GameController {
         gameView.setInputEnabled(false);
         gameView.setStatus("L'adversaire réfléchit...");
 
-        Timer timer = new Timer(1000, e -> {
+        Timer timer = new Timer(10, e -> {
             playComputerTurn();
             ((Timer)e.getSource()).stop();
         });
@@ -124,7 +124,12 @@ public class GameController {
     }
 
     private void playComputerTurn() {
+
         game.processComputerAttack();
+        if (!game.isGameOver()) {
+            gameView.setInputEnabled(true);
+            gameView.setStatus("À vous de jouer !");
+        }
     }
 
     private boolean canUseSonar(Player player) {
