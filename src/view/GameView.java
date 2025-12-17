@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     private final JLabel turnLabel;
     private JPanel infoPanel;
     private ButtonGroup weaponGroup;
+
+    private List<Coordinate> lastScannedArea = new ArrayList<>();
 
     private boolean inputEnabled = true;
 
@@ -140,9 +143,6 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         stats.add(new JLabel(" - Sonar (Reste) : " + targetPlayer.getWeaponUsesLeft("SONAR")));
 
 
-        // stats.add(new JLabel(" - Pièges restants : " + targetPlayer.getRemainingTrapsCount()));
-        // stats.add(new JLabel("Île à fouiller : " + targetPlayer.getIslandSegmentsLeft()));
-
         return stats;
     }
 
@@ -248,33 +248,31 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     }
 
     private void updateSingleGrid(JPanel[][] cellsUI, Grid gridModel, boolean showShips) {
+        boolean isOpponentGrid = gridModel == game.getM_computerPlayer().getOwnGrid();
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
                 Cell cell = gridModel.getCell(r, c);
                 JPanel panel = cellsUI[r][c];
-
                 Color color = new Color(173, 216, 230);
-
                 if (cell.isHit()) {
                     if (cell.getEntity() != null) {
                         if (cell.getEntity().isSunk()) {
-                            color = new Color(128, 0, 0);
+                            color = new Color(128, 0, 0); // Coulé
                         } else {
-                            color = Color.RED;
+                            color = Color.RED; // Touché
                         }
                     } else {
-                        color = Color.WHITE;
+                        color = Color.WHITE; // Raté
                     }
                 }
-                else if (showShips) {
-                    if (cell.getEntity() != null) {
-                        color = Color.DARK_GRAY;
-                    }
-                    // else if (cell.isIsland()) { color = Color.YELLOW; } // Pour la fonctionnalité D11
+                else if (showShips && cell.getEntity() != null) {
+                    color = Color.DARK_GRAY;
                 }
-
                 panel.setBackground(color);
             }
+        }
+        if (isOpponentGrid) {
+            lastScannedArea.clear();
         }
     }
 
@@ -324,10 +322,14 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     }
 
     @Override
-    public void onScanResult(Player player, List<ScanResult> results) {
-        setStatus("Sonar détecté. Entités trouvées : " + results.size());
-        // TODO: Mettre à jour la grille pour afficher les résultats du scan (couleur/marque)
-        this.updateGrids();
+    public void onScanResult(Player player, List<Coordinate> scannedArea, List<ScanResult> results) {
+        setStatus("Sonar activé ! " + results.size() + " présence(s) détectée(s) dans la zone.");
+        this.lastScannedArea = scannedArea;
+        updateGrids();
+        if (player instanceof model.player.ComputerPlayer) {
+            this.setInputEnabled(true);
+            this.setStatus("À vous de jouer ! (L'ennemi a utilisé son Sonar)");
+        }
     }
 
     public void notifyPlaceIslandEntity(Trap entity, Player player){

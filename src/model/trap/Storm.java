@@ -10,19 +10,20 @@ import java.util.Random;
 
 public class Storm implements GridEntity, Trap {
     private Integer m_size = 1;
+    private boolean isConsumed = false;
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
 
     public Storm(){}
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
-        this.turnsLeft --;
-        Coordinate coord = modifyCoordinates(defender.getGridSize());
-        defender.receiveShot(coord, attacker);
+        if (isConsumed) return;
+        attacker.triggerTornadoEffect();
+        isConsumed = true;
     }
 
     public Coordinate modifyCoordinates(Integer size){
-        // renvoie une coordonée aléatoire
+
         Random rand = new Random();
 
         int x = rand.nextInt(size);
@@ -36,7 +37,7 @@ public class Storm implements GridEntity, Trap {
 
     public Integer getSize() {return this.m_size;}
 
-    public void activate(){turnsLeft = 3;}
+    public void activate(){}
         @Override
     public boolean isSunk(){
         return false;

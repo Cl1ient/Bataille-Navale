@@ -71,7 +71,7 @@ public class Game implements GameMediator {
             System.out.println("[DEBUG] Impossible : Partie déjà terminée.");
             return;
         }
-        Coordinate target = m_computerPlayer.choseCoord();
+        Coordinate target = m_computerPlayer.choseCoord(m_humanPlayer.getOwnGrid());
         Weapon weapon = m_computerPlayer.choseWeapon();
 
         processAttack(m_computerPlayer, weapon, target);
@@ -84,27 +84,47 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
+
+        Coordinate targetCoord = coord;
+
+        if (attacker.isUnderTornadoInfluence() && weapon.isOffensive()) {
+            targetCoord = generateRandomCoordinate(attacker.getGridSize());
+            attacker.decrementTornadoEffect();
+            addToHistory("🌪️ TORNADE : Le tir de " + attacker.getNickName() + " est dévié vers " + targetCoord + " !"); // TODO pour le debug pour le moment mais à enlevé pour plus tard
+        }
+
         displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
         Player defender = getOpponent(attacker);
         int gridSize = this.m_game.getGridSize();
-        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + coord);
+        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + targetCoord);
 
-        List<Coordinate> targets = weapon.generateTargets(coord, gridSize);
+        List<Coordinate> targets = weapon.generateTargets(targetCoord, gridSize);
+
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
+            weapon.use();
         } else {
             processScan(attacker, defender, targets);
         }
         weapon.use();
     }
 
+
+    private Coordinate generateRandomCoordinate(int gridSize) {
+        java.util.Random rand = new java.util.Random();
+        return new Coordinate(rand.nextInt(gridSize), rand.nextInt(gridSize));
+    }
+
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
             if (defender.getTypeEntityAt(t) == EntityType.BLACK_HOLE) {
-                System.out.println("Je suis la");
                 System.out.println("[DEBUG] → BlackHole détecté sur " + t);
-                addToHistory(" -> ABSORBÉ par un Trou Noir en " + t + " !");
+                defender.getOwnGrid().getCell(t.getX(), t.getY()).setHit(true);
+                for (GameListener li : m_listeners) {
+                    li.onCellUpdated(defender, t);
+                }
+                handleBlackHoleHit(defender, t);
                 processAttack(defender, m_currentWeaponUsed, t);
                 return;
             }
@@ -136,10 +156,22 @@ public class Game implements GameMediator {
     }
 
     private void processScan(Player attacker, Player defender, List<Coordinate> targets) {
-        addToHistory(" -> Scan effectué sur " + targets.size() + " cases.");
         List<ScanResult> results = new ArrayList<>();
+        int foundCount = 0;
+
+        for (Coordinate target : targets) {
+            Cell cell = defender.getOwnGrid().getCell(target.getX(), target.getY());
+
+            if (cell != null && cell.isFilled()) {
+                foundCount++;
+                results.add(new ScanResult(target, cell.getEntity().getType()));
+            }
+        }
+
+        addToHistory(" -> Sonar utilisé en " + targets.get(0) + " : " + foundCount + " entités détectées.");
+
         for (GameListener li : m_listeners){
-            li.onScanResult(attacker, results);
+            li.onScanResult(attacker, targets, results);
         }
     }
 
@@ -199,6 +231,9 @@ public class Game implements GameMediator {
         System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
         addToHistory(" -> Tir dans l'eau en (" + x + "," + y + ")");
         defender.getOwnGrid().markMiss(x, y);
+        for (GameListener li : m_listeners) {
+            li.onCellUpdated(defender, new Coordinate(x, y));
+        }
     }
 
     @Override

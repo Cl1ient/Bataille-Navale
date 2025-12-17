@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface GameListener {
-    void onScanResult(Player player, List<ScanResult> results);
+    void onScanResult(Player player, List<Coordinate> scannedArea, List<ScanResult> results);
     void onGameOver(Player winner);
     void turnEnded(Player a, Map<Coordinate, String> s);
     void onCellUpdated(Player defender, Coordinate coord);

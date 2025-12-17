@@ -150,6 +150,9 @@ public class ConfigView extends JFrame {
                 System.err.println("Erreur de mapping BoatType -> EntityType pour : " + bType);
             }
         }
+        // TODO a revoir plus tard
+        counts.put(EntityType.STORM, 1);
+        counts.put(EntityType.BLACK_HOLE, 1);
         return counts;
     }
 

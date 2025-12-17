@@ -4,6 +4,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.GameListener;
 import model.ScanResult;
+import model.boat.Boat;
 import model.player.ComputerPlayer;
 import model.player.HumanPlayer;
 import model.player.Player;
@@ -92,6 +93,13 @@ public class GameController {
             return;
         }
 
+        if (this.currentWeaponMode.equals("SONAR")) {
+            if (!canUseSonar(hp)) {
+                gameView.setStatus("Impossible : Votre Sous-marin est détruit !");
+                return;
+            }
+        }
+
         if (currentWeapon.isOffensive() && game.getM_computerPlayer().getOwnGrid().isAlreadyHit(x, y)) {
             gameView.setStatus("Cible déjà touchée ! Choisissez-en une autre.");
             return;
@@ -107,7 +115,7 @@ public class GameController {
         gameView.setInputEnabled(false);
         gameView.setStatus("L'adversaire réfléchit...");
 
-        Timer timer = new Timer(1000, e -> {
+        Timer timer = new Timer(10, e -> {
             playComputerTurn();
             ((Timer)e.getSource()).stop();
         });
@@ -116,6 +124,20 @@ public class GameController {
     }
 
     private void playComputerTurn() {
+
         game.processComputerAttack();
+        if (!game.isGameOver()) {
+            gameView.setInputEnabled(true);
+            gameView.setStatus("À vous de jouer !");
+        }
+    }
+
+    private boolean canUseSonar(Player player) {
+        for (Boat boat : player.getOwnGrid().getOwnBoats()) { // TODO fix le get.get
+            if (boat.getType() == EntityType.SUBMARINE) {
+                return !boat.isSunk();
+            }
+        }
+        return false;
     }
 }

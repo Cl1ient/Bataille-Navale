@@ -35,6 +35,7 @@ public abstract class Player {
     private WeaponFactory m_weaponFacto = new WeaponFactory();
     private List<IslandListener> m_listeners;
 
+    private int mTornadoTurnsRemaining = 0;
 
     public Player(GameConfiguration config) {
         this.m_name = config.getNickName();
@@ -48,6 +49,20 @@ public abstract class Player {
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPlacement) {
         this.m_ownGrid.placeEntity(entityPlacement);
+    }
+
+    public void triggerTornadoEffect() {
+        this.mTornadoTurnsRemaining = 3;
+    }
+
+    public boolean isUnderTornadoInfluence() {
+        return this.mTornadoTurnsRemaining > 0;
+    }
+
+    public void decrementTornadoEffect() {
+        if (this.mTornadoTurnsRemaining > 0) {
+            this.mTornadoTurnsRemaining--;
+        }
     }
 
     public Grid getOwnGrid(){return this.m_ownGrid;}
@@ -101,11 +116,11 @@ public abstract class Player {
     public Trap findTrap(EntityType type){
         Trap trap = null;
         switch (type){
-            case EntityType.BLACK_HOLE :
+            case BLACK_HOLE :
                 trap = (Trap) m_trapFacto.createBlackHole();
                 this.m_traps.add(trap);
                 break;
-            case EntityType.STORM:
+            case STORM:
                 trap = (Trap) m_trapFacto.createStorm();
                 this.m_traps.add(trap);
                 break;
@@ -116,11 +131,11 @@ public abstract class Player {
     public void findWeapon(EntityType type){
         Weapon weapon = null;
         switch (type){
-            case EntityType.BOMB:
+            case BOMB:
                 weapon = (Weapon) m_weaponFacto.createBomb();
                 this.availableWeapons.add(weapon);
                 break;
-            case EntityType.SONAR:
+            case SONAR:
                 weapon = (Weapon) m_weaponFacto.createSonar();
                 this.availableWeapons.add(weapon);
                 break;
@@ -247,24 +262,5 @@ public abstract class Player {
             }
         }
         return null;
-    }
-
-    public void placeNewTrap(Trap trap, Coordinate coord){
-        if(this.m_ownGrid.isAlreadyHit(coord.getX(), coord.getY()) || this.m_ownGrid.cellAlreadyFilled(coord.getX(), coord.getY())){
-            this.notifyWrongPlacement();
-        }
-        else{
-            this.m_ownGrid.placeTrap(trap, coord);
-        }
-    }
-
-    public void attachListener(IslandListener listener){
-        m_listeners.add(listener);
-    }
-
-    public void notifyWrongPlacement(){
-        for(IslandListener listener : m_listeners){
-            listener.notifyTrapWrongPlacement();
-        }
     }
 }
