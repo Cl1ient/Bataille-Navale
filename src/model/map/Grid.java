@@ -24,6 +24,7 @@ public class Grid {
     private final BoatFactory m_boatFactory;
     private final TrapFactory m_trapFactory;
     private boolean m_islandMod;
+    private List<Coordinate> m_islandCoordinates = new ArrayList<>();
 
     public Grid(Integer gridSize, boolean isIsland) {
         this.m_size = gridSize;
@@ -39,9 +40,27 @@ public class Grid {
                 this.cells[i][j] = new Cell();
             }
         }
+        this.getAllCoordsFromIsland();
     }
 
+    public void getAllCoordsFromIsland(){
+        List<Integer> indexIsland = getIslandPositions();
+        for(Integer x : indexIsland){
+            for(Integer y : indexIsland){
+                this.m_islandCoordinates.add(new Coordinate(x,y));
+            }
+        }
+    }
 
+    // vérifie si une coordonnée fais partie de l'île ou non
+    public boolean coordIsinIsland(Coordinate coord){
+        for(Coordinate coordinate : this.m_islandCoordinates){
+            if(coordinate.getX() == coord.getX() && coordinate.getY() == coord.getY()){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void placeTrap(Trap trap, Coordinate coord){
         cells[coord.getX()][coord.getY()].setEntity( (GridEntity) trap);
@@ -118,9 +137,9 @@ public class Grid {
 
             // Pièges
             case STORM:
-                return m_trapFactory.createStorm(m_islandMod);
+                return m_trapFactory.createStorm();
             case BLACK_HOLE:
-                return m_trapFactory.createBlackHole(m_islandMod);
+                return m_trapFactory.createBlackHole();
 
             default:
                 return null;
