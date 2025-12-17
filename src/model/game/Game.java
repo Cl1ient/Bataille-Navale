@@ -109,7 +109,6 @@ public class Game implements GameMediator {
 
         if (weapon.isOffensive()) {
             processOffensiveAttack(attacker, defender, targets);
-            weapon.use();
         } else {
             processScan(attacker, defender, targets);
         }
