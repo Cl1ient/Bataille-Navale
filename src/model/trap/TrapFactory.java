@@ -6,5 +6,5 @@ public class TrapFactory {
     public TrapFactory(){}
 
     public GridEntity createStorm(){return new Storm();}
-    public GridEntity createBlackHole(){return new BlackHole();}
+    public GridEntity createBlackHole(){return new BlackHole(true);}
 }
