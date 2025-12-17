@@ -11,10 +11,13 @@ import java.util.Random;
 public class Storm implements GridEntity, Trap {
     private Integer m_size = 1;
     private boolean isConsumed = false;
+    private boolean m_activate;
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
 
-    public Storm(){}
+    public Storm(boolean islandMod){
+        this.m_activate = !islandMod;
+    }
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
         if (isConsumed) return;

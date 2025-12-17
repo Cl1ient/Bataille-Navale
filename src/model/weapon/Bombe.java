@@ -40,6 +40,10 @@ public class Bombe implements Weapon{
         return m_useLeft;
     }
 
+    @Override
+    public void setUsesLeft(){
+        m_useLeft++;
+    }
     public boolean isOffensive(){return true;}
 
     @Override

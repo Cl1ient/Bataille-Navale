@@ -35,6 +35,9 @@ public class GameView extends JFrame implements GameListener, IslandListener {
 
     private boolean inputEnabled = true;
 
+    private boolean isPlacingTrap = false;
+    private Trap trapToPlace = null;
+
     public GameView(GameController controller, Game game) {
         this.controller = controller;
         this.game = game;
@@ -68,6 +71,10 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         pack();
         setLocationRelativeTo(null);
         updateGrids();
+    }
+
+    public void showScreen() {
+        this.setVisible(true);
     }
 
     private JPanel createInfoPanel() {
@@ -197,7 +204,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         return container;
     }
 
-    private JPanel createGridPanel(JPanel[][] cellsArray, boolean isClickable) {
+    private JPanel createGridPanel(JPanel[][] cellsArray, boolean isOpponentGrid) {
         JPanel grid = new JPanel(new GridLayout(gridSize + 1, gridSize + 1));
 
         grid.add(new JLabel(""));
@@ -214,24 +221,40 @@ public class GameView extends JFrame implements GameListener, IslandListener {
                 cell.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 cell.setBackground(new Color(173, 216, 230));
 
-                if (isClickable) {
-                    final int r = row;
-                    final int c = col;
-                    cell.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            if (inputEnabled) {
+                final int r = row;
+                final int c = col;
+
+                cell.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (!inputEnabled) return;
+                        if (isOpponentGrid) {
+                            if (!isPlacingTrap) {
                                 controller.handleHumanAttack(r, c);
+                            } else {
+                                setStatus("Erreur : Placez d'abord votre piège sur VOTRE grille (Gauche) !");
+                            }
+                        } else {
+                            if (isPlacingTrap) {
+                                handleTrapPlacementClick(r, c);
                             }
                         }
-                    });
-                }
+                    }
+                });
 
                 cellsArray[row][col] = cell;
                 grid.add(cell);
             }
         }
         return grid;
+    }
+
+    private void handleTrapPlacementClick(int row, int col) {
+        Coordinate coord = new Coordinate(row, col);
+        controller.handlePlaceTrap(this.trapToPlace, coord);
+
+        this.isPlacingTrap = false;
+        this.trapToPlace = null;
     }
 
     public void updateGrids() {
@@ -247,27 +270,45 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         this.repaint();
     }
 
+
     private void updateSingleGrid(JPanel[][] cellsUI, Grid gridModel, boolean showShips) {
         boolean isOpponentGrid = gridModel == game.getM_computerPlayer().getOwnGrid();
+        boolean islandMode = controller.getGameConfiguration().isIslandMode();
+
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
                 Cell cell = gridModel.getCell(r, c);
                 JPanel panel = cellsUI[r][c];
                 Color color = new Color(173, 216, 230);
-                if (cell.isHit()) {
-                    if (cell.getEntity() != null) {
-                        if (cell.getEntity().isSunk()) {
-                            color = new Color(128, 0, 0); // Coulé
-                        } else {
-                            color = Color.RED; // Touché
-                        }
+                boolean isIslandZone = r >= 3 && r <= 6 && c >= 3 && c <= 6;
+                if (islandMode && isIslandZone) {
+                    if (!cell.isHit()) {
+                        color = new Color(238, 214, 175); // Sable (Inexploré)
                     } else {
-                        color = Color.WHITE; // Raté
+                        if (cell.getEntity() != null) {
+                            color = new Color(34, 139, 34); // Trésor trouvé (Vert)
+                        } else {
+                            color = Color.GRAY; // Fouillé et vide
+                        }
                     }
                 }
-                else if (showShips && cell.getEntity() != null) {
-                    color = Color.DARK_GRAY;
+                else {
+                    if (cell.isHit()) {
+                        if (cell.getEntity() != null) {
+                            if (cell.getEntity().isSunk()) {
+                                color = new Color(128, 0, 0); // Coulé
+                            } else {
+                                color = Color.RED; // Touché
+                            }
+                        } else {
+                            color = Color.WHITE; // Raté
+                        }
+                    }
+                    else if (showShips && cell.getEntity() != null) {
+                        color = Color.DARK_GRAY; // Bateau visible
+                    }
                 }
+
                 panel.setBackground(color);
             }
         }
@@ -285,13 +326,11 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         this.setCursor(enabled ? Cursor.getDefaultCursor() : Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
     }
 
-    public void showScreen() {
-        setVisible(true);
-    }
+    // GAME LISTENER
 
     @Override
     public void turnEnded(Player a, Map<Coordinate, String> s) {
-
+        updateGrids();
     }
 
     @Override
@@ -332,13 +371,25 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         }
     }
 
-    public void notifyPlaceIslandEntity(Trap entity, Player player){
+    // ISLAND LISTENER
 
+    @Override
+    public void notifyPlaceIslandEntity(Trap entity, Player player) {
+        this.trapToPlace = entity;
+        this.isPlacingTrap = true;
+        setInputEnabled(true);
+        setStatus("PIÈGE TROUVÉ : Cliquez sur votre GRILLE (gauche) pour placer le " + entity.getType());
     }
-    public void notifyWeaponFind(EntityType weaponType){
-        this.statusLabel.setText("Vous avez trouvé : " + weaponType.toString());
-    }
-    public void notifyTrapWrongPlacement(){
 
+    @Override
+    public void notifyTrapWrongPlacement() {
+        this.isPlacingTrap = true;
+        setStatus("ERREUR : Emplacement invalide (Occupé, touché ou sur l'île). Réessayez.");
+    }
+
+    @Override
+    public void notifyWeaponFind(EntityType weaponType) {
+        setStatus("ARME TROUVÉE : " + weaponType + " ajoutée !");
+        updateGrids();
     }
 }

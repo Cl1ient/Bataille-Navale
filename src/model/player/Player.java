@@ -27,6 +27,7 @@ public abstract class Player {
     protected Grid m_shotGrid;
     private Integer m_nbBoatRemaning;
     private GameMediator m_mediator;
+    private IslandListener m_islandListener;
     protected List<Weapon> availableWeapons;
     private List<Trap> m_traps;
     private Coordinate m_lastMove = null;
@@ -117,11 +118,11 @@ public abstract class Player {
         Trap trap = null;
         switch (type){
             case BLACK_HOLE :
-                trap = (Trap) m_trapFacto.createBlackHole();
+                trap = (Trap) m_trapFacto.createBlackHole(true);
                 this.m_traps.add(trap);
                 break;
             case STORM:
-                trap = (Trap) m_trapFacto.createStorm();
+                trap = (Trap) m_trapFacto.createStorm(true);
                 this.m_traps.add(trap);
                 break;
         }
@@ -262,5 +263,37 @@ public abstract class Player {
             }
         }
         return null;
+    }
+
+    public void addFoundItem(EntityType type) {
+        String weaponName = "";
+        switch (type) {
+            case NEW_BOMB: weaponName = "BOMB"; break;
+            case NEW_SONAR: weaponName = "SONAR"; break;
+            default: return;
+        }
+
+        Weapon w = getWeapon(weaponName);
+        if (w != null) {
+            w.setUsesLeft();
+        } else {
+
+            findWeapon(type == EntityType.NEW_BOMB ? EntityType.BOMB : EntityType.SONAR);
+        }
+    }
+
+
+    public void placeNewTrap(Trap trap, Coordinate coord) {
+        boolean isValid = this.m_ownGrid.isInside(coord)
+                && !this.m_ownGrid.cellAlreadyFilled(coord.getX(), coord.getY())
+                && !this.m_ownGrid.isAlreadyHit(coord.getX(), coord.getY())
+                && !this.m_ownGrid.coordIsinIsland(coord);
+
+        if (isValid) {
+            this.m_ownGrid.placeTrap(trap, coord);
+            System.out.println("[INFO] Piège " + trap.getType() + " placé en " + coord);
+        } else {
+            this.m_mediator.notifyTrapPlacementError();
+        }
     }
 }

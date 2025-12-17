@@ -50,9 +50,14 @@ public class Game implements GameMediator {
 
         this.m_currentPlayer = m_humanPlayer;
         this.turnNumber = 1;
-
+        if (m_game.isIslandMode()) {
+            m_humanPlayer.getOwnGrid().initIslandItems();
+            m_computerPlayer.getOwnGrid().initIslandItems();
+        }
         this.historyLog = new StringBuilder();
         this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
+
+
 
 
     }
@@ -84,8 +89,16 @@ public class Game implements GameMediator {
     }
 
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
-
+        Player defender = getOpponent(attacker);
         Coordinate targetCoord = coord;
+
+        if (m_game.isIslandMode()) {
+            if (defender.getOwnGrid().coordIsinIsland(coord)) {
+                processIslandSearch(attacker, defender, coord);
+                weapon.use();
+                return;
+            }
+        }
 
         if (attacker.isUnderTornadoInfluence() && weapon.isOffensive()) {
             targetCoord = generateRandomCoordinate(attacker.getGridSize());
@@ -95,7 +108,6 @@ public class Game implements GameMediator {
 
         displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
-        Player defender = getOpponent(attacker);
         int gridSize = this.m_game.getGridSize();
         addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + targetCoord);
 
@@ -272,4 +284,76 @@ public class Game implements GameMediator {
     public int getTurnNumber() {
         return turnNumber;
     }
+
+    private void processIslandSearch(Player attacker, Player defender, Coordinate coord) {
+
+        Cell cell = defender.getOwnGrid().getCell(coord.getX(), coord.getY());
+
+        if (cell.isHit()) {
+            addToHistory(attacker.getNickName() + " a déjà fouillé l'île en " + coord);
+            return;
+        }
+
+        cell.setHit(true);
+        GridEntity item = cell.getEntity();
+
+        if (item != null) {
+            addToHistory("TRÉSOR ! " + attacker.getNickName() + " trouve : " + item.getType());
+
+            switch (item.getType()) {
+                case NEW_BOMB:
+                case NEW_SONAR:
+                    attacker.addFoundItem(item.getType());
+                    notifyWeaponFound(item.getType());
+                    break;
+
+                case NEW_STORM:
+
+                    Trap storm = (Trap) m_trapFactory.createStorm(false);
+                    notifyPlaceTrapRequest(storm, attacker);
+                    break;
+
+                case NEW_BLACKHOLE:
+                    Trap blackHole = (Trap) m_trapFactory.createBlackHole(false);
+                    notifyPlaceTrapRequest(blackHole, attacker);
+                    break;
+
+                default:
+                    break;
+            }
+
+        } else {
+            addToHistory(attacker.getNickName() + " fouille en " + coord + " mais ne trouve rien.");
+        }
+
+        for (GameListener li : m_listeners) {
+            li.onCellUpdated(defender, coord);
+        }
+    }
+
+    private void notifyPlaceTrapRequest(Trap trap, Player player) {
+        for (GameListener li : m_listeners) {
+            if (li instanceof IslandListener) {
+                ((IslandListener) li).notifyPlaceIslandEntity(trap, player);
+            }
+        }
+    }
+    private void notifyWeaponFound(EntityType type) {
+        for (GameListener li : m_listeners) {
+            if (li instanceof IslandListener) {
+                ((IslandListener) li).notifyWeaponFind(type);
+            }
+        }
+    }
+
+    @Override
+    public void notifyTrapPlacementError() {
+        for (GameListener li : m_listeners) {
+            if (li instanceof IslandListener) {
+                ((IslandListener) li).notifyTrapWrongPlacement();
+            }
+        }
+    }
+
+
 }

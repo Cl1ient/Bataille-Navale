@@ -137,9 +137,9 @@ public class Grid {
 
             // Pièges
             case STORM:
-                return m_trapFactory.createStorm();
+                return m_trapFactory.createStorm(true);
             case BLACK_HOLE:
-                return m_trapFactory.createBlackHole();
+                return m_trapFactory.createBlackHole(true);
 
             default:
                 return null;
@@ -325,6 +325,54 @@ public class Grid {
 
     public List<Boat> getOwnBoats() {
         return m_ownBoats;
+    }
+
+    public boolean isIsland(int row, int col) {
+        return row >= 3 && row <= 6 && col >= 3 && col <= 6;
+    }
+
+    public boolean isIsland(Coordinate c) {
+        return isIsland(c.getX(), c.getY());
+    }
+
+    public boolean isValidPosition(Coordinate coord, int size, boolean horizontal) {
+        if (coord.getX() < 0 || coord.getX() >= m_size || coord.getY() < 0 || coord.getY() >= m_size) return false;
+
+        for (int i = 0; i < size; i++) {
+            int r = horizontal ? coord.getX() : coord.getX() + i;
+            int c = horizontal ? coord.getY() + i : coord.getY();
+
+            if (!isInside(r, c)) return false;
+            if (coordIsinIsland(new Coordinate(r, c))) return false;
+            if (cellAlreadyFilled(r, c)) return false;
+        }
+        return true;
+    }
+
+    public void initIslandItems() {
+        if (!m_islandMod) return;
+
+        List<EntityType> itemsToPlace = new ArrayList<>();
+        itemsToPlace.add(EntityType.NEW_BOMB);
+        itemsToPlace.add(EntityType.NEW_SONAR);
+        itemsToPlace.add(EntityType.NEW_STORM);
+        itemsToPlace.add(EntityType.NEW_BLACKHOLE);
+
+        List<Coordinate> availableCoords = new ArrayList<>(this.m_islandCoordinates);
+        Random rand = new Random();
+
+        for (EntityType type : itemsToPlace) {
+            if (availableCoords.isEmpty()) break;
+
+            int index = rand.nextInt(availableCoords.size());
+            Coordinate pos = availableCoords.remove(index);
+
+            GridEntity item = createEntityFromType(type);
+
+            if (item != null) {
+                this.cells[pos.getX()][pos.getY()].setEntity(item);
+            }
+        }
     }
 
 
