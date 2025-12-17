@@ -42,6 +42,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         this.controller = controller;
         this.game = game;
         this.game.addListener(this);
+        this.game.addIslandListener(this);
         this.gridSize = game.getHumanPlayer().getGridSize();
 
         this.playerCells = new JPanel[gridSize][gridSize];

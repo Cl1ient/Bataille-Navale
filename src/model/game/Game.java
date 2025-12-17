@@ -18,8 +18,7 @@ import java.util.Map;
 public class Game implements GameMediator {
 
     private final TrapFactory m_trapFactory;
-    private final WeaponFactory m_weaponFactory;
-    private final BoatFactory m_boatFactory;
+
 
     private Player m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
@@ -29,6 +28,7 @@ public class Game implements GameMediator {
     private GameConfiguration m_game;
     private int turnNumber;
     private final List<GameListener> m_listeners;
+    private List<IslandListener> m_islandListeners = new ArrayList<>();
 
     private StringBuilder historyLog;
 
@@ -41,8 +41,6 @@ public class Game implements GameMediator {
         this.m_computerPlayer = new ComputerPlayer(config);
 
         this.m_trapFactory = new TrapFactory();
-        this.m_weaponFactory = new WeaponFactory();
-        this.m_boatFactory = new BoatFactory();
         this.m_listeners = new ArrayList<>();
 
         this.m_humanPlayer.setMediator(this);
@@ -56,10 +54,6 @@ public class Game implements GameMediator {
         }
         this.historyLog = new StringBuilder();
         this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
-
-
-
-
     }
 
     public String getHistory() {
@@ -238,6 +232,9 @@ public class Game implements GameMediator {
     }
 
     public void addListener(GameListener listener){ this.m_listeners.add(listener); }
+    public void addIslandListener(IslandListener listener) {
+        this.m_islandListeners.add(listener);
+    }
 
     public void handleMiss(Player defender, int x, int y) {
         System.out.println("[HANDLE] handleMiss(" + x + "," + y + ")");
@@ -332,26 +329,21 @@ public class Game implements GameMediator {
     }
 
     private void notifyPlaceTrapRequest(Trap trap, Player player) {
-        for (GameListener li : m_listeners) {
-            if (li instanceof IslandListener) {
-                ((IslandListener) li).notifyPlaceIslandEntity(trap, player);
-            }
+        for (IslandListener li : m_islandListeners) {
+            li.notifyPlaceIslandEntity(trap, player);
         }
     }
+
     private void notifyWeaponFound(EntityType type) {
-        for (GameListener li : m_listeners) {
-            if (li instanceof IslandListener) {
-                ((IslandListener) li).notifyWeaponFind(type);
-            }
+        for (IslandListener li : m_islandListeners) {
+            li.notifyWeaponFind(type);
         }
     }
 
     @Override
     public void notifyTrapPlacementError() {
-        for (GameListener li : m_listeners) {
-            if (li instanceof IslandListener) {
-                ((IslandListener) li).notifyTrapWrongPlacement();
-            }
+        for (IslandListener li : m_islandListeners) {
+            li.notifyTrapWrongPlacement();
         }
     }
 
