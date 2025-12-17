@@ -2,6 +2,7 @@ package model.player;
 
 import model.Coordinate;
 import model.EntityType;
+import model.IslandListener;
 import model.boat.Boat;
 import model.trap.*;
 import model.game.Game;
@@ -32,6 +33,8 @@ public abstract class Player {
     private int m_totalShipSegments = 0;
     private TrapFactory m_trapFacto = new TrapFactory();
     private WeaponFactory m_weaponFacto = new WeaponFactory();
+    private List<IslandListener> m_listeners;
+
     private int mTornadoTurnsRemaining = 0;
 
     public Player(GameConfiguration config) {
@@ -114,11 +117,11 @@ public abstract class Player {
         Trap trap = null;
         switch (type){
             case BLACK_HOLE :
-                trap = (Trap) m_trapFacto.createBlackHole(true);
+                trap = (Trap) m_trapFacto.createBlackHole();
                 this.m_traps.add(trap);
                 break;
             case STORM:
-                trap = (Trap) m_trapFacto.createStorm(true);
+                trap = (Trap) m_trapFacto.createStorm();
                 this.m_traps.add(trap);
                 break;
         }
@@ -260,5 +263,4 @@ public abstract class Player {
         }
         return null;
     }
-
 }

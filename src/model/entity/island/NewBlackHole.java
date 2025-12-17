@@ -5,6 +5,7 @@ import model.GameListener;
 import model.IslandListener;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 import model.trap.BlackHole;
 import model.trap.Trap;
@@ -19,7 +20,7 @@ public class NewBlackHole implements GridEntity {
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex) {
         Trap entity = attacker.findTrap(EntityType.BLACK_HOLE);
-        notifyListener(entity);
+        notifyListener(entity, attacker);
     }
 
     public EntityType getType(){return this.m_type;}
@@ -32,9 +33,9 @@ public class NewBlackHole implements GridEntity {
         m_listeners.add(listener);
     }
 
-    public void notifyListener(Trap entity){
+    public void notifyListener(Trap entity, Player player){
         for(IslandListener listener : m_listeners){
-            listener.notifyPlaceIslandEntity(entity);
+            listener.notifyPlaceIslandEntity(entity, player);
         }
     }
 }

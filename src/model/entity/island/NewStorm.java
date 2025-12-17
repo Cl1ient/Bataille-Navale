@@ -4,6 +4,7 @@ import model.EntityType;
 import model.IslandListener;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 import model.trap.Trap;
 
@@ -18,16 +19,20 @@ public class NewStorm implements GridEntity {
     @Override
     public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
         Trap entity = attacker.findTrap(EntityType.STORM);
-        notifyListener(entity);
+        notifyListener(entity, attacker);
     }
     @Override
     public EntityType getType(){return this.m_type;}
     @Override
     public Integer getSize(){return this.m_size;}
 
-    public void notifyListener(Trap entity){
+    public void attachListener(IslandListener listener){
+        m_listeners.add(listener);
+    }
+
+    public void notifyListener(Trap entity, Player player){
         for(IslandListener listener : m_listeners){
-            listener.notifyPlaceIslandEntity(entity);
+            listener.notifyPlaceIslandEntity(entity, player);
         }
     }
         @Override

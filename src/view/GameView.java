@@ -6,6 +6,7 @@ import model.game.Game;
 import model.map.Cell;
 import model.map.Grid;
 import model.player.Player;
+import model.trap.Trap;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class GameView extends JFrame implements GameListener {
+public class GameView extends JFrame implements GameListener, IslandListener {
 
     private final GameController controller;
     private final Game game;
@@ -329,5 +330,15 @@ public class GameView extends JFrame implements GameListener {
             this.setInputEnabled(true);
             this.setStatus("À vous de jouer ! (L'ennemi a utilisé son Sonar)");
         }
+    }
+
+    public void notifyPlaceIslandEntity(Trap entity, Player player){
+
+    }
+    public void notifyWeaponFind(EntityType weaponType){
+        this.statusLabel.setText("Vous avez trouvé : " + weaponType.toString());
+    }
+    public void notifyTrapWrongPlacement(){
+
     }
 }
