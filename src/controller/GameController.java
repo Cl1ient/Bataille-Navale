@@ -2,18 +2,14 @@ package controller;
 
 import model.Coordinate;
 import model.EntityType;
-import model.GameListener;
-import model.ScanResult;
 import model.boat.Boat;
 import model.player.ComputerPlayer;
 import model.player.HumanPlayer;
 import model.player.Player;
-import model.weapon.Bombe;
-import model.weapon.Missile;
-import model.weapon.Sonar;
 import model.weapon.Weapon;
 import model.game.Game;
 import model.game.GameConfiguration;
+import model.trap.Trap;
 import view.ConfigView;
 import view.GameView;
 import view.PlacementView;
@@ -28,8 +24,6 @@ public class GameController {
     private GameConfiguration gameConfig;
     private Map<EntityType, Integer> boatsToPlace;
 
-
-
     private String currentWeaponMode = "MISSILE";
 
     private final ConfigView configView;
@@ -37,15 +31,17 @@ public class GameController {
     private GameView gameView;
 
     public GameController() {
-
         this.currentWeaponMode = "MISSILE";
-
         this.configView = new ConfigView(this);
         this.configView.showScreen();
     }
 
     public void setGameConfig(GameConfiguration config) {
         this.gameConfig = config;
+    }
+
+    public GameConfiguration getGameConfiguration() {
+        return this.gameConfig;
     }
 
     public void setBoatsToPlace(Map<EntityType, Integer> boatsToPlace) {
@@ -59,7 +55,6 @@ public class GameController {
 
     public void callPlaceEntityView() {
         if (this.configView != null) this.configView.dispose();
-
         this.placementView = new PlacementView(this, gameConfig.getGridSize(), boatsToPlace);
         this.placementView.showScreen();
     }
@@ -89,7 +84,7 @@ public class GameController {
         Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
         if (currentWeapon == null || currentWeapon.getUsesLeft() == 0) {
-            gameView.setStatus("ERREUR : L'arme " + this.currentWeaponMode + " est épuisée ou non disponible !");
+            gameView.setStatus("ERREUR : L'arme " + this.currentWeaponMode + " est épuisée !");
             return;
         }
 
@@ -111,11 +106,17 @@ public class GameController {
         triggerComputerTurn();
     }
 
+    public void handlePlaceTrap(Trap trap, Coordinate coord) {
+        Player player = game.getHumanPlayer();
+        player.placeNewTrap(trap, coord);
+        gameView.updateGrids();
+    }
+
     private void triggerComputerTurn() {
         gameView.setInputEnabled(false);
         gameView.setStatus("L'adversaire réfléchit...");
 
-        Timer timer = new Timer(10, e -> {
+        Timer timer = new Timer(1000, e -> {
             playComputerTurn();
             ((Timer)e.getSource()).stop();
         });
@@ -124,16 +125,11 @@ public class GameController {
     }
 
     private void playComputerTurn() {
-
         game.processComputerAttack();
-        if (!game.isGameOver()) {
-            gameView.setInputEnabled(true);
-            gameView.setStatus("À vous de jouer !");
-        }
     }
 
     private boolean canUseSonar(Player player) {
-        for (Boat boat : player.getOwnGrid().getOwnBoats()) { // TODO fix le get.get
+        for (Boat boat : player.getOwnGrid().getOwnBoats()) {
             if (boat.getType() == EntityType.SUBMARINE) {
                 return !boat.isSunk();
             }

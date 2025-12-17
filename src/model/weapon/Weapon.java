@@ -25,6 +25,7 @@ public interface Weapon {
      */
     Integer getUsesLeft();
 
+    void setUsesLeft();
     /**
      * Decrements the remaining uses of the weapon after it has been fired.
      */

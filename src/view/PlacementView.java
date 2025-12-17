@@ -25,16 +25,13 @@ public class PlacementView extends JFrame {
     private final Map<EntityType, List<Coordinate>> placedEntitiesMap;
     private List<Coordinate> currentPreviewCoords = new ArrayList<>();
 
-    // Composants UI
     private JPanel gridPanel;
     private JLabel statusLabel;
     private JComboBox<EntityType> cbEntitySelector;
     private JCheckBox chkOrientation;
     private JButton btnValidate;
 
-    // ref au cellules pour le glissement
     private final JPanel[][] gridCells;
-
 
     public PlacementView(GameController controller, int gridSize, Map<EntityType, Integer> boatsToPlace) {
         this.controller = controller;
@@ -48,7 +45,6 @@ public class PlacementView extends JFrame {
         setLayout(new BorderLayout(10, 10));
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-
         mainPanel.add(createControlPanel(), BorderLayout.NORTH);
 
         this.gridPanel = createGridPanel();
@@ -66,9 +62,6 @@ public class PlacementView extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    /*
-    ui setup
-     */
     private JPanel createControlPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
 
@@ -76,7 +69,7 @@ public class PlacementView extends JFrame {
         cbEntitySelector.addActionListener(e -> {
             selectedEntityType = (EntityType) cbEntitySelector.getSelectedItem();
             updateStatus();
-            updateGridDisplay(); // refresh l'apercu
+            updateGridDisplay();
         });
         panel.add(new JLabel("Entité à placer :"));
         panel.add(cbEntitySelector);
@@ -84,7 +77,7 @@ public class PlacementView extends JFrame {
         chkOrientation = new JCheckBox("Horizontal", true);
         chkOrientation.addActionListener(e -> {
             isHorizontal = chkOrientation.isSelected();
-            updateGridDisplay(); // refresh l'apercu
+            updateGridDisplay();
         });
         panel.add(chkOrientation);
 
@@ -106,21 +99,16 @@ public class PlacementView extends JFrame {
         }
 
         for (int r = 0; r < gridSize; r++) {
-            // en tete de ligne
             panel.add(new JLabel(String.valueOf(r + 1), SwingConstants.CENTER));
-
             for (int c = 0; c < gridSize; c++) {
                 JPanel cell = createGridCell(r, c);
-                gridCells[r][c] = cell; // stocker la référence
+                gridCells[r][c] = cell;
                 panel.add(cell);
             }
         }
         return panel;
     }
 
-    /**
-     * Create interactiv cell
-     */
     private JPanel createGridCell(int row, int col) {
         JPanel cell = new JPanel();
         cell.setPreferredSize(new Dimension(30, 30));
@@ -165,9 +153,6 @@ public class PlacementView extends JFrame {
         return cell;
     }
 
-    /**
-     * Displays a preview of the boat without placing it.
-     */
     private void previewPlacement(int startRow, int startCol) {
         if (selectedEntityType == null || boatsToPlace.getOrDefault(selectedEntityType, 0) <= 0) {
             return;
@@ -186,39 +171,27 @@ public class PlacementView extends JFrame {
             }
         }
         currentPreviewCoords = requestedCoords;
-        statusLabel.setText(isValid ? "Prêt à placer : " + selectedEntityType.name() : "Placement invalide (Chevauchement/Bords)");
     }
 
-
-    /**
-     * Attempts to place the selected entity at the end coordinate of the slide.
-     */
     private void attemptPlacement(int endRow, int endCol) {
         if (selectedEntityType == null || boatsToPlace.getOrDefault(selectedEntityType, 0) <= 0) {
             return;
         }
 
         int size = getEntitySize(selectedEntityType);
-
         List<Coordinate> requestedCoords = calculateEntityCoordinates(endRow, endCol, size);
         if (!validatePlacement(requestedCoords)) {
-            JOptionPane.showMessageDialog(this, "Placement invalide (hors limites ou chevauchement).", "Erreur", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Placement invalide (hors limites, chevauchement ou sur l'île).", "Erreur", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // si valdie :
         registerPlacement(requestedCoords);
-
-        // update le compteur
         boatsToPlace.put(selectedEntityType, boatsToPlace.get(selectedEntityType) - 1);
         updateGridDisplay();
         updateStatus();
         updateEntitySelector();
     }
 
-    /**
-     * Saves the coordinates for the placed entity.
-     */
     private void registerPlacement(List<Coordinate> coords) {
         placedEntitiesMap.computeIfAbsent(selectedEntityType, k -> new java.util.ArrayList<>()).addAll(coords);
     }
@@ -235,12 +208,17 @@ public class PlacementView extends JFrame {
 
 
     private boolean validatePlacement(List<Coordinate> coords) {
+        boolean islandMode = controller.getGameConfiguration().isIslandMode();
+
         for (Coordinate coord : coords) {
-            // 1. Hors limites
             if (coord.getX() < 0 || coord.getX() >= gridSize || coord.getY() < 0 || coord.getY() >= gridSize) {
                 return false;
             }
-            // 2. Chevauchement
+            if (islandMode) {
+                if (coord.getX() >= 3 && coord.getX() <= 6 && coord.getY() >= 3 && coord.getY() <= 6) {
+                    return false;
+                }
+            }
             if (isOccupied(coord)) {
                 return false;
             }
@@ -254,15 +232,22 @@ public class PlacementView extends JFrame {
                 .anyMatch(c -> c.getX() == coord.getX() && c.getY() == coord.getY());
     }
 
-    // UI UPDATE
-
     private void updateGridDisplay() {
+        boolean islandMode = controller.getGameConfiguration().isIslandMode();
+
         for (int r = 0; r < gridSize; r++) {
             for (int c = 0; c < gridSize; c++) {
                 JPanel cell = gridCells[r][c];
                 Coordinate currentCoord = new Coordinate(r, c);
                 EntityType placedType = getPlacedEntityType(currentCoord);
+
                 Color color = Color.WHITE;
+
+                // Affichage de l'île
+                if (islandMode && r >= 3 && r <= 6 && c >= 3 && c <= 6) {
+                    color = new Color(238, 214, 175); // Couleur sable
+                }
+
                 if (placedType != null) {
                     switch (placedType) {
                         case AIRCRAFT_CARRIER:
@@ -290,12 +275,6 @@ public class PlacementView extends JFrame {
         gridPanel.repaint();
     }
 
-    private boolean isCoordinatePlaced(Coordinate coord) {
-        return placedEntitiesMap.values().stream()
-                .flatMap(List::stream)
-                .anyMatch(c -> c.getX() == coord.getX() && c.getY() == coord.getY());
-    }
-
     private void updateEntitySelector() {
         cbEntitySelector.removeAllItems();
         boolean boatsRemaining = boatsToPlace.entrySet().stream()
@@ -306,8 +285,7 @@ public class PlacementView extends JFrame {
                 .filter(type -> {
                     if (boatsRemaining) {
                         return isBoat(type);
-                    }
-                    else {
+                    } else {
                         return !isBoat(type);
                     }
                 })
@@ -319,7 +297,7 @@ public class PlacementView extends JFrame {
 
         if (!availableTypes.isEmpty()) {
             cbEntitySelector.setSelectedIndex(0);
-            selectedEntityType = availableTypes.get(0);
+            selectedEntityType = (EntityType) cbEntitySelector.getSelectedItem();
         } else {
             selectedEntityType = null;
         }
@@ -327,18 +305,16 @@ public class PlacementView extends JFrame {
 
     private void updateStatus() {
         int totalRemaining = boatsToPlace.values().stream().mapToInt(Integer::intValue).sum();
-
         boolean boatsRemaining = boatsToPlace.entrySet().stream()
                 .anyMatch(entry -> entry.getValue() > 0 && isBoat(entry.getKey()));
 
         if (totalRemaining == 0) {
             statusLabel.setText("PRÊT ! Tous les navires et pièges sont placés. Validez pour jouer.");
-            statusLabel.setForeground(new Color(0, 100, 0)); // Vert foncé
+            statusLabel.setForeground(new Color(0, 100, 0));
             btnValidate.setEnabled(true);
         } else {
             btnValidate.setEnabled(false);
             statusLabel.setForeground(Color.BLACK);
-
             if (boatsRemaining) {
                 statusLabel.setText("PHASE 1 : Placez vos navires (Reste : " + totalRemaining + ")");
             } else {
@@ -348,11 +324,6 @@ public class PlacementView extends JFrame {
     }
 
     private void onValidateClicked() {
-        if (boatsToPlace.values().stream().anyMatch(count -> count > 0)) {
-            JOptionPane.showMessageDialog(this, "Veuillez placer toutes les entités avant de valider.", "Attention", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         controller.startGame(placedEntitiesMap);
         this.dispose();
     }
@@ -363,18 +334,10 @@ public class PlacementView extends JFrame {
             case CRUISER -> 4;
             case DESTROYER, SUBMARINE -> 3;
             case TORPEDO -> 2;
-            case BLACK_HOLE, STORM -> 1;
             default -> 1;
         };
     }
 
-    public void showScreen() {
-        this.setVisible(true);
-    }
-
-    /**
-     * Retourne le type d'entité placé à une coordonnée spécifique.
-     */
     private EntityType getPlacedEntityType(Coordinate coord) {
         for (Map.Entry<EntityType, List<Coordinate>> entry : placedEntitiesMap.entrySet()) {
             for (Coordinate placedCoord : entry.getValue()) {
@@ -387,17 +350,14 @@ public class PlacementView extends JFrame {
     }
 
     private boolean isBoat(EntityType type) {
-        switch (type) {
-            case AIRCRAFT_CARRIER:
-            case CRUISER:
-            case DESTROYER:
-            case SUBMARINE:
-            case TORPEDO:
-                return true;
-            default:
-                return false;
-        }
+        if (type == null) return false;
+        return switch (type) {
+            case AIRCRAFT_CARRIER, CRUISER, DESTROYER, SUBMARINE, TORPEDO -> true;
+            default -> false;
+        };
     }
 
-
+    public void showScreen() {
+        this.setVisible(true);
+    }
 }

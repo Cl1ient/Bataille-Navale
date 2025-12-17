@@ -33,6 +33,11 @@ public class Sonar implements Weapon{
     }
 
     @Override
+    public void setUsesLeft(){
+        m_useLeft++;
+    }
+
+    @Override
     public void use(){
         if(this.m_useLeft > 0){
             this.m_useLeft--;

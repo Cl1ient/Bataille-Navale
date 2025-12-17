@@ -20,7 +20,10 @@ public class Missile implements Weapon{
         return "MISSILE";
     }
     public boolean isOffensive(){return true;}
+    @Override
+    public void setUsesLeft(){
 
+    }
     @Override
     public Integer getUsesLeft() {
         return m_unlimited_uses;
