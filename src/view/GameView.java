@@ -252,9 +252,9 @@ public class GameView extends JFrame implements GameListener, IslandListener {
 
     private void handleTrapPlacementClick(int row, int col) {
         Coordinate coord = new Coordinate(row, col);
-        controller.handlePlaceTrap(this.trapToPlace, coord);
 
-        this.isPlacingTrap = false;
+
+        this.isPlacingTrap = controller.handlePlaceTrap(this.trapToPlace, coord);
         this.trapToPlace = null;
     }
 
@@ -376,6 +376,11 @@ public class GameView extends JFrame implements GameListener, IslandListener {
 
     @Override
     public void notifyPlaceIslandEntity(Trap entity, Player player) {
+        if(player == game.getM_computerPlayer()) {
+            player.placeFoundTrap(entity, null, player.getOwnGrid());
+            System.out.println("L'ordinateur a placé sont trap ");
+            return;
+        }
         this.trapToPlace = entity;
         this.isPlacingTrap = true;
         setInputEnabled(true);

@@ -10,6 +10,7 @@ public enum EntityType {
     STORM,
     BOMB,
     SONAR,
+    MISSILE,
     NEW_BLACKHOLE,
     NEW_STORM,
     NEW_BOMB,

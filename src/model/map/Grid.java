@@ -76,7 +76,7 @@ public class Grid {
         }
     }
 
-    private boolean placeSingleEntity(GridEntity entity, List<Coordinate> coordinates) {
+    public boolean placeSingleEntity(GridEntity entity, List<Coordinate> coordinates) {
         for (Coordinate coord : coordinates) {
             if (!isInside(coord) || this.cells[coord.getX()][coord.getY()].getEntity() != null) {
                 return false;
@@ -95,7 +95,7 @@ public class Grid {
         if (entity instanceof Boat && !m_ownBoats.contains(entity)) {
             m_ownBoats.add((Boat) entity);
         }
-
+        System.out.println("lentité trouvé a été placé" + entity);
         return true;
     }
 
@@ -152,7 +152,7 @@ public class Grid {
         return isInside(coord.getX(), coord.getY());
     }
 
-    private boolean isInside(int x, int y) {
+    public boolean isInside(int x, int y) {
         return x >= 0 && x < m_size && y >= 0 && y < m_size;
     }
 
@@ -167,14 +167,6 @@ public class Grid {
         } else {
             targetCell.setMiss(true);
         }
-    }
-
-    public void desactiveTrap(int x, int y) {
-        if (!isInside(x, y)) return;
-        Cell targetCell = cells[x][y];
-        GridEntity entity = targetCell.getEntity();
-        // TODO retirer l'entité si c'est un piège
-        // targetCell.setEntity(null);
     }
 
     public void markMiss(int x, int y) {
@@ -308,6 +300,27 @@ public class Grid {
                 this.cells[pos.getX()][pos.getY()].setEntity(item);
             }
         }
+    }
+
+
+    public boolean isPosOnIsland(int x, int y) {
+        if (!m_islandMod) return false;
+        List<Integer> islandIndices = getIslandPositions();
+        return islandIndices.contains(x) && islandIndices.contains(y);
+    }
+
+    public GridEntity realTrap(Trap trap) {
+        GridEntity realTrapToPlace;
+        if (trap.getType() == EntityType.STORM) {
+            realTrapToPlace = m_trapFactory.createStorm(m_islandMod);
+            return realTrapToPlace;
+        }
+        else if (trap.getType() == EntityType.BLACK_HOLE) {
+            realTrapToPlace = m_trapFactory.createBlackHole(m_islandMod);
+            return realTrapToPlace;
+
+        }
+        return null;
     }
 
 

@@ -4,6 +4,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.game.GameConfiguration;
 import model.map.Grid;
+import model.trap.Trap;
 import model.weapon.Weapon;
 import model.weapon.WeaponFactory;
 
@@ -72,6 +73,32 @@ public class ComputerPlayer extends Player{
                 this.m_ownGrid.randomPlacementEntity(type);
             }
         }
+    }
+
+    @Override
+    public boolean placeFoundTrap(Trap trap, Coordinate coord, Grid grid) {
+        Random rand = new Random();
+        int attempts = 0;
+
+        while (attempts < 1000) {
+            int x = rand.nextInt(grid.getSize());
+            int y = rand.nextInt(grid.getSize());
+            if (grid.isInside(x, y) && !grid.cellAlreadyFilled(x, y) && !grid.isPosOnIsland(x, y) && !grid.isAlreadyHit(x, y)) {
+
+                List<Coordinate> coords = new ArrayList<>();
+                coords.add(new Coordinate(x, y));
+
+                System.out.println("[GRID] L'ordinateur a placé son piège " + trap.getType() + " en (" + x + "," + y + ")");
+
+                return grid.placeSingleEntity(grid.realTrap(trap), coords);
+            }else{
+                System.out.println("Toute les cases sont déjà occupé");
+            }
+            attempts++;
+        }
+
+        System.out.println("[GRID] Erreur : L'ordinateur n'a pas trouvé de place pour son piège.");
+        return false;
     }
 
 }

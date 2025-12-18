@@ -1,6 +1,7 @@
 package model.weapon;
 
 import model.Coordinate;
+import model.EntityType;
 
 import java.util.List;
 
@@ -30,6 +31,6 @@ public interface Weapon {
      * Decrements the remaining uses of the weapon after it has been fired.
      */
     void use();
-
+    public EntityType getType();
     public boolean isOffensive();
 }

@@ -1,6 +1,7 @@
 package model.weapon;
 
 import model.Coordinate;
+import model.EntityType;
 
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,11 @@ public class Missile implements Weapon{
     @Override
     public void use() {
         // Unlimited use
+    }
+
+    @Override
+    public EntityType getType(){
+        return EntityType.MISSILE;
     }
 
 }

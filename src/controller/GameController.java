@@ -3,18 +3,19 @@ package controller;
 import model.Coordinate;
 import model.EntityType;
 import model.boat.Boat;
+import model.game.Game;
+import model.game.GameConfiguration;
 import model.player.ComputerPlayer;
 import model.player.HumanPlayer;
 import model.player.Player;
-import model.weapon.Weapon;
-import model.game.Game;
-import model.game.GameConfiguration;
 import model.trap.Trap;
+import model.weapon.Weapon;
 import view.ConfigView;
 import view.GameView;
 import view.PlacementView;
 
 import javax.swing.*;
+import java.awt.Toolkit;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,8 @@ public class GameController {
     private Map<EntityType, Integer> boatsToPlace;
 
     private String currentWeaponMode = "MISSILE";
+
+    private Trap trapToPlace = null;
 
     private final ConfigView configView;
     private PlacementView placementView;
@@ -40,21 +43,22 @@ public class GameController {
         this.gameConfig = config;
     }
 
-    public GameConfiguration getGameConfiguration() {
-        return this.gameConfig;
-    }
-
     public void setBoatsToPlace(Map<EntityType, Integer> boatsToPlace) {
         this.boatsToPlace = boatsToPlace;
     }
 
     public void setWeaponMode(String mode) {
+        if (this.trapToPlace != null) {
+            gameView.setStatus("Placement annulé. Mode arme : " + mode);
+            this.trapToPlace = null;
+        }
         this.currentWeaponMode = mode;
         System.out.println("Arme sélectionnée : " + mode);
     }
 
     public void callPlaceEntityView() {
         if (this.configView != null) this.configView.dispose();
+        boolean islandMode = (gameConfig != null) && gameConfig.isIslandMode();
         this.placementView = new PlacementView(this, gameConfig.getGridSize(), boatsToPlace);
         this.placementView.showScreen();
     }
@@ -66,7 +70,7 @@ public class GameController {
         ComputerPlayer cp = this.game.getM_computerPlayer();
 
         hp.placeEntity(humanPlacement);
-        cp.placeRandomEntities(this.boatsToPlace);
+        cp.placeRandomEntities(this.boatsToPlace); // Ordi place bateaux + pièges
 
         hp.updateTotalShipSegments();
         cp.updateTotalShipSegments();
@@ -81,6 +85,10 @@ public class GameController {
         Coordinate target = new Coordinate(x, y);
         HumanPlayer hp = (HumanPlayer) this.game.getHumanPlayer();
 
+        if (this.trapToPlace != null) {
+            handlePlaceTrap(this.trapToPlace, target);
+            return;
+        }
         Weapon currentWeapon = hp.getWeapon(this.currentWeaponMode);
 
         if (currentWeapon == null || currentWeapon.getUsesLeft() == 0) {
@@ -88,35 +96,47 @@ public class GameController {
             return;
         }
 
-        if (this.currentWeaponMode.equals("SONAR")) {
-            if (!canUseSonar(hp)) {
-                gameView.setStatus("Impossible : Votre Sous-marin est détruit !");
-                return;
-            }
-        }
-
         if (currentWeapon.isOffensive() && game.getM_computerPlayer().getOwnGrid().isAlreadyHit(x, y)) {
-            gameView.setStatus("Cible déjà touchée ! Choisissez-en une autre.");
+            gameView.setStatus("Cible déjà touchée !");
             return;
         }
 
+        if (this.currentWeaponMode.equals("SONAR")) {
+            if (!canUseSonar(hp)) {
+                gameView.setStatus("Impossible : Sous-marin détruit !");
+                return;
+            }
+        }
         gameView.setStatus("Tir (" + this.currentWeaponMode + ") en cours...");
         game.processAttack(hp, currentWeapon, target);
-
         triggerComputerTurn();
     }
 
-    public void handlePlaceTrap(Trap trap, Coordinate coord) {
-        Player player = game.getHumanPlayer();
-        player.placeNewTrap(trap, coord);
-        gameView.updateGrids();
+    public Boolean handlePlaceTrap(Trap trap, Coordinate coord) {
+        if(trap == null) {
+            trap = this.trapToPlace;
+        }
+        HumanPlayer hp = game.getHumanPlayer();
+        boolean success = hp.placeFoundTrap(trap, coord, hp.getOwnGrid());
+        this.trapToPlace = trap;
+        if (success) {
+            gameView.setStatus("Succès ! Piège " + trap.getType() + " placé en " + coord);
+            gameView.updateGrids();
+
+            this.trapToPlace = null;
+            return false;
+        } else {
+            gameView.setStatus("ERREUR : Impossible de placer ici (Occupé). Réessayez !");
+            Toolkit.getDefaultToolkit().beep();
+            return true;
+        }
     }
 
     private void triggerComputerTurn() {
         gameView.setInputEnabled(false);
         gameView.setStatus("L'adversaire réfléchit...");
 
-        Timer timer = new Timer(1000, e -> {
+        Timer timer = new Timer(10, e -> {
             playComputerTurn();
             ((Timer)e.getSource()).stop();
         });
@@ -135,5 +155,9 @@ public class GameController {
             }
         }
         return false;
+    }
+
+    public GameConfiguration getGameConfiguration() {
+        return gameConfig;
     }
 }

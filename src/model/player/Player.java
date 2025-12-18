@@ -263,4 +263,6 @@ public abstract class Player {
             this.m_mediator.notifyTrapPlacementError();
         }
     }
+
+    public abstract boolean placeFoundTrap(Trap trap, Coordinate coord, Grid grid);
 }

@@ -1,6 +1,7 @@
 package model.weapon;
 
 import model.Coordinate;
+import model.EntityType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,10 @@ public class Bombe implements Weapon{
         if(this.m_useLeft > 0 ){
             this.m_useLeft--;
         }
+    }
+
+    public EntityType getType(){
+        return EntityType.BOMB;
     }
 
 }

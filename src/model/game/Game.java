@@ -20,7 +20,7 @@ public class Game implements GameMediator {
     private final TrapFactory m_trapFactory;
 
 
-    private Player m_humanPlayer;
+    private HumanPlayer m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
     private Player m_currentPlayer;
 
@@ -115,6 +115,17 @@ public class Game implements GameMediator {
         List<Coordinate> targets = weapon.generateTargets(targetCoord, gridSize);
 
         if (weapon.isOffensive()) {
+            if(m_game.isIslandMode() && weapon.getType() == EntityType.BOMB){
+                List<Coordinate> validTargets = new ArrayList<>();
+                for(Coordinate target : targets){
+                    int x = target.getX();
+                    int y = target.getY();
+                    if (!defender.getOwnGrid().isPosOnIsland(x,y)) {
+                        validTargets.add(target);
+                    }
+                }
+                targets = validTargets;
+            }
             processOffensiveAttack(attacker, defender, targets);
         } else {
             processScan(attacker, defender, targets);
@@ -272,7 +283,7 @@ public class Game implements GameMediator {
         checkGameOver();
     }
 
-    public Player getHumanPlayer(){
+    public HumanPlayer getHumanPlayer(){
         return this.m_humanPlayer;
     }
 
