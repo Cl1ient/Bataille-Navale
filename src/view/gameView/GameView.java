@@ -169,11 +169,24 @@ public class GameView extends JFrame implements GameListener, IslandListener {
 
     @Override
     public void onGameOver(Player winner) {
-        setInputEnabled(false);
-        String msg = "VICTOIRE DE " + winner.getNickName() + " !";
-        setStatus(msg);
-        logPanel.addLog(msg, true);
-        JOptionPane.showMessageDialog(this, msg, "Fin de Partie", JOptionPane.INFORMATION_MESSAGE);
+        this.setInputEnabled(false);
+        this.setStatus("PARTIE TERMINÉE ! Vainqueur: " + winner.getNickName());
+        Toolkit.getDefaultToolkit().beep();
+        int choice = JOptionPane.showConfirmDialog(
+                this,
+                "La partie est terminée !\n" +
+                        "Vainqueur : " + winner.getNickName() + "\n\n" +
+                        "Souhaitez-vous rejouer ?",
+                "Fin de Partie",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (choice == JOptionPane.YES_OPTION) {
+            controller.restartGame();
+        } else {
+            System.exit(0);
+        }
     }
 
     @Override
@@ -192,6 +205,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     public void notifyPlaceIslandEntity(Trap entity, Player player) {
         if (player == game.getM_computerPlayer()) {
             logPanel.addLog("L'adversaire a trouvé un " + entity.getType() + " sur l'île !");
+            player.placeFoundTrap(entity, null, player.getOwnGrid());
             return;
         }
 
@@ -226,6 +240,4 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     public void onStormHit(Player attacker){
         logPanel.addLog(attacker.getName() + "a touché une Tornade");
     }
-
-
 }

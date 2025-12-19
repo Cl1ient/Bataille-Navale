@@ -29,7 +29,7 @@ public class GameController {
 
     private Trap trapToPlace = null;
 
-    private final ConfigView configView;
+    private ConfigView configView;
     private PlacementView placementView;
     private GameView gameView;
 
@@ -157,5 +157,18 @@ public class GameController {
 
     public GameConfiguration getGameConfiguration() {
         return gameConfig;
+    }
+
+    public void restartGame() {
+        if (this.gameView != null) {
+            this.gameView.dispose();
+        }
+        this.trapToPlace = null;
+        this.currentWeaponMode = "MISSILE";
+
+        this.configView = new ConfigView(this);
+        this.configView.showScreen();
+
+        System.out.println("[CONTROLLER] Redémarrage du jeu...");
     }
 }
