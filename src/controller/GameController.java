@@ -12,10 +12,9 @@ import model.trap.Trap;
 import model.weapon.Weapon;
 import view.ConfigView;
 import view.gameView.GameView;
-import view.PlacementView;
+import view.placementView.PlacementView;
 
 import javax.swing.*;
-import java.awt.Toolkit;
 import java.util.List;
 import java.util.Map;
 
