@@ -18,7 +18,7 @@ import java.util.Map;
 public class Game implements GameMediator {
 
     private final TrapFactory m_trapFactory;
-
+    private boolean gameFinished = false;
 
     private HumanPlayer m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
@@ -59,6 +59,7 @@ public class Game implements GameMediator {
             m_computerPlayer.getWeapon("SONAR").use();
             m_computerPlayer.getWeapon("BOMB").use();
         }
+        this.gameFinished = false;
         this.historyLog = new StringBuilder();
         this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
     }
@@ -215,11 +216,17 @@ public class Game implements GameMediator {
     }
 
     private boolean checkGameOver() {
+        if (gameFinished) {
+            return true;
+        }
         if (isGameOver()) {
+            gameFinished = true;
+
             Player winner = getWinner();
             addToHistory("=== FIN DE PARTIE : Victoire de " + winner.getNickName() + " ===");
-            for (GameListener li : m_listeners)
+            for (GameListener li : m_listeners) {
                 li.onGameOver(winner);
+            }
             return true;
         }
         return false;
@@ -376,14 +383,11 @@ public class Game implements GameMediator {
     }
 
     public boolean tryPlaceTrap(Player player, Trap trap, Coordinate coord) {
-        // On tente l'action sur le modèle
         boolean success = player.placeFoundTrap(trap, coord, player.getOwnGrid());
 
         if (success) {
-            // Optionnel : On pourrait notifier un succès ici aussi via un listener
             return true;
         } else {
-            // ÉCHEC : C'est le Game qui prévient la Vue
             notifyTrapPlacementError();
             return false;
         }
