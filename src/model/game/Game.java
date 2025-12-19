@@ -146,6 +146,7 @@ public class Game implements GameMediator {
                 defender.getOwnGrid().getCell(t.getX(), t.getY()).setHit(true);
                 for (GameListener li : m_listeners) {
                     li.onCellUpdated(defender, t);
+                    li.onBlackHolHit(attacker);
                 }
                 handleBlackHoleHit(defender, t);
                 processAttack(defender, m_currentWeaponUsed, t);
@@ -154,6 +155,11 @@ public class Game implements GameMediator {
         }
         System.out.println("Je suis toujours la");
         for (Coordinate t : targets) {
+            if(defender.getTypeEntityAt(t) == EntityType.STORM){
+                for (GameListener li : m_listeners) {
+                    li.onStormHit(attacker);
+                }
+            }
             processShot(attacker, defender, t.getX(), t.getY());
             if (isGameOver()) {
                 checkGameOver();
@@ -364,5 +370,17 @@ public class Game implements GameMediator {
         }
     }
 
+    public boolean tryPlaceTrap(Player player, Trap trap, Coordinate coord) {
+        // On tente l'action sur le modèle
+        boolean success = player.placeFoundTrap(trap, coord, player.getOwnGrid());
 
+        if (success) {
+            // Optionnel : On pourrait notifier un succès ici aussi via un listener
+            return true;
+        } else {
+            // ÉCHEC : C'est le Game qui prévient la Vue
+            notifyTrapPlacementError();
+            return false;
+        }
+    }
 }

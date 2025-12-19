@@ -162,8 +162,9 @@ public class Grid {
         targetCell.setHit(true);
         GridEntity entity = targetCell.getEntity();
         if (entity != null) {
-            int segmentIndex = targetCell.getIndexInEntity();
-            entity.onHit(attacker, defender, x, y, segmentIndex);
+            Integer rawIndex = targetCell.getIndexInEntity();
+            int safeIndex = (rawIndex != null) ? rawIndex : 0;
+            entity.onHit(attacker, defender, x, y, safeIndex);
         } else {
             targetCell.setMiss(true);
         }

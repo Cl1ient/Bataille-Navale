@@ -11,4 +11,6 @@ public interface GameListener {
     void turnEnded(Player a, Map<Coordinate, String> s);
     void onCellUpdated(Player defender, Coordinate coord);
     void onShipSunk(Player defender);
+    void onBlackHolHit(Player defender);
+    void onStormHit(Player attacker);
 }

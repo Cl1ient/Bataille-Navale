@@ -11,7 +11,7 @@ import model.player.Player;
 import model.trap.Trap;
 import model.weapon.Weapon;
 import view.ConfigView;
-import view.GameView;
+import view.gameView.GameView;
 import view.PlacementView;
 
 import javax.swing.*;
@@ -70,7 +70,7 @@ public class GameController {
         ComputerPlayer cp = this.game.getM_computerPlayer();
 
         hp.placeEntity(humanPlacement);
-        cp.placeRandomEntities(this.boatsToPlace); // Ordi place bateaux + pièges
+        cp.placeRandomEntities(this.boatsToPlace);
 
         hp.updateTotalShipSegments();
         cp.updateTotalShipSegments();
@@ -117,7 +117,7 @@ public class GameController {
             trap = this.trapToPlace;
         }
         HumanPlayer hp = game.getHumanPlayer();
-        boolean success = hp.placeFoundTrap(trap, coord, hp.getOwnGrid());
+        boolean success = game.tryPlaceTrap(hp, trap, coord);
         this.trapToPlace = trap;
         if (success) {
             gameView.setStatus("Succès ! Piège " + trap.getType() + " placé en " + coord);
@@ -126,8 +126,6 @@ public class GameController {
             this.trapToPlace = null;
             return false;
         } else {
-            gameView.setStatus("ERREUR : Impossible de placer ici (Occupé). Réessayez !");
-            Toolkit.getDefaultToolkit().beep();
             return true;
         }
     }
@@ -145,7 +143,7 @@ public class GameController {
     }
 
     private void playComputerTurn() {
-        game.processComputerAttack();
+            game.processComputerAttack();
     }
 
     private boolean canUseSonar(Player player) {
