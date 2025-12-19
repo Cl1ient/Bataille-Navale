@@ -11,7 +11,7 @@ import java.util.Map;
 public class InfoPanel extends JPanel {
 
     private final Game game;
-    private final Component parentFrame; // Pour centrer les popups
+    private final Component parentFrame;
 
     public InfoPanel(Game game, Component parentFrame) {
         this.game = game;
@@ -65,7 +65,6 @@ public class InfoPanel extends JPanel {
                 hitStats.getOrDefault("hits", 0) + " / " +
                 (target.getTotalShipSegments() - hitStats.getOrDefault("hits", 0))));
 
-        // Affiche les munitions seulement pour l'humain
         if (target == game.getHumanPlayer()) {
             stats.add(new JLabel("<html><b>Munitions :</b></html>"));
             stats.add(new JLabel(" - Bombe : " + target.getWeaponUsesLeft("BOMB")));

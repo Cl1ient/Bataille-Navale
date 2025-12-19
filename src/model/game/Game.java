@@ -92,35 +92,41 @@ public class Game implements GameMediator {
     public void processAttack(Player attacker, Weapon weapon, Coordinate coord) {
         Player defender = getOpponent(attacker);
         Coordinate targetCoord = coord;
-
-        if (m_game.isIslandMode()) {
-            if (defender.getOwnGrid().coordIsinIsland(coord)) {
-                processIslandSearch(attacker, defender, coord);
-                weapon.use();
-                return;
-            }
+        if (m_game.isIslandMode() && defender.getOwnGrid().coordIsinIsland(coord)) {
+            processIslandSearch(attacker, defender, coord);
+            weapon.use();
+            return;
         }
-
         if (attacker.isUnderTornadoInfluence() && weapon.isOffensive()) {
             targetCoord = generateRandomCoordinate(attacker.getGridSize());
             attacker.decrementTornadoEffect();
-            addToHistory("🌪️ TORNADE : Le tir de " + attacker.getNickName() + " est dévié vers " + targetCoord + " !"); // TODO pour le debug pour le moment mais à enlevé pour plus tard
+            addToHistory("🌪️ TORNADE : Le tir de " + attacker.getNickName() + " est dévié vers " + targetCoord + " !");
         }
 
         displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
         int gridSize = this.m_game.getGridSize();
         addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + targetCoord);
+        if (weapon.isOffensive() && defender.getTypeEntityAt(targetCoord) == EntityType.BLACK_HOLE) {
+            System.out.println("[DEBUG] → Tir DIRECT (Centre) sur BlackHole en " + targetCoord);
 
+            defender.getOwnGrid().getCell(targetCoord.getX(), targetCoord.getY()).setHit(true);
+            for (GameListener li : m_listeners) {
+                li.onCellUpdated(defender, targetCoord);
+                li.onBlackHolHit(attacker);
+            }
+            handleBlackHoleHit(defender, targetCoord);
+            processAttack(defender, weapon, targetCoord);
+
+            weapon.use();
+            return;
+        }
         List<Coordinate> targets = weapon.generateTargets(targetCoord, gridSize);
-
         if (weapon.isOffensive()) {
             if(m_game.isIslandMode() && weapon.getType() == EntityType.BOMB){
                 List<Coordinate> validTargets = new ArrayList<>();
                 for(Coordinate target : targets){
-                    int x = target.getX();
-                    int y = target.getY();
-                    if (!defender.getOwnGrid().isPosOnIsland(x,y)) {
+                    if (!defender.getOwnGrid().isPosOnIsland(target.getX(), target.getY())) {
                         validTargets.add(target);
                     }
                 }
@@ -141,21 +147,20 @@ public class Game implements GameMediator {
 
     private void processOffensiveAttack(Player attacker, Player defender, List<Coordinate> targets) {
         for (Coordinate t : targets) {
-            if (defender.getTypeEntityAt(t) == EntityType.BLACK_HOLE) {
-                System.out.println("[DEBUG] → BlackHole détecté sur " + t);
+            EntityType type = defender.getTypeEntityAt(t);
+            if (type == EntityType.BLACK_HOLE) {
+                System.out.println("[DEBUG] → BlackHole touché par le BORD en " + t);
                 defender.getOwnGrid().getCell(t.getX(), t.getY()).setHit(true);
                 for (GameListener li : m_listeners) {
                     li.onCellUpdated(defender, t);
                     li.onBlackHolHit(attacker);
                 }
                 handleBlackHoleHit(defender, t);
-                processAttack(defender, m_currentWeaponUsed, t);
-                return;
+                processShot(defender, attacker, t.getX(), t.getY());
+
+                continue;
             }
-        }
-        System.out.println("Je suis toujours la");
-        for (Coordinate t : targets) {
-            if(defender.getTypeEntityAt(t) == EntityType.STORM){
+            if (type == EntityType.STORM) {
                 for (GameListener li : m_listeners) {
                     li.onStormHit(attacker);
                 }

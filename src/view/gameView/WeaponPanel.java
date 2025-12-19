@@ -14,7 +14,6 @@ public class WeaponPanel extends JPanel {
 
         ButtonGroup group = new ButtonGroup();
 
-        // Ajout des boutons
         addWeaponOption("Missile", "Tir classique (1 case)", "MISSILE", true, group, controller);
         add(Box.createVerticalStrut(10));
         addWeaponOption("Bombe", "Tir de zone (Croix)", "BOMB", false, group, controller);
@@ -26,7 +25,6 @@ public class WeaponPanel extends JPanel {
         JRadioButton rb = new JRadioButton(label);
         rb.setToolTipText(tooltip);
         rb.setSelected(selected);
-        // Connexion directe au contrôleur
         rb.addActionListener(e -> controller.setWeaponMode(mode));
 
         group.add(rb);

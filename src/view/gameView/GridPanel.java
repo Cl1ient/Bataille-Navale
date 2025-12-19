@@ -17,7 +17,6 @@ public class GridPanel extends JPanel {
     private final int gridSize;
     private final JPanel[][] cellsUI;
 
-    // Action à exécuter lors d'un clic (définie par GameView)
     private final Consumer<Coordinate> onClickAction;
 
     private boolean inputEnabled = true;
@@ -34,16 +33,13 @@ public class GridPanel extends JPanel {
     }
 
     private void initializeGrid() {
-        // Coin vide
         add(new JLabel(""));
 
-        // Lettres colonnes
         for (int i = 0; i < gridSize; i++) {
             add(new JLabel(String.valueOf((char)('A' + i)), SwingConstants.CENTER));
         }
 
         for (int row = 0; row < gridSize; row++) {
-            // Chiffres lignes
             add(new JLabel(String.valueOf(row + 1), SwingConstants.CENTER));
 
             for (int col = 0; col < gridSize; col++) {
@@ -63,7 +59,6 @@ public class GridPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (!inputEnabled) return;
-                // On délègue l'action à la méthode fournie
                 onClickAction.accept(new Coordinate(row, col));
             }
         });
@@ -81,27 +76,25 @@ public class GridPanel extends JPanel {
     }
 
     private Color getCellColor(Cell cell, int r, int c, boolean showShips) {
-        // 1. Gestion Mode Île
         boolean isIslandZone = (r >= 3 && r <= 6 && c >= 3 && c <= 6);
 
         if (isIslandMode && isIslandZone) {
-            if (!cell.isHit()) return new Color(238, 214, 175); // Sable
-            if (cell.getEntity() != null) return new Color(34, 139, 34); // Trésor
-            return Color.GRAY; // Fouillé vide
+            if (!cell.isHit()) return new Color(238, 214, 175);
+            if (cell.getEntity() != null) return new Color(34, 139, 34);
+            return Color.GRAY;
         }
 
-        // 2. Gestion Standard
         if (cell.isHit()) {
             if (cell.getEntity() != null) {
                 return cell.getEntity().isSunk() ? new Color(128, 0, 0) : Color.RED;
             }
-            return Color.WHITE; // Eau ratée
+            return Color.WHITE;
         }
         else if (showShips && cell.getEntity() != null) {
-            return Color.DARK_GRAY; // Bateau visible (allié)
+            return Color.DARK_GRAY;
         }
 
-        return new Color(173, 216, 230); // Eau par défaut
+        return new Color(173, 216, 230);
     }
 
     public void setInputEnabled(boolean enabled) {

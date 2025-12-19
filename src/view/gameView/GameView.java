@@ -27,17 +27,15 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     private final WeaponPanel weaponPanel;
 
     // Composants du bas
-    private final JLabel statusLabel;       // Pour l'instruction immédiate (ex: "Cliquez ici")
-    private final GameLogPanel logPanel;    // Pour l'historique (ex: "Bombe trouvée")
+    private final JLabel statusLabel;
+    private final GameLogPanel logPanel;
 
-    // État temporaire
     private Trap pendingTrapToPlace = null;
 
     public GameView(GameController controller, Game game) {
         this.controller = controller;
         this.game = game;
 
-        // Connexion des observateurs
         this.game.addListener(this);
         this.game.addIslandListener(this);
 
@@ -45,15 +43,12 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        // 1. OUEST : Armes
         this.weaponPanel = new WeaponPanel(controller);
         add(weaponPanel, BorderLayout.WEST);
 
-        // 2. EST : Stats
         this.infoPanel = new InfoPanel(game, this);
         add(infoPanel, BorderLayout.EAST);
 
-        // 3. CENTRE : Grilles
         boolean islandMode = controller.getGameConfiguration().isIslandMode();
 
         this.playerGridPanel = new GridPanel(
@@ -74,17 +69,14 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         centerPanel.add(wrapGrid(opponentGridPanel, "RADAR (ATTAQUEZ ICI)"));
         add(centerPanel, BorderLayout.CENTER);
 
-        // 4. SUD : Status + Logs
         JPanel bottomPanel = new JPanel(new BorderLayout());
 
-        // Label d'instruction (Juste au-dessus des logs)
         this.statusLabel = new JLabel("Initialisation de la partie...", SwingConstants.CENTER);
         this.statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
         this.statusLabel.setOpaque(true);
         this.statusLabel.setBackground(new Color(230, 230, 230));
         this.statusLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        // Le Journal de bord
         this.logPanel = new GameLogPanel();
 
         bottomPanel.add(this.statusLabel, BorderLayout.NORTH);
@@ -93,7 +85,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         add(bottomPanel, BorderLayout.SOUTH);
 
         pack();
-        setLocationRelativeTo(null); // Centrer l'écran
+        setLocationRelativeTo(null);
         updateGrids();
 
         logPanel.addLog("Bienvenue Capitaine ! La bataille commence.");
@@ -106,8 +98,6 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         return p;
     }
 
-    // --- LOGIQUE INTERACTIONS ---
-
     private void onPlayerGridClick(Coordinate coord) {
         if (this.pendingTrapToPlace != null) {
             boolean failed = controller.handlePlaceTrap(this.pendingTrapToPlace, coord);
@@ -117,7 +107,6 @@ public class GameView extends JFrame implements GameListener, IslandListener {
             }
         } else {
             setStatus("C'est votre flotte. Cliquez à droite pour attaquer.");
-            // Pas de log ici pour ne pas spammer
         }
     }
 
@@ -131,17 +120,12 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         }
     }
 
-    // --- MISES A JOUR VISUELLES ---
-
     public void showScreen() {
         this.setVisible(true);
     }
 
     public void setStatus(String text) {
-        // Met à jour le texte qui dit "Que faire maintenant"
         statusLabel.setText(text);
-
-        // Change la couleur si c'est une erreur ou une action
         if (text.toLowerCase().contains("erreur") || text.toLowerCase().contains("impossible")) {
             statusLabel.setForeground(Color.RED);
         } else {
@@ -160,13 +144,8 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         opponentGridPanel.setInputEnabled(enabled);
     }
 
-    // ==========================================================
-    // IMPLÉMENTATION COMPLÈTE DES LISTENERS (UTILISÉS)
-    // ==========================================================
-
     @Override
     public void turnEnded(Player player, Map<Coordinate, String> moves) {
-        // On log la fin du tour pour y voir clair
         logPanel.addLog("--- Fin du tour " + game.getTurnNumber() + " ---");
         updateGrids();
     }
@@ -174,7 +153,6 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     @Override
     public void onCellUpdated(Player p, Coordinate c) {
         updateGrids();
-        // Si c'est à l'humain de jouer, on l'avertit
         if (p.equals(game.getHumanPlayer()) && !game.isGameOver()) {
             setInputEnabled(true);
             setStatus("À vous de jouer ! Choisissez une cible.");
@@ -185,7 +163,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     public void onShipSunk(Player defender) {
         String msg = "NAVIRE COULÉ ! La flotte de " + defender.getNickName() + " perd un bâtiment.";
         setStatus(msg);
-        logPanel.addLog(msg, true); // true = Message important (MAJUSCULES)
+        logPanel.addLog(msg, true);
         updateGrids();
     }
 
@@ -205,24 +183,18 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         setStatus(msg);
         updateGrids();
 
-        // Si c'est l'ordi qui a scanné, on rend la main
         if (player == game.getM_computerPlayer()) {
             setInputEnabled(true);
             setStatus("L'ennemi a scanné. À vous !");
         }
     }
-
-    // --- ISLAND LISTENER (Tous les événements sont maintenant loggés) ---
-
     @Override
     public void notifyPlaceIslandEntity(Trap entity, Player player) {
         if (player == game.getM_computerPlayer()) {
-            // L'IA a trouvé un piège
             logPanel.addLog("L'adversaire a trouvé un " + entity.getType() + " sur l'île !");
             return;
         }
 
-        // Le joueur a trouvé un piège
         this.pendingTrapToPlace = entity;
         setInputEnabled(true);
         String msg = "TRÉSOR ! Vous avez trouvé : " + entity.getType();
@@ -239,11 +211,10 @@ public class GameView extends JFrame implements GameListener, IslandListener {
 
     @Override
     public void notifyWeaponFind(EntityType weaponType) {
-        // Observer utilisé !
         String msg = "NOUVELLE ARME : " + weaponType + " ajoutée à l'arsenal !";
         logPanel.addLog(msg, true);
         setStatus(msg);
-        infoPanel.updateStats(); // Pour mettre à jour les munitions affichées
+        infoPanel.updateStats();
     }
 
     @Override
