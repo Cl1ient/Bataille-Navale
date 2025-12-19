@@ -185,7 +185,7 @@ public class Game implements GameMediator {
         for (Coordinate target : targets) {
             Cell cell = defender.getOwnGrid().getCell(target.getX(), target.getY());
 
-            if (cell != null && cell.isFilled()) {
+            if (cell != null && cell.isFilled() && !defender.getOwnGrid().isPosOnIsland(target.getX(), target.getY())) {
                 foundCount++;
                 results.add(new ScanResult(target, cell.getEntity().getType()));
             }
