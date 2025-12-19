@@ -4,6 +4,7 @@ import model.Coordinate;
 import model.EntityType;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 
 import java.util.Random;
@@ -45,5 +46,7 @@ public class Storm implements GridEntity, Trap {
     public boolean isSunk(){
         return false;
     }
+
+    public void registerToGrid(Grid grid){}
 
 }

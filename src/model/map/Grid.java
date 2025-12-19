@@ -82,7 +82,6 @@ public class Grid {
                 return false;
             }
         }
-
         int indexInEntity = 0;
         for (Coordinate coord : coordinates) {
             int row = coord.getX();
@@ -91,12 +90,15 @@ public class Grid {
             this.cells[row][col].setIndexInEntity(indexInEntity);
             indexInEntity++;
         }
-
-        if (entity instanceof Boat && !m_ownBoats.contains(entity)) {
-            m_ownBoats.add((Boat) entity);
-        }
-        System.out.println("lentité trouvé a été placé" + entity);
+        entity.registerToGrid(this);
+        System.out.println("L'entité trouvée a été placée : " + entity);
         return true;
+    }
+
+    public void addBoatToMemory(Boat boat) {
+        if (!m_ownBoats.contains(boat)) {
+            m_ownBoats.add(boat);
+        }
     }
 
     public GridEntity createEntityFromType(EntityType type) {

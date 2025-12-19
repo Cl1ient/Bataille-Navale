@@ -3,6 +3,7 @@ package model.boat.type;
 import model.Coordinate;
 import model.boat.Boat;
 import model.EntityType;
+import model.map.Grid;
 import model.player.Player;
 
 public class Submarine implements Boat {
@@ -73,6 +74,11 @@ public class Submarine implements Boat {
             }
         }
         return count;
+    }
+
+    @Override
+    public void registerToGrid(Grid grid) {
+        grid.addBoatToMemory(this);
     }
 
 }

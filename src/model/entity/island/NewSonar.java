@@ -3,6 +3,7 @@ package model.entity.island;
 import model.EntityType;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 
 public class NewSonar implements GridEntity {
@@ -22,4 +23,6 @@ public class NewSonar implements GridEntity {
     public boolean isSunk(){
         return false;
     }
+
+    public void registerToGrid(Grid grid){}
 }

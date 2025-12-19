@@ -39,4 +39,8 @@ public class NewBlackHole implements GridEntity {
             listener.notifyPlaceIslandEntity(entity, player);
         }
     }
+
+    public void registerToGrid(Grid grid){}
+
+
 }

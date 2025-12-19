@@ -39,4 +39,6 @@ public class NewStorm implements GridEntity {
     public boolean isSunk(){
         return false;
     }
+
+    public void registerToGrid(Grid grid){}
 }

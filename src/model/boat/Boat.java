@@ -3,6 +3,7 @@ package model.boat;
 import model.EntityType;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 
 public interface Boat extends GridEntity {
@@ -30,4 +31,5 @@ public interface Boat extends GridEntity {
 
     Integer getSegmentsHit();
 
+    void registerToGrid(Grid grid);
 }

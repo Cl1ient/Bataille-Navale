@@ -4,6 +4,7 @@ import model.EntityType;
 import model.IslandListener;
 import model.game.Game;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 import model.trap.Trap;
 import model.weapon.Weapon;
@@ -40,4 +41,6 @@ public class NewBomb implements GridEntity {
     public boolean isSunk(){
         return false;
     }
+
+    public void registerToGrid(Grid grid){}
 }

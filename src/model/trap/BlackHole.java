@@ -3,6 +3,7 @@ package model.trap;
 import model.Coordinate;
 import model.EntityType;
 import model.GridEntity;
+import model.map.Grid;
 import model.player.Player;
 
 public class BlackHole implements GridEntity, Trap {
@@ -37,5 +38,7 @@ public class BlackHole implements GridEntity, Trap {
     public boolean isSunk(){
         return false;
     }
+
+    public void registerToGrid(Grid grid){}
 
 }
