@@ -87,6 +87,11 @@ public class PlacementView extends JFrame {
 
     public PlacementModel getModel() { return model; }
 
+    public void onRandomPlacement() {
+        model.placeAllRandomly();
+        updateUIState();
+    }
+
     public void showScreen() {
         this.setVisible(true);
     }

@@ -4,15 +4,9 @@ import controller.GameController;
 import model.Coordinate;
 import model.EntityType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * Gère les données et la logique de placement (Validation, Stockage).
- */
 public class PlacementModel {
 
     private final int gridSize;
@@ -131,6 +125,37 @@ public class PlacementModel {
             case AIRCRAFT_CARRIER, CRUISER, DESTROYER, SUBMARINE, TORPEDO -> true;
             default -> false;
         };
+    }
+
+    public void placeAllRandomly() {
+        Random rand = new Random();
+        List<EntityType> remainingTypes = getAvailableTypes();
+        while (!remainingTypes.isEmpty()) {
+            EntityType type = remainingTypes.get(0);
+            boolean placed = false;
+            int attempts = 0;
+            while (!placed && attempts < 200) {
+                int r = rand.nextInt(gridSize);
+                int c = rand.nextInt(gridSize);
+                boolean horizontal = rand.nextBoolean();
+                boolean previousOrientation = this.isHorizontal;
+                this.isHorizontal = horizontal;
+                this.selectedEntityType = type;
+                List<Coordinate> coords = calculateCoordinates(r, c);
+                if (validatePlacement(coords)) {
+                    placeEntity(coords);
+                    placed = true;
+                }
+                this.isHorizontal = previousOrientation;
+                attempts++;
+            }
+            if (!placed) {
+                System.out.println("Impossible de placer automatiquement : " + type);
+                break;
+            }
+            remainingTypes = getAvailableTypes();
+        }
+        updateSelectionAuto();
     }
 
     public void setSelectedEntityType(EntityType type) { this.selectedEntityType = type; }

@@ -12,6 +12,7 @@ public class PlacementControlPanel extends JPanel {
     private final JComboBox<EntityType> cbEntitySelector;
     private final JCheckBox chkOrientation;
     private final JButton btnValidate;
+    private final JButton btnRandom;
     private final JLabel lblInstruction;
 
     public PlacementControlPanel(PlacementView parentView) {
@@ -31,6 +32,7 @@ public class PlacementControlPanel extends JPanel {
         });
         add(cbEntitySelector);
 
+
         chkOrientation = new JCheckBox("Horizontal", true);
         chkOrientation.addActionListener(e -> {
             parentView.getModel().setHorizontal(chkOrientation.isSelected());
@@ -38,11 +40,17 @@ public class PlacementControlPanel extends JPanel {
         });
         add(chkOrientation);
 
+        btnRandom = new JButton("Aléatoire");
+        btnRandom.setToolTipText("Placer automatiquement le reste des entités");
+        btnRandom.addActionListener(e -> parentView.onRandomPlacement());
+        add(btnRandom);
+
         btnValidate = new JButton("Valider et Jouer");
         btnValidate.setEnabled(false);
         btnValidate.addActionListener(e -> parentView.onValidate());
         add(btnValidate);
     }
+
 
     public void updateControls(PlacementModel model) {
         cbEntitySelector.removeAllItems();
@@ -50,13 +58,13 @@ public class PlacementControlPanel extends JPanel {
         for (EntityType type : available) {
             cbEntitySelector.addItem(type);
         }
-
         if (model.getSelectedEntityType() != null) {
             cbEntitySelector.setSelectedItem(model.getSelectedEntityType());
         }
+
         boolean finished = model.isFinished();
         btnValidate.setEnabled(finished);
-
+        btnRandom.setEnabled(!finished);
         if (finished) {
             lblInstruction.setText("Terminé !");
             cbEntitySelector.setEnabled(false);
