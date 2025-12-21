@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HumanPlayer extends Player{
-    WeaponFactory m_weaponFactory;
+    private WeaponFactory m_weaponFactory;
     public HumanPlayer(GameConfiguration config){
         super(config);
         this.placeEntity(config.getGridEntityPlacement());
