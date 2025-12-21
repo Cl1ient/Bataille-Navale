@@ -170,7 +170,6 @@ package model.game {
         - Player m_currentPlayer
         - Weapon m_currentWeaponUsed
         - int m_turnNumber
-        - List<IslandListener> m_islandListeners
         - StringBuilder m_historyLog
         + <<Create>> Game(config : GameConfiguration)
         + String getHistory()
@@ -246,8 +245,6 @@ package model.map {
 
     class Grid {
         - Integer m_size
-        - Cell[][] m_cells
-        - List<Boat> m_ownBoats
         - IslandItemFactory m_islandItemFactory
         - BoatFactory m_boatFactory
         - TrapFactory m_trapFactory
@@ -289,18 +286,10 @@ package model.player {
 
     abstract class Player {
         - String m_name
-        - Grid m_ownGrid
-        - Grid m_shotGrid
         - Integer m_nbBoatRemaning
         - GameMediator m_mediator
-        - IslandListener m_islandListener
-        - List<Weapon> m_availableWeapons
-        - List<Trap> m_traps
         - Coordinate m_lastMove
         - int m_totalShipSegments
-        - TrapFactory m_trapFacto
-        - WeaponFactory m_weaponFacto
-        - List<IslandListener> m_listeners
         - int mTornadoTurnsRemaining
         + <<Create>> Player(config : GameConfiguration)
         + void placeEntity(entityPlacement : Map<EntityType, List<Coordinate>>)
@@ -735,6 +724,9 @@ Player "1" *--> "1\n shotGrid" Grid
 Player "1" *--> "*\n m_availableWeapons" Weapon
 Player "1" *--> "1\n m_weaponFacto" WeaponFactory
 Player "1" *--> "1\n m_trapFacto" TrapFactory
+Player "1" --> "*\n m_islandListeners" IslandListener : <<notify>>
+Player "1" *--> "0..*\n m_traps" Trap : <<contain>>
+
 Player --> ScanResult : <<use>>
 Player --> Coordinate : <<use>>
 Player --> GameConfiguration : <<use>>
