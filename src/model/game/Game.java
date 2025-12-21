@@ -170,8 +170,10 @@ public class Game implements GameMediator {
             }
             if (type == EntityType.STORM) {
                 for (GameListener li : m_listeners) {
+                    li.onCellUpdated(defender, t);
                     li.onStormHit(attacker);
                 }
+
             }
             processShot(attacker, defender, t.getX(), t.getY());
             if (isGameOver()) {
@@ -202,6 +204,9 @@ public class Game implements GameMediator {
         int foundCount = 0;
 
         for (Coordinate target : targets) {
+            if (!defender.getOwnGrid().isInside(target)) {
+                continue;
+            }
             Cell cell = defender.getCellAt(target.getX(), target.getY());
             EntityType TypeOfGridEntityFromCoord = defender.getTypeOfGridEntityFromCoord(target.getX(), target.getY());
 
@@ -290,7 +295,7 @@ public class Game implements GameMediator {
 
     @Override
     public void handleHit(Player defender, Coordinate coord) {
-        addToHistory(" -> TOUCHÉ en " + coord + " !");
+        addToHistory(" -> Tire effectué en " + coord + " !");
         for (GameListener li : m_listeners)
             li.onCellUpdated(defender, coord);
     }
