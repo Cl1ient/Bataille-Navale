@@ -17,9 +17,9 @@ public class HumanPlayer extends Player{
 
          WeaponFactory weaponFactory = new WeaponFactory();
 
-        this.availableWeapons.add(weaponFactory.createMissile());
-        this.availableWeapons.add(weaponFactory.createBomb());
-        this.availableWeapons.add(weaponFactory.createSonar());
+        this.m_availableWeapons.add(weaponFactory.createMissile());
+        this.m_availableWeapons.add(weaponFactory.createBomb());
+        this.m_availableWeapons.add(weaponFactory.createSonar());
 
     }
     @Override

@@ -9,15 +9,15 @@ import model.player.Player;
 public class BlackHole implements GridEntity, Trap {
     private Integer m_size = 1;
     private boolean m_activate;
-    private boolean isConsumed = false;
+    private boolean m_isConsumed = false;
     private final EntityType m_type = EntityType.BLACK_HOLE;
     public BlackHole(boolean islandMod){
         this.m_activate = !islandMod;
     }
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
-        if(m_activate && !isConsumed){
-            isConsumed = true;
+        if(m_activate && !m_isConsumed){
+            m_isConsumed = true;
             Coordinate coord = new Coordinate(x, y);
             defender.notifyBlackHoleHit(defender, coord);
             attacker.receiveShot(new Coordinate(x, y), attacker);

@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Storm implements GridEntity, Trap {
     private Integer m_size = 1;
-    private boolean isConsumed = false;
+    private boolean m_isConsumed = false;
     private boolean m_activate;
     private Integer turnsLeft = 3;
     private final EntityType m_type = EntityType.STORM;
@@ -21,9 +21,12 @@ public class Storm implements GridEntity, Trap {
     }
 
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
-        if (isConsumed) return;
+        if (m_isConsumed) return;
         attacker.triggerTornadoEffect();
-        isConsumed = true;
+        Coordinate coord = modifyCoordinates(attacker.getGridSize());
+        defender.receiveShot(coord, attacker);
+        m_isConsumed = true;
+        System.out.println("je suis dans la tornade !!!");
     }
 
     public Coordinate modifyCoordinates(Integer size){

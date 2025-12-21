@@ -8,7 +8,7 @@ import model.player.Player;
 
 public class AirCraftCarrier implements Boat {
 
-    private static final int AIRCRAFTCARRIER_SIZE = 5;
+    private static final int m_AIRCRAFTCARRIER_SIZE = 5;
     private final Integer m_size;
     private final boolean[] m_hits;
     private final EntityType m_type = EntityType.AIRCRAFT_CARRIER;
@@ -18,7 +18,7 @@ public class AirCraftCarrier implements Boat {
      * Initializes the size and damage array.
      */
     public AirCraftCarrier(){
-        this.m_size = AIRCRAFTCARRIER_SIZE;
+        this.m_size = m_AIRCRAFTCARRIER_SIZE;
         this.m_hits = new boolean[this.m_size];
     }
 

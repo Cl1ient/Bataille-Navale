@@ -8,7 +8,7 @@ import model.player.Player;
 
 public class Destroyer implements Boat {
 
-    private static final int DESTROYER_SIZE = 3;
+    private static final int m_DESTROYER_SIZE = 3;
     private final Integer m_size;
     private final boolean[] m_hits;
     private final EntityType m_type = EntityType.DESTROYER;
@@ -18,7 +18,7 @@ public class Destroyer implements Boat {
      * Initializes the size and damage array.
      */
     public Destroyer(){
-        this.m_size = DESTROYER_SIZE;
+        this.m_size = m_DESTROYER_SIZE;
         this.m_hits = new boolean[this.m_size];
     }
 

@@ -17,70 +17,70 @@ import java.util.Map;
 
 public class GameView extends JFrame implements GameListener, IslandListener {
 
-    private final GameController controller;
-    private final Game game;
+    private final GameController m_controller;
+    private final Game m_game;
 
     // --- SOUS-COMPOSANTS ---
-    private final GridPanel playerGridPanel;
-    private final GridPanel opponentGridPanel;
-    private final InfoPanel infoPanel;
-    private final WeaponPanel weaponPanel;
+    private final GridPanel m_playerGridPanel;
+    private final GridPanel m_opponentGridPanel;
+    private final InfoPanel m_infoPanel;
+    private final WeaponPanel m_weaponPanel;
 
     // Composants du bas
-    private final JLabel statusLabel;
-    private final GameLogPanel logPanel;
+    private final JLabel m_statusLabel;
+    private final GameLogPanel m_logPanel;
 
-    private Trap pendingTrapToPlace = null;
+    private Trap m_pendingTrapToPlace = null;
 
     public GameView(GameController controller, Game game) {
-        this.controller = controller;
-        this.game = game;
+        this.m_controller = controller;
+        this.m_game = game;
 
-        this.game.addListener(this);
-        this.game.addIslandListener(this);
+        this.m_game.addListener(this);
+        this.m_game.addIslandListener(this);
 
         setTitle("Bataille Navale - En Jeu");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
-        this.weaponPanel = new WeaponPanel(controller);
-        add(weaponPanel, BorderLayout.WEST);
+        this.m_weaponPanel = new WeaponPanel(controller);
+        add(m_weaponPanel, BorderLayout.WEST);
 
-        this.infoPanel = new InfoPanel(game, this);
-        add(infoPanel, BorderLayout.EAST);
+        this.m_infoPanel = new InfoPanel(game, this);
+        add(m_infoPanel, BorderLayout.EAST);
 
         boolean islandMode = controller.getGameConfiguration().isIslandMode();
 
-        this.playerGridPanel = new GridPanel(
+        this.m_playerGridPanel = new GridPanel(
                 game.getHumanPlayer().getOwnGrid(),
                 islandMode,
                 this::onPlayerGridClick
         );
 
-        this.opponentGridPanel = new GridPanel(
-                game.getM_computerPlayer().getOwnGrid(),
+        this.m_opponentGridPanel = new GridPanel(
+                game.getComputerPlayer().getOwnGrid(),
                 islandMode,
                 this::onOpponentGridClick
         );
 
         JPanel centerPanel = new JPanel(new GridLayout(1, 2, 20, 0));
         centerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-        centerPanel.add(wrapGrid(playerGridPanel, "MA FLOTTE"));
-        centerPanel.add(wrapGrid(opponentGridPanel, "RADAR (ATTAQUEZ ICI)"));
+        centerPanel.add(wrapGrid(m_playerGridPanel, "MA FLOTTE"));
+        centerPanel.add(wrapGrid(m_opponentGridPanel, "RADAR (ATTAQUEZ ICI)"));
         add(centerPanel, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new BorderLayout());
 
-        this.statusLabel = new JLabel("Initialisation de la partie...", SwingConstants.CENTER);
-        this.statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        this.statusLabel.setOpaque(true);
-        this.statusLabel.setBackground(new Color(230, 230, 230));
-        this.statusLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        this.m_statusLabel = new JLabel("Initialisation de la partie...", SwingConstants.CENTER);
+        this.m_statusLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        this.m_statusLabel.setOpaque(true);
+        this.m_statusLabel.setBackground(new Color(230, 230, 230));
+        this.m_statusLabel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
 
-        this.logPanel = new GameLogPanel();
+        this.m_logPanel = new GameLogPanel();
 
-        bottomPanel.add(this.statusLabel, BorderLayout.NORTH);
-        bottomPanel.add(this.logPanel, BorderLayout.CENTER);
+        bottomPanel.add(this.m_statusLabel, BorderLayout.NORTH);
+        bottomPanel.add(this.m_logPanel, BorderLayout.CENTER);
 
         add(bottomPanel, BorderLayout.SOUTH);
 
@@ -88,7 +88,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         setLocationRelativeTo(null);
         updateGrids();
 
-        logPanel.addLog("Bienvenue Capitaine ! La bataille commence.");
+        m_logPanel.addLog("Bienvenue Capitaine ! La bataille commence.");
     }
 
     private JPanel wrapGrid(GridPanel grid, String title) {
@@ -99,10 +99,10 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     }
 
     private void onPlayerGridClick(Coordinate coord) {
-        if (this.pendingTrapToPlace != null) {
-            boolean failed = controller.handlePlaceTrap(this.pendingTrapToPlace, coord);
+        if (this.m_pendingTrapToPlace != null) {
+            boolean failed = m_controller.handlePlaceTrap(this.m_pendingTrapToPlace, coord);
             if (!failed) {
-                this.pendingTrapToPlace = null;
+                this.m_pendingTrapToPlace = null;
                 setStatus("Piège placé. À l'attaque !");
             }
         } else {
@@ -111,12 +111,12 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     }
 
     private void onOpponentGridClick(Coordinate coord) {
-        if (this.pendingTrapToPlace != null) {
+        if (this.m_pendingTrapToPlace != null) {
             setStatus("ACTION REQUISE : Placez d'abord le piège à GAUCHE !");
-            logPanel.addLog("Erreur : Vous essayez d'attaquer avant de placer votre piège.");
+            m_logPanel.addLog("Erreur : Vous essayez d'attaquer avant de placer votre piège.");
             Toolkit.getDefaultToolkit().beep();
         } else {
-            controller.handleHumanAttack(coord.getX(), coord.getY());
+            m_controller.handleHumanAttack(coord.getX(), coord.getY());
         }
     }
 
@@ -125,35 +125,35 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     }
 
     public void setStatus(String text) {
-        statusLabel.setText(text);
+        m_statusLabel.setText(text);
         if (text.toLowerCase().contains("erreur") || text.toLowerCase().contains("impossible")) {
-            statusLabel.setForeground(Color.RED);
+            m_statusLabel.setForeground(Color.RED);
         } else {
-            statusLabel.setForeground(Color.BLACK);
+            m_statusLabel.setForeground(Color.BLACK);
         }
     }
 
     public void updateGrids() {
-        playerGridPanel.updateGridDisplay(true);
-        opponentGridPanel.updateGridDisplay(false);
-        infoPanel.updateStats();
+        m_playerGridPanel.updateGridDisplay(true);
+        m_opponentGridPanel.updateGridDisplay(false);
+        m_infoPanel.updateStats();
     }
 
     public void setInputEnabled(boolean enabled) {
-        playerGridPanel.setInputEnabled(enabled);
-        opponentGridPanel.setInputEnabled(enabled);
+        m_playerGridPanel.setInputEnabled(enabled);
+        m_opponentGridPanel.setInputEnabled(enabled);
     }
 
     @Override
     public void turnEnded(Player player, Map<Coordinate, String> moves) {
-        logPanel.addLog("--- Fin du tour " + game.getTurnNumber() + " ---");
+        m_logPanel.addLog("--- Fin du tour " + m_game.getTurnNumber() + " ---");
         updateGrids();
     }
 
     @Override
     public void onCellUpdated(Player p, Coordinate c) {
         updateGrids();
-        if (p.equals(game.getHumanPlayer()) && !game.isGameOver()) {
+        if (p.equals(m_game.getHumanPlayer()) && !m_game.isGameOver()) {
             setInputEnabled(true);
             setStatus("À vous de jouer ! Choisissez une cible.");
         }
@@ -163,7 +163,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     public void onShipSunk(Player defender) {
         String msg = "NAVIRE COULÉ ! La flotte de " + defender.getNickName() + " perd un bâtiment.";
         setStatus(msg);
-        logPanel.addLog(msg, true);
+        m_logPanel.addLog(msg, true);
         updateGrids();
     }
 
@@ -183,7 +183,7 @@ public class GameView extends JFrame implements GameListener, IslandListener {
         );
 
         if (choice == JOptionPane.YES_OPTION) {
-            controller.restartGame();
+            m_controller.restartGame();
         } else {
             System.exit(0);
         }
@@ -192,52 +192,52 @@ public class GameView extends JFrame implements GameListener, IslandListener {
     @Override
     public void onScanResult(Player player, List<Coordinate> scannedArea, List<ScanResult> results) {
         String msg = "Sonar utilisé par " + player.getNickName() + " : " + results.size() + " échos détectés.";
-        logPanel.addLog(msg);
+        m_logPanel.addLog(msg);
         setStatus(msg);
         updateGrids();
 
-        if (player == game.getM_computerPlayer()) {
+        if (player == m_game.getComputerPlayer()) {
             setInputEnabled(true);
             setStatus("L'ennemi a scanné. À vous !");
         }
     }
     @Override
     public void notifyPlaceIslandEntity(Trap entity, Player player) {
-        if (player == game.getM_computerPlayer()) {
-            logPanel.addLog("L'adversaire a trouvé un " + entity.getType() + " sur l'île !");
+        if (player == m_game.getComputerPlayer()) {
+            m_logPanel.addLog("L'adversaire a trouvé un " + entity.getType() + " sur l'île !");
             player.placeFoundTrap(entity, null, player.getOwnGrid());
             return;
         }
 
-        this.pendingTrapToPlace = entity;
+        this.m_pendingTrapToPlace = entity;
         setInputEnabled(true);
         String msg = "TRÉSOR ! Vous avez trouvé : " + entity.getType();
-        logPanel.addLog(msg, true);
+        m_logPanel.addLog(msg, true);
         setStatus("Placez votre " + entity.getType() + " sur votre grille (Gauche).");
     }
 
     @Override
     public void notifyTrapWrongPlacement() {
         Toolkit.getDefaultToolkit().beep();
-        logPanel.addLog("Erreur de placement : Zone invalide (occupée ou île).");
+        m_logPanel.addLog("Erreur de placement : Zone invalide (occupée ou île).");
         setStatus("Erreur : Impossible de placer ici.");
     }
 
     @Override
     public void notifyWeaponFind(EntityType weaponType) {
         String msg = "NOUVELLE ARME : " + weaponType + " ajoutée à l'arsenal !";
-        logPanel.addLog(msg, true);
+        m_logPanel.addLog(msg, true);
         setStatus(msg);
-        infoPanel.updateStats();
+        m_infoPanel.updateStats();
     }
 
     @Override
     public void onBlackHolHit(Player defender){
-        logPanel.addLog(defender.getName() + "a touché un trou noir l'attaque à été repercuté sur ça grille");
+        m_logPanel.addLog(defender.getName() + "a touché un trou noir l'attaque à été repercuté sur ça grille");
     }
 
     @Override
     public void onStormHit(Player attacker){
-        logPanel.addLog(attacker.getName() + "a touché une Tornade");
+        m_logPanel.addLog(attacker.getName() + "a touché une Tornade");
     }
 }

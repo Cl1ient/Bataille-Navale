@@ -18,7 +18,7 @@ import java.util.Map;
 public class Game implements GameMediator {
 
     private final TrapFactory m_trapFactory;
-    private boolean gameFinished = false;
+    private boolean m_gameFinished = false;
 
     private HumanPlayer m_humanPlayer;
     private ComputerPlayer m_computerPlayer;
@@ -26,11 +26,11 @@ public class Game implements GameMediator {
 
     private Weapon m_currentWeaponUsed;
     private GameConfiguration m_game;
-    private int turnNumber;
+    private int m_turnNumber;
     private final List<GameListener> m_listeners;
     private List<IslandListener> m_islandListeners = new ArrayList<>();
 
-    private StringBuilder historyLog;
+    private StringBuilder m_historyLog;
 
     public Game(GameConfiguration config) {
 
@@ -47,10 +47,17 @@ public class Game implements GameMediator {
         this.m_computerPlayer.setMediator(this);
 
         this.m_currentPlayer = m_humanPlayer;
-        this.turnNumber = 1;
+        this.m_turnNumber = 1;
         boolean isIsland = m_game.isIslandMode();
+
+        /// ////////////////////////////////// POTENTIELLEMENT A SUPPRIMER ///////////////////////////////////////////////////////////////////////////////////////////////
+
         m_humanPlayer.getOwnGrid().setIslandMod(isIsland);
         m_computerPlayer.getOwnGrid().setIslandMod(isIsland);
+
+        /// ////////////////////////////////// POTENTIELLEMENT A SUPPRIMER ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
         if (isIsland) {
             m_humanPlayer.getOwnGrid().initIslandItems();
             m_computerPlayer.getOwnGrid().initIslandItems();
@@ -59,17 +66,17 @@ public class Game implements GameMediator {
             m_computerPlayer.getWeapon("SONAR").use();
             m_computerPlayer.getWeapon("BOMB").use();
         }
-        this.gameFinished = false;
-        this.historyLog = new StringBuilder();
-        this.historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
+        this.m_gameFinished = false;
+        this.m_historyLog = new StringBuilder();
+        this.m_historyLog.append("=== DÉBUT DE LA PARTIE ===\n\n");
     }
 
     public String getHistory() {
-        return historyLog.toString();
+        return m_historyLog.toString();
     }
 
     private void addToHistory(String action) {
-        this.historyLog.append("[Tour ").append(turnNumber).append("] ").append(action).append("\n");
+        this.m_historyLog.append("[Tour ").append(m_turnNumber).append("] ").append(action).append("\n");
     }
 
     public void processComputerAttack() {
@@ -107,11 +114,11 @@ public class Game implements GameMediator {
         displayGridPlayer();
         this.m_currentWeaponUsed = weapon;
         int gridSize = this.m_game.getGridSize();
-        addToHistory(attacker.getNickName() + " utilise " + weapon.getClass().getSimpleName() + " en " + targetCoord);
+        addToHistory(attacker.getNickName() + " utilise " + weapon.getName().toLowerCase() + " en " + targetCoord + "C'est là !!");
         if (weapon.isOffensive() && defender.getTypeEntityAt(targetCoord) == EntityType.BLACK_HOLE) {
             System.out.println("[DEBUG] → Tir DIRECT (Centre) sur BlackHole en " + targetCoord);
 
-            defender.getOwnGrid().getCell(targetCoord.getX(), targetCoord.getY()).setHit(true);
+            defender.setHitCellAt(targetCoord.getX(), targetCoord.getY(), true);
             for (GameListener li : m_listeners) {
                 li.onCellUpdated(defender, targetCoord);
                 li.onBlackHolHit(attacker);
@@ -151,7 +158,7 @@ public class Game implements GameMediator {
             EntityType type = defender.getTypeEntityAt(t);
             if (type == EntityType.BLACK_HOLE) {
                 System.out.println("[DEBUG] → BlackHole touché par le BORD en " + t);
-                defender.getOwnGrid().getCell(t.getX(), t.getY()).setHit(true);
+                defender.setHitCellAt(t.getX(), t.getY(), true);
                 for (GameListener li : m_listeners) {
                     li.onCellUpdated(defender, t);
                     li.onBlackHolHit(attacker);
@@ -195,11 +202,12 @@ public class Game implements GameMediator {
         int foundCount = 0;
 
         for (Coordinate target : targets) {
-            Cell cell = defender.getOwnGrid().getCell(target.getX(), target.getY());
+            Cell cell = defender.getCellAt(target.getX(), target.getY());
+            EntityType TypeOfGridEntityFromCoord = defender.getTypeOfGridEntityFromCoord(target.getX(), target.getY());
 
             if (cell != null && cell.isFilled() && !defender.getOwnGrid().isPosOnIsland(target.getX(), target.getY())) {
                 foundCount++;
-                results.add(new ScanResult(target, cell.getEntity().getType()));
+                results.add(new ScanResult(target, TypeOfGridEntityFromCoord));
             }
         }
 
@@ -216,11 +224,11 @@ public class Game implements GameMediator {
     }
 
     private boolean checkGameOver() {
-        if (gameFinished) {
+        if (m_gameFinished) {
             return true;
         }
         if (isGameOver()) {
-            gameFinished = true;
+            m_gameFinished = true;
 
             Player winner = getWinner();
             addToHistory("=== FIN DE PARTIE : Victoire de " + winner.getNickName() + " ===");
@@ -305,21 +313,21 @@ public class Game implements GameMediator {
         return this.m_humanPlayer;
     }
 
-    public ComputerPlayer getM_computerPlayer(){
+    public ComputerPlayer getComputerPlayer(){
         return this.m_computerPlayer;
     }
 
     public void incrementTurnNumber() {
-        this.turnNumber++;
+        this.m_turnNumber++;
     }
 
     public int getTurnNumber() {
-        return turnNumber;
+        return m_turnNumber;
     }
 
     private void processIslandSearch(Player attacker, Player defender, Coordinate coord) {
 
-        Cell cell = defender.getOwnGrid().getCell(coord.getX(), coord.getY());
+        Cell cell = defender.getCellAt(coord.getX(), coord.getY());
 
         if (cell.isHit()) {
             addToHistory(attacker.getNickName() + " a déjà fouillé l'île en " + coord);

@@ -8,71 +8,71 @@ import java.util.List;
 
 public class PlacementControlPanel extends JPanel {
 
-    private final PlacementView parentView;
-    private final JComboBox<EntityType> cbEntitySelector;
-    private final JCheckBox chkOrientation;
-    private final JButton btnValidate;
-    private final JButton btnRandom;
-    private final JLabel lblInstruction;
+    private final PlacementView m_parentView;
+    private final JComboBox<EntityType> m_cbEntitySelector;
+    private final JCheckBox m_chkOrientation;
+    private final JButton m_btnValidate;
+    private final JButton m_btnRandom;
+    private final JLabel m_lblInstruction;
 
     public PlacementControlPanel(PlacementView parentView) {
-        this.parentView = parentView;
+        this.m_parentView = parentView;
         this.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 5));
 
-        lblInstruction = new JLabel("Entité :");
-        add(lblInstruction);
+        m_lblInstruction = new JLabel("Entité :");
+        add(m_lblInstruction);
 
-        cbEntitySelector = new JComboBox<>();
-        cbEntitySelector.addActionListener(e -> {
-            EntityType selected = (EntityType) cbEntitySelector.getSelectedItem();
+        m_cbEntitySelector = new JComboBox<>();
+        m_cbEntitySelector.addActionListener(e -> {
+            EntityType selected = (EntityType) m_cbEntitySelector.getSelectedItem();
             if (selected != null) {
                 parentView.getModel().setSelectedEntityType(selected);
                 parentView.refreshGrid();
             }
         });
-        add(cbEntitySelector);
+        add(m_cbEntitySelector);
 
 
-        chkOrientation = new JCheckBox("Horizontal", true);
-        chkOrientation.addActionListener(e -> {
-            parentView.getModel().setHorizontal(chkOrientation.isSelected());
+        m_chkOrientation = new JCheckBox("Horizontal", true);
+        m_chkOrientation.addActionListener(e -> {
+            parentView.getModel().setHorizontal(m_chkOrientation.isSelected());
             parentView.refreshGrid();
         });
-        add(chkOrientation);
+        add(m_chkOrientation);
 
-        btnRandom = new JButton("Aléatoire");
-        btnRandom.setToolTipText("Placer automatiquement le reste des entités");
-        btnRandom.addActionListener(e -> parentView.onRandomPlacement());
-        add(btnRandom);
+        m_btnRandom = new JButton("Aléatoire");
+        m_btnRandom.setToolTipText("Placer automatiquement le reste des entités");
+        m_btnRandom.addActionListener(e -> parentView.onRandomPlacement());
+        add(m_btnRandom);
 
-        btnValidate = new JButton("Valider et Jouer");
-        btnValidate.setEnabled(false);
-        btnValidate.addActionListener(e -> parentView.onValidate());
-        add(btnValidate);
+        m_btnValidate = new JButton("Valider et Jouer");
+        m_btnValidate.setEnabled(false);
+        m_btnValidate.addActionListener(e -> parentView.onValidate());
+        add(m_btnValidate);
     }
 
 
     public void updateControls(PlacementModel model) {
-        cbEntitySelector.removeAllItems();
+        m_cbEntitySelector.removeAllItems();
         List<EntityType> available = model.getAvailableTypes();
         for (EntityType type : available) {
-            cbEntitySelector.addItem(type);
+            m_cbEntitySelector.addItem(type);
         }
         if (model.getSelectedEntityType() != null) {
-            cbEntitySelector.setSelectedItem(model.getSelectedEntityType());
+            m_cbEntitySelector.setSelectedItem(model.getSelectedEntityType());
         }
 
         boolean finished = model.isFinished();
-        btnValidate.setEnabled(finished);
-        btnRandom.setEnabled(!finished);
+        m_btnValidate.setEnabled(finished);
+        m_btnRandom.setEnabled(!finished);
         if (finished) {
-            lblInstruction.setText("Terminé !");
-            cbEntitySelector.setEnabled(false);
-            chkOrientation.setEnabled(false);
+            m_lblInstruction.setText("Terminé !");
+            m_cbEntitySelector.setEnabled(false);
+            m_chkOrientation.setEnabled(false);
         } else {
-            lblInstruction.setText("Entité :");
-            cbEntitySelector.setEnabled(true);
-            chkOrientation.setEnabled(true);
+            m_lblInstruction.setText("Entité :");
+            m_cbEntitySelector.setEnabled(true);
+            m_chkOrientation.setEnabled(true);
         }
     }
 }

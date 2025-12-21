@@ -21,6 +21,7 @@ public class NewBlackHole implements GridEntity {
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex) {
         Trap entity = attacker.findTrap(EntityType.BLACK_HOLE);
         notifyListener(entity, attacker);
+        System.out.println("je suis dans le nouveau trou noire !!!");
     }
 
     public EntityType getType(){return this.m_type;}

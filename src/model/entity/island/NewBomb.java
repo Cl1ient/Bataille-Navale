@@ -21,6 +21,7 @@ public class NewBomb implements GridEntity {
     public void onHit(Player attacker, Player defender, Integer x, Integer y, Integer segmentIndex){
         attacker.findWeapon(EntityType.BOMB);
         notifyListener(EntityType.BOMB);
+        System.out.println("je suis dans la nouvelle bombe !!!");
     }
 
     public EntityType getType(){return this.m_type;}

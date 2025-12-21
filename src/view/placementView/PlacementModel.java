@@ -9,29 +9,29 @@ import java.util.stream.Collectors;
 
 public class PlacementModel {
 
-    private final int gridSize;
-    private final boolean islandMode;
-    private final Map<EntityType, Integer> boatsToPlace;
-    private final Map<EntityType, List<Coordinate>> placedEntities;
+    private final int m_gridSize;
+    private final boolean m_islandMode;
+    private final Map<EntityType, Integer> m_boatsToPlace;
+    private final Map<EntityType, List<Coordinate>> m_placedEntities;
 
-    private EntityType selectedEntityType;
-    private boolean isHorizontal = true;
+    private EntityType m_selectedEntityType;
+    private boolean m_isHorizontal = true;
 
-    public PlacementModel(GameController controller, Map<EntityType, Integer> boatsToPlace) {
-        this.gridSize = controller.getGameConfiguration().getGridSize();
-        this.islandMode = controller.getGameConfiguration().isIslandMode();
-        this.boatsToPlace = new HashMap<>(boatsToPlace);
-        this.placedEntities = new HashMap<>();
+    public PlacementModel(GameController controller, Map<EntityType, Integer> m_boatsToPlace) {
+        this.m_gridSize = controller.getGameConfiguration().getGridSize();
+        this.m_islandMode = controller.getGameConfiguration().isIslandMode();
+        this.m_boatsToPlace = new HashMap<>(m_boatsToPlace);
+        this.m_placedEntities = new HashMap<>();
 
         updateSelectionAuto();
     }
 
     public boolean validatePlacement(List<Coordinate> coords) {
         for (Coordinate coord : coords) {
-            if (coord.getX() < 0 || coord.getX() >= gridSize || coord.getY() < 0 || coord.getY() >= gridSize) {
+            if (coord.getX() < 0 || coord.getX() >= m_gridSize || coord.getY() < 0 || coord.getY() >= m_gridSize) {
                 return false;
             }
-            if (islandMode && coord.getX() >= 3 && coord.getX() <= 6 && coord.getY() >= 3 && coord.getY() <= 6) {
+            if (m_islandMode && coord.getX() >= 3 && coord.getX() <= 6 && coord.getY() >= 3 && coord.getY() <= 6) {
                 return false;
             }
             if (isOccupied(coord)) {
@@ -42,27 +42,27 @@ public class PlacementModel {
     }
 
     public void placeEntity(List<Coordinate> coords) {
-        if (selectedEntityType != null && validatePlacement(coords)) {
-            placedEntities.computeIfAbsent(selectedEntityType, k -> new ArrayList<>()).addAll(coords);
-            decrementBoatCount(selectedEntityType);
+        if (m_selectedEntityType != null && validatePlacement(coords)) {
+            m_placedEntities.computeIfAbsent(m_selectedEntityType, k -> new ArrayList<>()).addAll(coords);
+            decrementBoatCount(m_selectedEntityType);
             updateSelectionAuto();
         }
     }
 
     private boolean isOccupied(Coordinate coord) {
-        return placedEntities.values().stream()
+        return m_placedEntities.values().stream()
                 .flatMap(List::stream)
                 .anyMatch(c -> c.getX() == coord.getX() && c.getY() == coord.getY());
     }
 
     public List<Coordinate> calculateCoordinates(int r, int c) {
         List<Coordinate> coords = new ArrayList<>();
-        if (selectedEntityType == null) return coords;
+        if (m_selectedEntityType == null) return coords;
 
-        int size = getEntitySize(selectedEntityType);
+        int size = getEntitySize(m_selectedEntityType);
         for (int i = 0; i < size; i++) {
-            int row = isHorizontal ? r : r + i;
-            int col = isHorizontal ? c + i : c;
+            int row = m_isHorizontal ? r : r + i;
+            int col = m_isHorizontal ? c + i : c;
             coords.add(new Coordinate(row, col));
         }
         return coords;
@@ -80,18 +80,18 @@ public class PlacementModel {
 
     public void updateSelectionAuto() {
         List<EntityType> available = getAvailableTypes();
-        if (!available.isEmpty() && (selectedEntityType == null || boatsToPlace.get(selectedEntityType) <= 0)) {
-            selectedEntityType = available.get(0);
+        if (!available.isEmpty() && (m_selectedEntityType == null || m_boatsToPlace.get(m_selectedEntityType) <= 0)) {
+            m_selectedEntityType = available.get(0);
         } else if (available.isEmpty()) {
-            selectedEntityType = null;
+            m_selectedEntityType = null;
         }
     }
 
     public List<EntityType> getAvailableTypes() {
-        boolean boatsRemaining = boatsToPlace.entrySet().stream()
+        boolean boatsRemaining = m_boatsToPlace.entrySet().stream()
                 .anyMatch(entry -> entry.getValue() > 0 && isBoat(entry.getKey()));
 
-        return boatsToPlace.entrySet().stream()
+        return m_boatsToPlace.entrySet().stream()
                 .filter(entry -> entry.getValue() > 0)
                 .map(Map.Entry::getKey)
                 .filter(type -> boatsRemaining == isBoat(type))
@@ -99,19 +99,19 @@ public class PlacementModel {
     }
 
     private void decrementBoatCount(EntityType type) {
-        boatsToPlace.put(type, boatsToPlace.get(type) - 1);
+        m_boatsToPlace.put(type, m_boatsToPlace.get(type) - 1);
     }
 
     public boolean isFinished() {
-        return boatsToPlace.values().stream().mapToInt(Integer::intValue).sum() == 0;
+        return m_boatsToPlace.values().stream().mapToInt(Integer::intValue).sum() == 0;
     }
 
     public int getRemainingCount() {
-        return boatsToPlace.values().stream().mapToInt(Integer::intValue).sum();
+        return m_boatsToPlace.values().stream().mapToInt(Integer::intValue).sum();
     }
 
     public EntityType getPlacedEntityTypeAt(int r, int c) {
-        for (Map.Entry<EntityType, List<Coordinate>> entry : placedEntities.entrySet()) {
+        for (Map.Entry<EntityType, List<Coordinate>> entry : m_placedEntities.entrySet()) {
             for (Coordinate coord : entry.getValue()) {
                 if (coord.getX() == r && coord.getY() == c) return entry.getKey();
             }
@@ -135,18 +135,18 @@ public class PlacementModel {
             boolean placed = false;
             int attempts = 0;
             while (!placed && attempts < 200) {
-                int r = rand.nextInt(gridSize);
-                int c = rand.nextInt(gridSize);
+                int r = rand.nextInt(m_gridSize);
+                int c = rand.nextInt(m_gridSize);
                 boolean horizontal = rand.nextBoolean();
-                boolean previousOrientation = this.isHorizontal;
-                this.isHorizontal = horizontal;
-                this.selectedEntityType = type;
+                boolean previousOrientation = this.m_isHorizontal;
+                this.m_isHorizontal = horizontal;
+                this.m_selectedEntityType = type;
                 List<Coordinate> coords = calculateCoordinates(r, c);
                 if (validatePlacement(coords)) {
                     placeEntity(coords);
                     placed = true;
                 }
-                this.isHorizontal = previousOrientation;
+                this.m_isHorizontal = previousOrientation;
                 attempts++;
             }
             if (!placed) {
@@ -158,10 +158,10 @@ public class PlacementModel {
         updateSelectionAuto();
     }
 
-    public void setSelectedEntityType(EntityType type) { this.selectedEntityType = type; }
-    public EntityType getSelectedEntityType() { return selectedEntityType; }
-    public void setHorizontal(boolean horizontal) { isHorizontal = horizontal; }
-    public Map<EntityType, List<Coordinate>> getPlacedEntities() { return placedEntities; }
-    public int getGridSize() { return gridSize; }
-    public boolean isIslandMode() { return islandMode; }
+    public void setSelectedEntityType(EntityType type) { this.m_selectedEntityType = type; }
+    public EntityType getSelectedEntityType() { return m_selectedEntityType; }
+    public void setHorizontal(boolean horizontal) { m_isHorizontal = horizontal; }
+    public Map<EntityType, List<Coordinate>> getPlacedEntities() { return m_placedEntities; }
+    public int getGridSize() { return m_gridSize; }
+    public boolean isIslandMode() { return m_islandMode; }
 }

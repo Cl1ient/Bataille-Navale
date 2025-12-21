@@ -7,7 +7,7 @@ import model.map.Grid;
 import model.player.Player;
 
 public class Cruiser implements Boat {
-    private static final int CRUISER_SIZE = 4;
+    private static final int m_CRUISER_SIZE = 4;
     private final Integer m_size;
     private final boolean[] m_hits;
     private final EntityType m_type = EntityType.CRUISER;
@@ -17,7 +17,7 @@ public class Cruiser implements Boat {
      * Initializes the size and damage array.
      */
     public Cruiser(){
-        this.m_size = CRUISER_SIZE;
+        this.m_size = m_CRUISER_SIZE;
         this.m_hits = new boolean[this.m_size];
     }
 

@@ -7,7 +7,7 @@ import model.map.Grid;
 import model.player.Player;
 
 public class Torpedo implements Boat {
-    private static final int Torpedo_SIZE = 2;
+    private static final int m_Torpedo_SIZE = 2;
     private final Integer m_size;
     private final boolean[] m_hits;
     private final EntityType m_type = EntityType.TORPEDO;
@@ -17,7 +17,7 @@ public class Torpedo implements Boat {
      * Initializes the size and damage array.
      */
     public Torpedo(){
-        this.m_size = Torpedo_SIZE;
+        this.m_size = m_Torpedo_SIZE;
         this.m_hits = new boolean[this.m_size];
     }
 

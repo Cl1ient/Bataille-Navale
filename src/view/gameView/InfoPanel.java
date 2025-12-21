@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class InfoPanel extends JPanel {
 
-    private final Game game;
-    private final Component parentFrame;
+    private final Game m_game;
+    private final Component m_parentFrame;
 
     public InfoPanel(Game game, Component parentFrame) {
-        this.game = game;
-        this.parentFrame = parentFrame;
+        this.m_game = game;
+        this.m_parentFrame = parentFrame;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createTitledBorder("Statistiques"));
         setPreferredSize(new Dimension(300, 0));
@@ -23,10 +23,10 @@ public class InfoPanel extends JPanel {
 
     public void updateStats() {
         removeAll();
-        Player human = game.getHumanPlayer();
-        Player computer = game.getM_computerPlayer();
+        Player human = m_game.getHumanPlayer();
+        Player computer = m_game.getComputerPlayer();
 
-        add(new JLabel("<html><h3>Tour " + game.getTurnNumber() + "</h3></html>"));
+        add(new JLabel("<html><h3>Tour " + m_game.getTurnNumber() + "</h3></html>"));
         add(Box.createVerticalStrut(10));
 
         add(new JLabel("<html><b>--- Capitaine " + human.getNickName() + " (Vous) ---</b></html>"));
@@ -65,7 +65,7 @@ public class InfoPanel extends JPanel {
                 hitStats.getOrDefault("hits", 0) + " / " +
                 (target.getTotalShipSegments() - hitStats.getOrDefault("hits", 0))));
 
-        if (target == game.getHumanPlayer()) {
+        if (target == m_game.getHumanPlayer()) {
             stats.add(new JLabel("<html><b>Munitions :</b></html>"));
             stats.add(new JLabel(" - Bombe : " + target.getWeaponUsesLeft("BOMB")));
             stats.add(new JLabel(" - Sonar : " + target.getWeaponUsesLeft("SONAR")));
@@ -75,12 +75,12 @@ public class InfoPanel extends JPanel {
     }
 
     private void showHistory() {
-        JTextArea textArea = new JTextArea(game.getHistory());
+        JTextArea textArea = new JTextArea(m_game.getHistory());
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(textArea);
         scrollPane.setPreferredSize(new Dimension(500, 400));
-        JOptionPane.showMessageDialog(parentFrame, scrollPane, "Historique", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(m_parentFrame, scrollPane, "Historique", JOptionPane.INFORMATION_MESSAGE);
     }
 }

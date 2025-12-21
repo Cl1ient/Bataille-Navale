@@ -28,7 +28,7 @@ public abstract class Player {
     private Integer m_nbBoatRemaning;
     private GameMediator m_mediator;
     private IslandListener m_islandListener;
-    protected List<Weapon> availableWeapons;
+    protected List<Weapon> m_availableWeapons;
     private List<Trap> m_traps;
     private Coordinate m_lastMove = null;
     private int m_totalShipSegments = 0;
@@ -42,7 +42,7 @@ public abstract class Player {
         this.m_name = config.getNickName();
         this.m_ownGrid = new Grid(config.getGridSize(), config.isIslandMode());
         this.m_shotGrid = new Grid(config.getGridSize(), config.isIslandMode());
-        this.availableWeapons = new ArrayList<>();
+        this.m_availableWeapons = new ArrayList<>();
         this.m_nbBoatRemaning = 1;
         this.m_traps = new ArrayList<>();
         this.placeEntity(config.getGridEntityPlacement());
@@ -140,11 +140,11 @@ public abstract class Player {
         switch (type){
             case BOMB:
                 weapon = m_weaponFacto.createBomb();
-                this.availableWeapons.add(weapon);
+                this.m_availableWeapons.add(weapon);
                 break;
             case SONAR:
                 weapon = m_weaponFacto.createSonar();
-                this.availableWeapons.add(weapon);
+                this.m_availableWeapons.add(weapon);
                 break;
         }
     }
@@ -214,22 +214,23 @@ public abstract class Player {
     }
 
     public Weapon getWeapon(String weaponType) {
-        String targetClassName;
+
+        EntityType targetClassName;
         switch (weaponType) {
             case "BOMB":
-                targetClassName = "Bombe";
+                targetClassName = EntityType.BOMB;
                 break;
             case "SONAR":
-                targetClassName = "Sonar";
+                targetClassName = EntityType.SONAR;
                 break;
             case "MISSILE":
-                targetClassName = "Missile";
+                targetClassName = EntityType.MISSILE;
                 break;
             default:
                 return null;
         }
-        for (Weapon weapon : availableWeapons) {
-            if (weapon.getClass().getSimpleName().equals(targetClassName)) {
+        for (Weapon weapon : m_availableWeapons) {
+            if (weapon.getType() == targetClassName) {
                 return weapon;
             }
         }
@@ -262,6 +263,16 @@ public abstract class Player {
         } else {
             this.m_mediator.notifyTrapPlacementError();
         }
+    }
+
+    public void setHitCellAt(Integer x, Integer y, boolean hit){
+        this.m_ownGrid.setCellHitAt(x,y,hit);
+    }
+    public Cell getCellAt(Integer x, Integer y){
+        return this.m_ownGrid.getCell(x,y);
+    }
+    public EntityType getTypeOfGridEntityFromCoord(Integer x, Integer y){
+        return this.m_ownGrid.getTypeEntityFromGrid(new Coordinate(x,y));
     }
 
     public abstract boolean placeFoundTrap(Trap trap, Coordinate coord, Grid grid);

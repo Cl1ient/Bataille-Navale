@@ -18,7 +18,7 @@ import java.util.Random;
 public class Grid {
 
     private final Integer m_size;
-    private Cell[][] cells;
+    private Cell[][] m_cells;
     private final List<Boat> m_ownBoats;
     private final IslandItemFactory m_islandItemFactory;
     private final BoatFactory m_boatFactory;
@@ -28,7 +28,7 @@ public class Grid {
 
     public Grid(Integer gridSize, boolean isIsland) {
         this.m_size = gridSize;
-        this.cells = new Cell[gridSize][gridSize];
+        this.m_cells = new Cell[gridSize][gridSize];
         this.m_ownBoats = new ArrayList<>();
         this.m_islandItemFactory = new IslandItemFactory();
         this.m_boatFactory = new BoatFactory();
@@ -37,7 +37,7 @@ public class Grid {
 
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                this.cells[i][j] = new Cell();
+                this.m_cells[i][j] = new Cell();
             }
         }
         this.getAllCoordsFromIsland();
@@ -62,7 +62,7 @@ public class Grid {
     }
 
     public void placeTrap(Trap trap, Coordinate coord){
-        cells[coord.getX()][coord.getY()].setEntity( (GridEntity) trap);
+        m_cells[coord.getX()][coord.getY()].setEntity( (GridEntity) trap);
     }
 
     public void placeEntity(Map<EntityType, List<Coordinate>> entityPosition) {
@@ -78,7 +78,7 @@ public class Grid {
 
     public boolean placeSingleEntity(GridEntity entity, List<Coordinate> coordinates) {
         for (Coordinate coord : coordinates) {
-            if (!isInside(coord) || this.cells[coord.getX()][coord.getY()].getEntity() != null) {
+            if (!isInside(coord) || this.m_cells[coord.getX()][coord.getY()].getEntity() != null) {
                 return false;
             }
         }
@@ -86,8 +86,8 @@ public class Grid {
         for (Coordinate coord : coordinates) {
             int row = coord.getX();
             int col = coord.getY();
-            this.cells[row][col].setEntity(entity);
-            this.cells[row][col].setIndexInEntity(indexInEntity);
+            this.m_cells[row][col].setEntity(entity);
+            this.m_cells[row][col].setIndexInEntity(indexInEntity);
             indexInEntity++;
         }
         entity.registerToGrid(this);
@@ -147,7 +147,7 @@ public class Grid {
     }
 
     public Cell getCell(int x, int y) {
-        return isInside(x, y) ? cells[x][y] : null;
+        return isInside(x, y) ? m_cells[x][y] : null;
     }
 
     public boolean isInside(Coordinate coord) {
@@ -160,7 +160,7 @@ public class Grid {
 
     public void hit(int x, int y, Player defender, Player attacker) {
         if (!isInside(x, y)) return;
-        Cell targetCell = cells[x][y];
+        Cell targetCell = m_cells[x][y];
         targetCell.setHit(true);
         GridEntity entity = targetCell.getEntity();
         if (entity != null) {
@@ -174,19 +174,23 @@ public class Grid {
 
     public void markMiss(int x, int y) {
         if (!isInside(x, y)) return;
-        cells[x][y].setMiss(true);
+        m_cells[x][y].setMiss(true);
     }
     public void markHitBoat(Coordinate coord){
-        this.cells[coord.getX()][coord.getY()].setHitBoat(true);
+        this.m_cells[coord.getX()][coord.getY()].setHitBoat(true);
     }
 
+
+    /// ////////////////////////////////// POTENTIELLEMENT A SUPPRIMER ///////////////////////////////////////////////////////////////////////////////////////////////
     public GridEntity getEntityFromCoord(Coordinate coord) {
         if (!isInside(coord)) return null;
         return getCell(coord.getX(), coord.getY()).getEntity();
     }
+    /// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     public EntityType getTypeEntityFromGrid(Coordinate coord){
-        return getCell(coord.getX(), coord.getY()).getTypeEntityFromCell(coord);
+        return this.m_cells[coord.getX()][coord.getY()].getTypeEntityFromCell(coord);
     }
 
     public int getSize() {
@@ -250,10 +254,10 @@ public class Grid {
     public void displayGrid() {
         for (int r = 0; r < m_size; r++) {
             for (int c = 0; c < m_size; c++) {
-                if(this.cells[r][c].isHit()){
+                if(this.m_cells[r][c].isHit()){
                     System.out.print(" -");
                 }
-                else if(this.cells[r][c].getEntity() != null){
+                else if(this.m_cells[r][c].getEntity() != null){
                     System.out.print(" x");
                 }
                 else {System.out.print(" o");}
@@ -300,7 +304,7 @@ public class Grid {
             Coordinate pos = availableCoords.remove(index);
             GridEntity item = createEntityFromType(type);
             if (item != null) {
-                this.cells[pos.getX()][pos.getY()].setEntity(item);
+                this.m_cells[pos.getX()][pos.getY()].setEntity(item);
             }
         }
     }
@@ -324,6 +328,10 @@ public class Grid {
 
         }
         return null;
+    }
+
+    public void setCellHitAt(Integer x, Integer y, boolean hit){
+        this.m_cells[x][y].setHit(hit);
     }
 
 

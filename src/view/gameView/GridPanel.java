@@ -12,39 +12,39 @@ import java.util.function.Consumer;
 
 public class GridPanel extends JPanel {
 
-    private final Grid gridModel;
-    private final boolean isIslandMode;
-    private final int gridSize;
-    private final JPanel[][] cellsUI;
+    private final Grid m_gridModel;
+    private final boolean m_isIslandMode;
+    private final int m_gridSize;
+    private final JPanel[][] m_cellsUI;
 
     private final Consumer<Coordinate> onClickAction;
 
     private boolean inputEnabled = true;
 
-    public GridPanel(Grid gridModel, boolean isIslandMode, Consumer<Coordinate> onClickAction) {
-        this.gridModel = gridModel;
-        this.isIslandMode = isIslandMode;
-        this.gridSize = gridModel.getSize();
+    public GridPanel(Grid m_gridModel, boolean m_isIslandMode, Consumer<Coordinate> onClickAction) {
+        this.m_gridModel = m_gridModel;
+        this.m_isIslandMode = m_isIslandMode;
+        this.m_gridSize = m_gridModel.getSize();
         this.onClickAction = onClickAction;
-        this.cellsUI = new JPanel[gridSize][gridSize];
+        this.m_cellsUI = new JPanel[m_gridSize][m_gridSize];
 
-        setLayout(new GridLayout(gridSize + 1, gridSize + 1));
+        setLayout(new GridLayout(m_gridSize + 1, m_gridSize + 1));
         initializeGrid();
     }
 
     private void initializeGrid() {
         add(new JLabel(""));
 
-        for (int i = 0; i < gridSize; i++) {
+        for (int i = 0; i < m_gridSize; i++) {
             add(new JLabel(String.valueOf((char)('A' + i)), SwingConstants.CENTER));
         }
 
-        for (int row = 0; row < gridSize; row++) {
+        for (int row = 0; row < m_gridSize; row++) {
             add(new JLabel(String.valueOf(row + 1), SwingConstants.CENTER));
 
-            for (int col = 0; col < gridSize; col++) {
+            for (int col = 0; col < m_gridSize; col++) {
                 JPanel cell = createCell(row, col);
-                cellsUI[row][col] = cell;
+                m_cellsUI[row][col] = cell;
                 add(cell);
             }
         }
@@ -66,10 +66,10 @@ public class GridPanel extends JPanel {
     }
 
     public void updateGridDisplay(boolean showUnvisitedShips) {
-        for (int r = 0; r < gridSize; r++) {
-            for (int c = 0; c < gridSize; c++) {
-                Cell cellModel = gridModel.getCell(r, c);
-                cellsUI[r][c].setBackground(getCellColor(cellModel, r, c, showUnvisitedShips));
+        for (int r = 0; r < m_gridSize; r++) {
+            for (int c = 0; c < m_gridSize; c++) {
+                Cell cellModel = m_gridModel.getCell(r, c);
+                m_cellsUI[r][c].setBackground(getCellColor(cellModel, r, c, showUnvisitedShips));
             }
         }
         repaint();
@@ -78,7 +78,7 @@ public class GridPanel extends JPanel {
     private Color getCellColor(Cell cell, int r, int c, boolean showShips) {
         boolean isIslandZone = (r >= 3 && r <= 6 && c >= 3 && c <= 6);
 
-        if (isIslandMode && isIslandZone) {
+        if (m_isIslandMode && isIslandZone) {
             if (!cell.isHit()) return new Color(238, 214, 175);
             if (cell.getEntity() != null) return new Color(34, 139, 34);
             return Color.GRAY;

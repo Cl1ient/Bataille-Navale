@@ -20,6 +20,7 @@ public class NewStorm implements GridEntity {
     public void onHit(Player attacker, Player defender, Integer x, Integer y,Integer segmentIndex){
         Trap entity = attacker.findTrap(EntityType.STORM);
         notifyListener(entity, attacker);
+        System.out.println("je suis dans la nouvelle tornade !!!");
     }
     @Override
     public EntityType getType(){return this.m_type;}

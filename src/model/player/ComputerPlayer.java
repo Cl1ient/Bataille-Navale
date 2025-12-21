@@ -21,9 +21,9 @@ public class ComputerPlayer extends Player{
         super(config);
         m_weaponFactory = new WeaponFactory();
         this.m_name = "Le Goat En Personne";
-        this.availableWeapons.add(this.m_weaponFactory.createMissile());
-        this.availableWeapons.add(this.m_weaponFactory.createBomb());
-        this.availableWeapons.add(this.m_weaponFactory.createSonar());
+        this.m_availableWeapons.add(this.m_weaponFactory.createMissile());
+        this.m_availableWeapons.add(this.m_weaponFactory.createBomb());
+        this.m_availableWeapons.add(this.m_weaponFactory.createSonar());
 
     }
 
@@ -51,7 +51,7 @@ public class ComputerPlayer extends Player{
     public Weapon choseWeapon(){
 
         List<Weapon> usableWeapons = new ArrayList<>();
-        for (Weapon w : this.availableWeapons) {
+        for (Weapon w : this.m_availableWeapons) {
             if (w.getUsesLeft() != 0) {
                 usableWeapons.add(w);
             }
