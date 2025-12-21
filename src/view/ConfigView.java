@@ -79,7 +79,7 @@ public class ConfigView extends JFrame {
 
         gbc.gridx = 0; gbc.gridy = row;
         panel.add(new JLabel("Taille de la Grille :"), gbc);
-        cbGridSize = new JComboBox<>(new Integer[]{6, 7, 8, 9, 10});
+        cbGridSize = new JComboBox<>(new Integer[]{10});
         cbGridSize.setSelectedItem(10);
         gbc.gridx = 1;
         panel.add(cbGridSize, gbc);
