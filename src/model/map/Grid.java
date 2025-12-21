@@ -190,6 +190,7 @@ public class Grid {
 
 
     public EntityType getTypeEntityFromGrid(Coordinate coord){
+        if(!isInside(coord.getX(), coord.getY())) return null;
         return this.m_cells[coord.getX()][coord.getY()].getTypeEntityFromCell(coord);
     }
 
